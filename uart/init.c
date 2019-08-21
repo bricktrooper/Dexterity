@@ -1,6 +1,9 @@
+#include <xc.h>
+#include <pic16f690.h>
+
 #include "init.h"
 
-#define DELAY 75000
+#define LED_DELAY 75000
 
 void init_hardware(void)
 {
@@ -33,15 +36,15 @@ void startup_indicator(void)
 	{
 		leds |= 0x1 << i;
 		PORTC = leds;
-		_delay(DELAY);
+		_delay(LED_DELAY);
 	}
 
 	for (int i = 0; i < 3; i++)
 	{
 		PORTC = 0x0;
-		_delay(DELAY);
+		_delay(LED_DELAY);
 		PORTC = 0xFF;
-		_delay(DELAY);
+		_delay(LED_DELAY);
 	}
 
 	PORTC = 0x0;

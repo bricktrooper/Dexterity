@@ -10,12 +10,10 @@ void main(void)
 {
 	init_hardware();
 	uart_init();
-	_delay(1000000);
 
 	while (1)
 	{
-		PORTC = OSCCON;
-		while (TXSTAbits.TRMT == 0);    // Wait for buffer to be empty
-		TXREG = 'u';
+		uart_send("Hello World!\n\r");
+		_delay(1000000);
 	}
 }

@@ -5,31 +5,28 @@
 
 void uart_init(void)
 {
+	RCSTAbits.SPEN = 1;     // enable serial port pins (TX = OUTPUT, RX = INPUT)
+
 	// TRANSMITTER (TX) //
 
-	// TXEN = 1;   // enable TX circuitry
-	// SYNC = 0;   // use asynchronous mode
-	// SPEN = 1;   // enable serial port pins
-	// TX9 = 0;    // use 8-bit transmission
+	TXSTAbits.TX9 = 0;      // use 8-bit transmission
+	TXSTAbits.TXEN = 1;     // enable TX circuitry
+	TXSTAbits.SYNC = 0;     // use asynchronous mode
 
-	// BAUD RATE (9600 bps, 4MHz Fosc) //
+	// BAUD RATE (9600 bps, 3.6864MHz Fosc) //
 
-	// BRGH = 0;   // use lo baud rate
-	// BRG16 = 0;  // use 8-bit baud rate generator
+	TXSTAbits.BRGH = 1;     // use high baud rate
+	BAUDCTLbits.BRG16 = 0;  // use 8-bit baud rate generator
+	BAUDCTLbits.SCKP = 0;   // don't invert transmitted bits
+	SPBRG = 23;             // low register BRG multiplier
+	SPBRGH = 0;             // high register BRG multiplier
+}
 
-	// SPBRG = 25; // lower register for BRG setting
-	// SPBRGH = 0; // higher register for BRG setting
-
-	TXSTAbits.TX9 = 0;
-	TXSTAbits.TXEN = 1;
-	TXSTAbits.SYNC = 0;
-	TXSTAbits.BRGH = 1;
-
-	RCSTAbits.SPEN = 1;
-
-	BAUDCTLbits.BRG16 = 0;
-	BAUDCTLbits.SCKP = 0;
-
-	SPBRG = 23;
-	SPBRGH = 0;
+void uart_send(const char * data)
+{
+	for (int i = 0; data[i] != '\0'; i++)
+	{
+		while (TXSTAbits.TRMT == 0);   // Wait for TX register to empty
+		TXREG = data[i];               // Load new byte into TX register
+	}
 }

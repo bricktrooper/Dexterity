@@ -24,6 +24,8 @@ void init_hardware(void)
 	PORTB = 0b00000000;
 	PORTC = 0b00000000;
 
+	// OSCILLATOR FREQUENCY = 4MHz (~3.6864MHz) //
+
 	OSCCONbits.IRCF2 = 1;
 	OSCCONbits.IRCF1 = 1;
 	OSCCONbits.IRCF0 = 0;

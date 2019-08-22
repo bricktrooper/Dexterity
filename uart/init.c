@@ -24,6 +24,11 @@ void init_hardware(void)
 	PORTB = 0b00000000;
 	PORTC = 0b00000000;
 
+	OSCCONbits.IRCF2 = 1;
+	OSCCONbits.IRCF1 = 1;
+	OSCCONbits.IRCF0 = 0;
+	OSCCONbits.SCS = 1;
+
 	startup_indicator();
 }
 

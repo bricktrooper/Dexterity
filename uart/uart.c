@@ -5,13 +5,20 @@
 
 void uart_init(void)
 {
+	// BASIC CONFIG //
+
+	TXSTAbits.SYNC = 0;     // use asynchronous mode
 	RCSTAbits.SPEN = 1;     // enable serial port pins (TX = OUTPUT, RX = INPUT)
 
 	// TRANSMITTER (TX) //
 
-	TXSTAbits.TX9 = 0;      // use 8-bit transmission
 	TXSTAbits.TXEN = 1;     // enable TX circuitry
-	TXSTAbits.SYNC = 0;     // use asynchronous mode
+	TXSTAbits.TX9 = 0;      // use 8-bit transmission
+
+	// RECEIVER (RX) //
+
+	RCSTAbits.CREN = 1;     // enable RX circuitry
+	RCSTAbits.RX9 = 1;      // use 8-bit reception
 
 	// BAUD RATE (9600 bps, 3.6864MHz Fosc) //
 
@@ -29,4 +36,25 @@ void uart_send(const char * data)
 		while (TXSTAbits.TRMT == 0);   // Wait for TX register to empty
 		TXREG = data[i];               // Load new byte into TX register
 	}
+}
+
+void uart_receive(char * buffer, unsigned int length)
+{
+	char new_byte = 0;
+	int i = 0;
+
+	for (i = 0; i < length - 1; i++)
+	{
+		while (PIR1bits.RCIF == 0);   // Wait for RX register to receive new byte
+		new_byte = RCREG;             // Read new byte from RX buffer
+
+		if (new_byte == '\0' || new_byte == '\n' || new_byte == '\r')
+		{
+			break;
+		}
+
+		buffer[i] = new_byte;
+	}
+
+	buffer[i + 1] = '\0';
 }

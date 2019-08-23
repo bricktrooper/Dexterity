@@ -11,9 +11,11 @@ void main(void)
 	init_hardware();
 	uart_init();
 
+	char buffer [50];
+
 	while (1)
 	{
-		uart_send("Hello World!\n\r");
-		_delay(1000000);
+		uart_receive(buffer, 50);
+		uart_send(buffer);
 	}
 }

@@ -3,6 +3,12 @@
 
 #include "uart.h"
 
+#define null     0
+
+#define ERROR   -1
+#define WARNING  1
+#define OK       0
+
 void uart_init(void)
 {
 	// BASIC CONFIG //
@@ -29,17 +35,29 @@ void uart_init(void)
 	SPBRGH = 0;             // high register BRG multiplier
 }
 
-void uart_send(const char * data)
+int uart_send(const char * data)
 {
+	if (data == null)
+	{
+		return ERROR;
+	}
+
 	for (int i = 0; data[i] != '\0'; i++)
 	{
 		while (TXSTAbits.TRMT == 0);   // Wait for TX register to empty
 		TXREG = data[i];               // Load new byte into TX register
 	}
+
+	return OK;
 }
 
-void uart_receive(char * buffer, unsigned int length)
+int uart_receive(char * buffer, int length)
 {
+	if (buffer == null || length < 0)
+	{
+		return ERROR;
+	}
+
 	char new_byte = 0;
 	int i = 0;
 
@@ -57,4 +75,5 @@ void uart_receive(char * buffer, unsigned int length)
 	}
 
 	buffer[i + 1] = '\0';
+	return OK;
 }

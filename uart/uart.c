@@ -72,6 +72,7 @@ int uart_receive(char * buffer, int length)
 		}
 
 		buffer[i] = new_byte;
+		PORTC = new_byte;
 	}
 
 	buffer[i + 1] = '\0';

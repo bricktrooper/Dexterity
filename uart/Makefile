@@ -15,21 +15,21 @@ OUT = out
 # can we simplify this makefile?
 
 program: $(addprefix $(OUT)/, $(OBJ))
-	@echo "Linking: $(OBJ) ....."
+	@echo "LD  $(OBJ)"
 	@$(CC) $(CFLAGS) $(addprefix $(OUT)/, $(OBJ)) -o $(OUT)/$(EXE)
 
 clean:
-	@echo "Cleaning: $(OUT)/ ....."
+	@echo "Delete $(OUT)/"
 	@rm -rf $(OUT)/*
 
 $(OUT)/test.p1: test.c $(HDR)
-	@echo "Compiling: test.c ....."
+	@echo "CC  test.c"
 	@$(CC) $(CFLAGS) -c test.c -o $(OUT)/test.p1
 
 $(OUT)/init.p1: init.c init.h
-	@echo "Compiling: init.c ....."
+	@echo "CC  init.c"
 	@$(CC) $(CFLAGS) -c init.c -o $(OUT)/init.p1
 
 $(OUT)/uart.p1: uart.c uart.h
-	@echo "Compiling: uart.c ....."
+	@echo "CC  uart.c"
 	@$(CC) $(CFLAGS) -c uart.c -o $(OUT)/uart.p1

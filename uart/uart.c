@@ -3,11 +3,11 @@
 
 #include "uart.h"
 
-#define null     0
+#define null       0
 
-#define ERROR   -1
-#define WARNING  1
-#define OK       0
+#define ERROR     -1
+#define WARNING    1
+#define SUCCESS    0
 
 void uart_init(void)
 {
@@ -48,7 +48,7 @@ int uart_transmit(const char * data)
 		TXREG = data[i];               // Load new byte into TX register
 	}
 
-	return OK;
+	return SUCCESS;
 }
 
 int uart_receive(char * buffer, int length)
@@ -76,5 +76,5 @@ int uart_receive(char * buffer, int length)
 	}
 
 	buffer[i + 1] = '\0';
-	return OK;
+	return SUCCESS;
 }

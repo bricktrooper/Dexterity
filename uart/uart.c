@@ -35,7 +35,7 @@ void uart_init(void)
 	SPBRGH = 0;             // high register BRG multiplier
 }
 
-int uart_send(const char * data)
+int uart_transmit(const char * data)
 {
 	if (data == null)
 	{

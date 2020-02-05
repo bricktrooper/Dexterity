@@ -3,8 +3,32 @@
 
 #include "init.h"
 
+#ifdef PIC_TEST_BOARD
 #define LED_DELAY 75000
-#define PIC_TEST_BOARD
+
+void init_indicator(void)
+{
+	unsigned char LEDs = 0x0;
+	PORTC = 0x0;
+
+	for (int i = 0; i < 8; i++)
+	{
+		LEDs |= 0x1 << i;
+		PORTC = LEDs;
+		_delay(LED_DELAY);
+	}
+
+	for (int i = 0; i < 3; i++)
+	{
+		PORTC = 0x0;
+		_delay(LED_DELAY);
+		PORTC = 0xFF;
+		_delay(LED_DELAY);
+	}
+
+	PORTC = 0x0;
+}
+#endif
 
 void init_hardware(void)
 {
@@ -33,29 +57,8 @@ void init_hardware(void)
 	OSCCONbits.SCS = 1;
 
 #ifdef PIC_TEST_BOARD
-	startup_indicator();
+	TRISAbits.TRISA4 = 1;   // RA4 button input
+	TRISAbits.TRISA5 = 1;   // RA5 button input
+	init_indicator();       // flash test board LEDs
 #endif
-}
-
-void startup_indicator(void)
-{
-	unsigned char leds = 0x0;
-	PORTC = 0x0;
-
-	for (int i = 0; i < 8; i++)
-	{
-		leds |= 0x1 << i;
-		PORTC = leds;
-		_delay(LED_DELAY);
-	}
-
-	for (int i = 0; i < 3; i++)
-	{
-		PORTC = 0x0;
-		_delay(LED_DELAY);
-		PORTC = 0xFF;
-		_delay(LED_DELAY);
-	}
-
-	PORTC = 0x0;
 }

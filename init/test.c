@@ -8,4 +8,12 @@
 void main(void)
 {
 	init_hardware();
+
+#ifdef PIC_TEST_BOARD
+	while (1)
+	{
+		PORTCbits.RC0 = RA5;
+		PORTCbits.RC1 = RA4;
+	}
+#endif
 }

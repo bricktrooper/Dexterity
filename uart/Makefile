@@ -13,7 +13,7 @@ OBJ += uart.p1
 OBJ += test.p1
 
 program: $(addprefix out/, $(OBJ)) $(INIT)/out/init.p1
-	@echo "LD  $(OBJ)"
+	@echo "LD  $(OBJ) init.p1"
 	@mkdir -p out
 	@$(CC) $(CFLAGS) $(addprefix out/, $(OBJ)) $(INIT)/out/init.p1 -o out/$(EXE)
 

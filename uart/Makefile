@@ -2,38 +2,38 @@ CC = xc8-cc
 DEVICE = 16F690
 CFLAGS = -mcpu=$(DEVICE) -mc90lib
 
-HDR += uart.h
-HDR += init.h
+INIT = ../init
 
-OBJ += uart.p1
-OBJ += init.p1
-OBJ += test.p1
+HDR += uart.h
+HDR += $(INIT)/init.h
 
 EXE = program
-OUT = out
 
-# can we simplify this makefile?
+OBJ += uart.p1
+OBJ += test.p1
 
-program: $(addprefix $(OUT)/, $(OBJ))
+program: $(addprefix out/, $(OBJ)) $(INIT)/out/init.p1
 	@echo "LD  $(OBJ)"
-	mkdir -p $(OUT)
-	@$(CC) $(CFLAGS) $(addprefix $(OUT)/, $(OBJ)) -o $(OUT)/$(EXE)
+	@mkdir -p out
+	@$(CC) $(CFLAGS) $(addprefix out/, $(OBJ)) $(INIT)/out/init.p1 -o out/$(EXE)
+
+uart.p1: out/uart.p1
+test.p1: out/test.p1
+init.p1: out/init.p1
 
 clean:
-	@echo "Delete $(OUT)/"
-	@rm -rf $(OUT)
+	@echo "RM  uart/out/"
+	@rm -rf out
 
-$(OUT)/test.p1: test.c $(HDR)
-	@echo "CC  test.c"
-	mkdir -p $(OUT)
-	@$(CC) $(CFLAGS) -c test.c -o $(OUT)/test.p1
-
-$(OUT)/init.p1: init.c init.h
-	@echo "CC  init.c"
-	mkdir -p $(OUT)
-	@$(CC) $(CFLAGS) -c init.c -o $(OUT)/init.p1
-
-$(OUT)/uart.p1: uart.c uart.h
+out/uart.p1: uart.c uart.h
 	@echo "CC  uart.c"
-	mkdir -p $(OUT)
-	@$(CC) $(CFLAGS) -c uart.c -o $(OUT)/uart.p1
+	@mkdir -p out
+	@$(CC) $(CFLAGS) -c uart.c -o out/uart.p1
+
+out/test.p1: test.c $(HDR)
+	@echo "CC  test.c"
+	@mkdir -p out
+	@$(CC) $(CFLAGS) -c test.c -o out/test.p1
+
+$(INIT)/out/init.p1:
+	@make init.p1 -C $(INIT)

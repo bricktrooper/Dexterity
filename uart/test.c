@@ -3,7 +3,7 @@
 #include <xc.h>
 #include <pic16f690.h>
 
-#include "init.h"
+#include "../init/init.h"
 #include "uart.h"
 
 void main(void)

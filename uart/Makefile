@@ -12,18 +12,16 @@ EXE = program
 OBJ += uart.p1
 OBJ += test.p1
 
-OBJ += print.p1
+ART += $(addprefix out/, $(OBJ))
+ART += $(INIT)/out/init.p1
 
-ART = $(addprefix out/, $(OBJ)) $(INIT)/out/init.p1
-
-program: $(ART)
+$(EXE): $(ART)
 	@echo "LD  $(OBJ) init.p1"
 	@mkdir -p out
 	@$(CC) $(CFLAGS) $(ART) -o out/$(EXE)
 
 uart.p1: out/uart.p1
 test.p1: out/test.p1
-init.p1: out/init.p1
 
 clean:
 	@echo "RM  uart/out/"
@@ -41,9 +39,3 @@ out/test.p1: test.c $(HDR)
 
 $(INIT)/out/init.p1:
 	@make init.p1 -C $(INIT)
-
-
-out/print.p1: print.c
-	@echo "CC  print.c"
-	@mkdir -p out
-	@$(CC) $(CFLAGS) -c print.c -o out/print.p1

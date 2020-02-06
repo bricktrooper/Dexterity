@@ -9,10 +9,12 @@ EXE = program
 OBJ += init.p1
 OBJ += test.p1
 
-program: $(addprefix out/, $(OBJ))
+ART = $(addprefix out/, $(OBJ))
+
+$(EXE): $(ART)
 	@echo "LD  $(OBJ)"
 	@mkdir -p out
-	@$(CC) $(CFLAGS) $(addprefix out/, $(OBJ)) -o out/$(EXE)
+	@$(CC) $(CFLAGS) $(ART) -o out/$(EXE)
 
 init.p1: out/init.p1
 test.p1: out/test.p1

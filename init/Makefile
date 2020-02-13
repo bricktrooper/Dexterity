@@ -11,11 +11,15 @@ OBJ += test.p1
 
 ART = $(addprefix out/, $(OBJ))
 
+.PHONY: init.p1
+.PHONY: test.p1
+
 $(EXE): $(ART)
 	@echo "LD  $(OBJ)"
 	@mkdir -p out
 	@$(CC) $(CFLAGS) $(ART) -o out/$(EXE)
 
+all: $(OBJ)
 init.p1: out/init.p1
 test.p1: out/test.p1
 

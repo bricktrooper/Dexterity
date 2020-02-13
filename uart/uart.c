@@ -38,20 +38,23 @@ void uart_init(void)
 	SPBRGH = 0;             // high register BRG multiplier
 }
 
-int uart_transmit(const char * data)
+int uart_transmit(const char * data, int length)
 {
-	if (data == null)
+	if (data == null || length < 0)
 	{
 		return ERROR;
 	}
 
-	for (int i = 0; data[i] != '\0'; i++)
+	int byte_count = 0;
+
+	for (int i = 0; i < length; i++)
 	{
 		while (TXSTAbits.TRMT == 0);   // Wait for TX register to empty
 		TXREG = data[i];               // Load new byte into TX register
+		byte_count++;
 	}
 
-	return SUCCESS;
+	return byte_count;
 }
 
 int uart_receive(char * buffer, int length)
@@ -62,22 +65,17 @@ int uart_receive(char * buffer, int length)
 	}
 
 	char new_byte = 0;
-	int i = 0;
+	int byte_count = 0;
 
-	for (i = 0; i < length - 1; i++)
+	for (int i = 0; i < length; i++)
 	{
 		while (PIR1bits.RCIF == 0);   // Wait for RX register to receive new byte
 		new_byte = RCREG;             // Read new byte from RX buffer
-
-		if (new_byte == '\0' || new_byte == '\n' || new_byte == '\r')
-		{
-			break;
-		}
-
 		buffer[i] = new_byte;
+		byte_count++;
+
 		PORTC = new_byte;
 	}
 
-	buffer[i + 1] = '\0';
-	return SUCCESS;
+	return byte_count;
 }

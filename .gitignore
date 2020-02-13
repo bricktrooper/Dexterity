@@ -1,5 +1,9 @@
 .DS_Store
+
 init/out/*
-!/init/out/.empty
 uart/out/*
+serial/out/*
+
+!/init/out/.empty
 !/uart/out/.empty
+!/serial/out/.empty

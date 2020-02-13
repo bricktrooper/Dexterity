@@ -1,3 +1,5 @@
 .DS_Store
-/init/out/
-/uart/out/
+init/out/*
+!/init/out/.empty
+uart/out/*
+!/uart/out/.empty

@@ -13,7 +13,7 @@ uart:
 serial:
 	@make serial.p1 -C serial
 
-tests:
+all-tests:
 	@make -C init
 	@make -C uart
 	@make -C serial

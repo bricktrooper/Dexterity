@@ -1,41 +1,43 @@
 CC = xc8-cc
-DEVICE = 16F690
-CFLAGS = -mcpu=$(DEVICE) -mc90lib
+
+CFLAGS += -mcpu=16F690
+CFLAGS += -mc90lib
 
 INIT = ../init
 
-HDR += uart.h
-HDR += $(INIT)/init.h
+SRC_DIRS += out
+SRC_DIRS += $(INIT)
 
-EXE = program
+VPATH = $(subst $(eval) ,:,$(SRC_DIRS))
+
+INCLUDE += -I $(INIT)
+
+HDR_MOD += uart.h
+HDR_EXE += init.h
 
 OBJ += uart.p1
 OBJ += test.p1
 
-ART += $(addprefix out/, $(OBJ))
+EXT += init.p1
 
-EXT += $(INIT)/out/init.p1
+OBJ_FILES += $(addprefix out/, $(OBJ))
+EXT_FILES += $(INIT)/out/init.p1
 
-.PHONY: uart.p1
-.PHONY: test.p1
+EXE = uart.hex
 
-$(EXE): $(ART)
+$(EXE): $(OBJ)
 	@make init.p1 -C $(INIT)
-	@echo "LD  $(OBJ) init.p1"
-	@$(CC) $(CFLAGS) $(ART) $(EXT) -o out/$(EXE)
-
-all: $(OBJ)
-uart.p1: out/uart.p1
-test.p1: out/test.p1
+	@echo "LD  $(OBJ) $(EXT)"
+	@$(CC) $(CFLAGS) $(OBJ_FILES) $(EXT_FILES) -o out/$(EXE)
 
 clean:
 	@echo "RM  uart/out/*"
 	@rm -rf out/*
 
-out/uart.p1: uart.c uart.h
+uart.p1: uart.c $(HDR_MOD)
 	@echo "CC  uart.c"
-	@$(CC) $(CFLAGS) -c uart.c -o out/uart.p1
+	@$(CC) $(CFLAGS) $(INCLUDE) -c uart.c -o out/uart.p1
 
-out/test.p1: test.c $(HDR)
+test.p1: test.c $(HDR_MOD) $(HDR_EXE)
 	@echo "CC  test.c"
-	@$(CC) $(CFLAGS) -c test.c -o out/test.p1
+	@$(CC) $(CFLAGS) $(INCLUDE) -c test.c -o out/test.p1

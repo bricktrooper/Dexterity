@@ -1,35 +1,31 @@
 CC = xc8-cc
-DEVICE = 16F690
-CFLAGS = -mcpu=$(DEVICE) -mc90lib
 
-HDR += init.h
+CFLAGS += -mcpu=16F690
+CFLAGS += -mc90lib
 
-EXE = program
+VPATH += out
+
+HDR_MOD += init.h
 
 OBJ += init.p1
 OBJ += test.p1
 
-ART = $(addprefix out/, $(OBJ))
+OBJ_FILES = $(addprefix out/, $(OBJ))
 
-.PHONY: init.p1
-.PHONY: test.p1
+EXE = init.hex
 
-$(EXE): $(ART)
+$(EXE): $(OBJ)
 	@echo "LD  $(OBJ)"
-	@$(CC) $(CFLAGS) $(ART) -o out/$(EXE)
-
-all: $(OBJ)
-init.p1: out/init.p1
-test.p1: out/test.p1
+	@$(CC) $(CFLAGS) $(OBJ_FILES) -o out/$(EXE)
 
 clean:
 	@echo "RM  init/out/*"
 	@rm -rf out/*
 
-out/init.p1: init.c init.h
+init.p1: init.c $(HDR_MOD)
 	@echo "CC  init.c"
 	@$(CC) $(CFLAGS) -c init.c -o out/init.p1
 
-out/test.p1: test.c $(HDR)
+test.p1: test.c $(HDR_MOD)
 	@echo "CC  test.c"
 	@$(CC) $(CFLAGS) -c test.c -o out/test.p1

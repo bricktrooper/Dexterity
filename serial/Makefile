@@ -1,45 +1,52 @@
 CC = xc8-cc
-DEVICE = 16F690
-CFLAGS = -mcpu=$(DEVICE) -mc90lib
+
+CFLAGS += -mcpu=16F690
+CFLAGS += -mc90lib
 
 INIT = ../init
 UART = ../uart
 
-HDR += serial.h
-HDR += $(INIT)/init.h
-HDR += $(UART)/uart.h
+SRC_DIRS += out
+SRC_DIRS += $(INIT)
+SRC_DIRS += $(UART)
 
-EXE = program
+VPATH = $(subst $(eval) ,:,$(SRC_DIRS))
+
+INCLUDE += -I $(INIT)
+INCLUDE += -I $(UART)
+
+HDR_MOD += serial.h
+HDR_MOD += uart.h
+
+HDR_EXE += init.h
 
 OBJ += serial.p1
 OBJ += test.p1
 
-ART += $(addprefix out/, $(OBJ))
+EXT += init.p1
+EXT += uart.p1
 
-EXT += $(INIT)/out/init.p1
-EXT += $(UART)/out/uart.p1
+OBJ_FILES += $(addprefix out/, $(OBJ))
 
-.PHONY: serial.p1
-.PHONY: test.p1
+EXT_FILES += $(INIT)/out/init.p1
+EXT_FILES += $(UART)/out/uart.p1
 
-$(EXE): $(ART)
+EXE = serial.hex
+
+$(EXE): $(OBJ)
 	@make init.p1 -C $(INIT)
 	@make uart.p1 -C $(UART)
-	@echo "LD  $(OBJ) init.p1 uart.p1"
-	@$(CC) $(CFLAGS) $(ART) $(EXT) -o out/$(EXE)
-
-all: $(OBJ)
-serial.p1: out/serial.p1
-test.p1: out/test.p1
+	@echo "LD  $(OBJ) $(EXT)"
+	@$(CC) $(CFLAGS) $(OBJ_FILES) $(EXT_FILES) -o out/$(EXE)
 
 clean:
 	@echo "RM  serial/out/*"
 	@rm -rf out/*
 
-out/serial.p1: serial.c serial.h
+serial.p1: serial.c $(HDR_MOD)
 	@echo "CC  serial.c"
-	@$(CC) $(CFLAGS) -c serial.c -o out/serial.p1
+	@$(CC) $(CFLAGS) $(INCLUDE) -c serial.c -o out/serial.p1
 
-out/test.p1: test.c $(HDR)
+test.p1: test.c $(HDR_MOD) $(HDR_EXE)
 	@echo "CC  test.c"
-	@$(CC) $(CFLAGS) -c test.c -o out/test.p1
+	@$(CC) $(CFLAGS) $(INCLUDE) -c test.c -o out/test.p1

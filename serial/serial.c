@@ -1,11 +1,8 @@
 #include <stdio.h>
-#include <string.h>
-#include <stdarg.h>
-
 #include <xc.h>
 #include <pic16f690.h>
 
-#include "../uart/uart.h"
+#include "uart.h"
 #include "serial.h"
 
 #define null       0

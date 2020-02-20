@@ -10,13 +10,13 @@ HDR_MOD += init.h
 OBJ += init.p1
 OBJ += test.p1
 
-OBJ_FILES = $(addprefix out/, $(OBJ))
+OBJ_ART = $(addprefix out/, $(OBJ))
 
 EXE = init.hex
 
 $(EXE): $(OBJ)
 	@echo "LD  $(OBJ)"
-	@$(CC) $(CFLAGS) $(OBJ_FILES) -o out/$(EXE)
+	@$(CC) $(CFLAGS) $(OBJ_ART) -o out/$(EXE)
 
 clean:
 	@echo "RM  init/out/*"

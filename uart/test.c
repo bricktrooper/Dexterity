@@ -15,7 +15,7 @@ void main(void)
 
 	while (1)
 	{
-		uart_receive(buffer, 50);
-		uart_transmit(buffer, 50);
+		uart_receive_data(buffer, 50);
+		uart_transmit_data(buffer, 50);
 	}
 }

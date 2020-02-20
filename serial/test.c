@@ -20,5 +20,10 @@ void main(void)
 	serial_printc('K');
 	serial_println("");
 
+	char input [50];
+	serial_print("Please enter some text: ");
+	serial_printf(NEWLINE "bytes read: %d" NEWLINE, serial_read(input, 50));
+	serial_printf("You entered: %s" NEWLINE, input);
+
 	while (1);
 }

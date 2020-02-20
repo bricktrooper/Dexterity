@@ -12,13 +12,14 @@ void main(void)
 	init_hardware();
 	uart_init();
 
-	serial_println("");
-	serial_print("serial_print(): Hello\r\n");
+	serial_println(NEWLINE NEWLINE "======= SERIAL Test =======" NEWLINE);
+
+	serial_print("serial_print(): Hello" NEWLINE);
 	serial_println("serial_println(): Hello");
-	serial_printf("serial_printf(): number = %d\r\n", 7);
+	serial_printf("serial_printf(): number = %d" NEWLINE, 7);
 	serial_print("serial_printc(): ");
 	serial_printc('K');
-	serial_println("");
+	serial_print(NEWLINE);
 
 	char input [50];
 	serial_print("Please enter some text: ");

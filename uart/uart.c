@@ -38,7 +38,7 @@ void uart_init(void)
 	SPBRGH = 0;             // high register BRG multiplier
 }
 
-void uart_transmit_byte(const char byte)
+void uart_transmit_byte(char byte)
 {
 	while (TXSTAbits.TRMT == 0);   // wait for TX register to empty
 	TXREG = byte;                  // load new byte into TX register
@@ -50,7 +50,7 @@ char uart_receive_byte(void)
 	return RCREG;                 // read new byte from RX buffer
 }
 
-int uart_transmit_data(const char * data, int length)
+int uart_transmit_data(char * data, int length)
 {
 	if (data == null || length < 0)
 	{

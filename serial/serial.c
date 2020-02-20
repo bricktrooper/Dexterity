@@ -19,7 +19,7 @@ int serial_print(char * string)
 
 int serial_println(char * string)
 {
-	return serial_printf(string) + serial_printf(NEWLINE);
+	return serial_printf("%s" NEWLINE, string);
 }
 
 int serial_read(char * input, int length)

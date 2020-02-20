@@ -40,7 +40,7 @@ void init_hardware(void)
 	// INPUT (1) / OUTPUT (0) //
 
 	TRISA = 0b00000000;    // N/C, N/C, RA5, RA4, RA3,  RA2,  RA1, RA0
-	TRISB = 0b00000000;    // RB7, RB6, RB5, N/C, N/C,  N/C,  N/C, N/C
+	TRISB = 0b00000000;    // RB7, RB6, RB5, RB4, N/C,  N/C,  N/C, N/C
 	TRISC = 0b00000000;    // RC7, RC6, RC5, RC4, RC3,  RC2,  RC1, RC0
 
 	// INITIALIZE IO REGISTERS //

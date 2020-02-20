@@ -3,7 +3,9 @@
 init/out/*
 uart/out/*
 serial/out/*
+adc/out/*
 
 !/init/out/.empty
 !/uart/out/.empty
 !/serial/out/.empty
+!/adc/out/.empty

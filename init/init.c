@@ -4,8 +4,45 @@
 #include "init.h"
 
 #ifdef PIC_TEST_BOARD
-#define LED_DELAY 75000
+#define OSC_TUNE    0b00000   // factory-calibrated frequency (original PIC)
+#define LED_DELAY     75000
+#else
+#define OSC_TUNE    0b10000   // minimum frequency (new PICs)
+#endif
 
+void init_hardware(void)
+{
+	// ANALOGUE (1) / DIGITAL (0) //
+
+	ANSEL  = 0b00000000;   // AN7, AN6, AN5, AN4, AN3,  AN2,  AN1, AN0
+	ANSELH = 0b00000000;   // N/C, N/C, N/C, N/C, AN11, AN10, AN9, AN8
+
+	// INPUT (1) / OUTPUT (0) //
+
+	TRISA = 0b00000000;    // N/C, N/C, RA5, RA4, RA3,  RA2,  RA1, RA0
+	TRISB = 0b00000000;    // RB7, RB6, RB5, RB4, N/C,  N/C,  N/C, N/C
+	TRISC = 0b00000000;    // RC7, RC6, RC5, RC4, RC3,  RC2,  RC1, RC0
+
+	// INITIALIZE IO REGISTERS //
+
+	PORTA = 0b00000000;
+	PORTB = 0b00000000;
+	PORTC = 0b00000000;
+
+	// OSCILLATOR FREQUENCY //
+
+	OSCCONbits.IRCF = 0b110;      // Fosc = 4MHz (~3.6864MHz)
+	OSCCONbits.SCS = 1;           // use internal oscillator as system clock
+	OSCTUNEbits.TUN = OSC_TUNE;   // tune internal oscillator frequency
+
+#ifdef PIC_TEST_BOARD
+	TRISAbits.TRISA4 = 1;   // RA4 button input
+	TRISAbits.TRISA5 = 1;   // RA5 button input
+	init_indicator();       // flash test board LEDs
+#endif
+}
+
+#ifdef PIC_TEST_BOARD
 void init_indicator(void)
 {
 	unsigned char LEDs = 0x0;
@@ -29,36 +66,3 @@ void init_indicator(void)
 	PORTC = 0x0;
 }
 #endif
-
-void init_hardware(void)
-{
-	// ANALOGUE (1) / DIGITAL (0) //
-
-	ANSEL  = 0b00000000;   // AN7, AN6, AN5, AN4, AN3,  AN2,  AN1, AN0
-	ANSELH = 0b00000000;   // N/C, N/C, N/C, N/C, AN11, AN10, AN9, AN8
-
-	// INPUT (1) / OUTPUT (0) //
-
-	TRISA = 0b00000000;    // N/C, N/C, RA5, RA4, RA3,  RA2,  RA1, RA0
-	TRISB = 0b00000000;    // RB7, RB6, RB5, RB4, N/C,  N/C,  N/C, N/C
-	TRISC = 0b00000000;    // RC7, RC6, RC5, RC4, RC3,  RC2,  RC1, RC0
-
-	// INITIALIZE IO REGISTERS //
-
-	PORTA = 0b00000000;
-	PORTB = 0b00000000;
-	PORTC = 0b00000000;
-
-	// OSCILLATOR FREQUENCY = 4MHz (~3.6864MHz) //
-
-	OSCCONbits.IRCF2 = 1;
-	OSCCONbits.IRCF1 = 1;
-	OSCCONbits.IRCF0 = 0;
-	OSCCONbits.SCS = 1;
-
-#ifdef PIC_TEST_BOARD
-	TRISAbits.TRISA4 = 1;   // RA4 button input
-	TRISAbits.TRISA5 = 1;   // RA5 button input
-	init_indicator();       // flash test board LEDs
-#endif
-}

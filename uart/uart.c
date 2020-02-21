@@ -29,7 +29,10 @@ void uart_init(void)
 	RCSTAbits.CREN = 1;     // enable RX circuitry
 	RCSTAbits.RX9 = 1;      // use 8-bit reception
 
-	// BAUD RATE (9600 bps, 3.6864MHz Fosc) //
+	// BAUD RATE //
+
+	// 9600 bps @ 3.6864MHz Fosc
+	// 10417 bps @ 4MHz Fosc
 
 	TXSTAbits.BRGH = 1;     // use high baud rate
 	BAUDCTLbits.BRG16 = 0;  // use 8-bit baud rate generator

@@ -11,12 +11,12 @@
 #pragma config IESO = OFF
 #pragma config FCMEN = OFF
 
-#define PIC_TEST_BOARD
+// #define PIC_TEST_BOARD
 
 void init_hardware(void);
 
 #ifdef PIC_TEST_BOARD
-void startup_indicator(void);
+void init_indicator(void);
 #endif
 
 #endif /* INIT_H */

@@ -16,16 +16,15 @@ void main(void)
 
 	serial_println(NEWLINE NEWLINE "======= ADC Test =======" NEWLINE);
 
-	TRISB4 = 1;   // set RB4 as an input
-	ANS10 = 1;    // set RB4 as analogue
+	TRISC7 = 1;   // set RC7 as an input
+	ANS9 = 1;     // set RC7 as analogue
 
 	int reading = 0;
 
 	while (1)
 	{
-		reading = adc_read(10);
-		serial_printf("AN10 Reading: %u" NEWLINE, reading);
-		PORTC = reading;
+		reading = adc_read(9);
+		serial_printf("AN9 Reading: %u" NEWLINE, reading);
 		_delay(100000);
 	}
 }

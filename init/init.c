@@ -5,10 +5,11 @@
 
 #ifdef PIC_TEST_BOARD
 #define OSC_TUNE    0b00000   // factory-calibrated frequency (original PIC)
-#define LED_DELAY     75000
 #else
 #define OSC_TUNE    0b10000   // minimum frequency (new PICs)
 #endif
+
+#define LED_DELAY     75000
 
 void init_hardware(void)
 {
@@ -38,13 +39,16 @@ void init_hardware(void)
 #ifdef PIC_TEST_BOARD
 	TRISAbits.TRISA4 = 1;   // RA4 button input
 	TRISAbits.TRISA5 = 1;   // RA5 button input
-	init_indicator();       // flash test board LEDs
+#else
+	TRISCbits.TRISC5 = 0;   // RC5 status LED
 #endif
+
+	init_indicator();       // flash status LEDs
 }
 
-#ifdef PIC_TEST_BOARD
 void init_indicator(void)
 {
+#ifdef PIC_TEST_BOARD
 	unsigned char LEDs = 0x0;
 	PORTC = 0x0;
 
@@ -64,5 +68,13 @@ void init_indicator(void)
 	}
 
 	PORTC = 0x0;
-}
+#else
+	for (int i = 0; i < 3; i++)
+	{
+		RC5 = 1;
+		_delay(LED_DELAY);
+		RC5 = 0;
+		_delay(LED_DELAY);
+	}
 #endif
+}

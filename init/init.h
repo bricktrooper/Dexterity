@@ -14,9 +14,6 @@
 // #define PIC_TEST_BOARD
 
 void init_hardware(void);
-
-#ifdef PIC_TEST_BOARD
 void init_indicator(void);
-#endif
 
 #endif /* INIT_H */

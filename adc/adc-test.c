@@ -29,7 +29,7 @@ void main(void)
 	{
 		reading_AN9 = adc_read(9);
 		reading_AN10 = adc_read(10);
-		serial_printf("AN9: %u, AN10: %u" NEWLINE, reading_AN9, reading_AN10);
+		serial_printf("AN9: %d, AN10: %d" NEWLINE, reading_AN9, reading_AN10);
 		_delay(100000);
 	}
 }

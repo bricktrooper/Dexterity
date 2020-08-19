@@ -9,3 +9,6 @@ adc/out/*
 !/uart/out/.empty
 !/serial/out/.empty
 !/adc/out/.empty
+
+board/*.s#*
+board/*.b#*

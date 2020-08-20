@@ -5,9 +5,11 @@ uart/out/*
 serial/out/*
 adc/out/*
 accel/out/*
+flex/out/*
 
 !/init/out/.empty
 !/uart/out/.empty
 !/serial/out/.empty
 !/adc/out/.empty
 !/accel/out/.empty
+!/flex/out/.empty

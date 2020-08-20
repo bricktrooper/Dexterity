@@ -1,52 +1,45 @@
-MODULES += init
-MODULES += uart
-MODULES += serial
-MODULES += adc
-MODULES += accel
-MODULES += flex
+# ============== COMPILER ============== #
 
-.PHONY: $(MODULES)
+CC = xc8-cc
 
-all: $(MODULES)
+CFLAGS += -mcpu=16F690
+CFLAGS += -mc90lib
 
-init:
-	@make init.p1 -C init
-uart:
-	@make uart.p1 -C uart
-serial:
-	@make serial.p1 -C serial
-adc:
-	@make adc.p1 -C adc
-accel:
-	@make accel.p1 -C accel
-flex:
-	@make flex.p1 -C flex
+# ============== BUILD CONFIG ============== #
 
-all-tests:
-	@make -C init
-	@make -C uart
-	@make -C serial
-	@make -C adc
-	@make -C accel
-	@make -C flex
+include config.mk
 
-init-test:
-	@make -C init
-uart-test:
-	@make -C uart
-serial-test:
-	@make -C serial
-adc-test:
-	@make -C adc
-accel-test:
-	@make -C accel
-flex-test:
-	@make -C flex
+DEP_OBJ = $(addsuffix .p1, $(DEP))
+DEP_DIR = $(addprefix ../, $(DEP))
+
+ART += $(addprefix out/, $(PRG_OBJ))
+ART += $(foreach MODULE,$(DEP),../$(MODULE)/out/$(MODULE).p1)
+
+INC += $(addprefix -I , $(DEP_DIR))
+
+VPATH += out
+VPATH += $(DEP_DIR)
+VPATH += $(addsuffix /out, $(DEP_DIR))
+
+# ============== MODULE RULES ============== #
+
+$(EXE): $(PRG_OBJ) $(DEP_OBJ)
+	@echo "LD  $(PRG_OBJ) $(DEP_OBJ)"
+	@$(CC) $(CFLAGS) $(ART) -o out/$(EXE)
 
 clean:
-	@make clean -C init
-	@make clean -C uart
-	@make clean -C serial
-	@make clean -C adc
-	@make clean -C accel
-	@make clean -C flex
+	@echo "RM  $(MOD)/out/*"
+	@rm -rf out/*
+
+$(MOD).p1: $(MOD).c $(MOD_HDR)
+	@echo "CC  $(MOD).c"
+	@$(CC) $(CFLAGS) $(INC) -c $(MOD).c -o out/$(MOD).p1
+
+$(PRG).p1: $(PRG).c $(PRG_HDR)
+	@echo "CC  $(PRG).c"
+	@$(CC) $(CFLAGS) $(INC) -c $(PRG).c -o out/$(PRG).p1
+
+# ============== DEPENDENCY RULES ============== #
+
+$(DEP_OBJ): %.p1: %.c
+	@make $@ -C ../$(basename $@)

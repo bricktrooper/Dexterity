@@ -7,7 +7,7 @@ CFLAGS += -mc90lib
 LDFLAGS += -mcpu=16F690
 LDFLAGS += -mc90lib
 LDFLAGS += -msummary=none
-# LDFLAGS += -mwarn=-9
+LDFLAGS += -mwarn=-2
 
 SRC += test.c
 SRC += init.c

@@ -7,9 +7,15 @@ CFLAGS += -mc90lib
 LDFLAGS += -mcpu=16F690
 LDFLAGS += -mc90lib
 LDFLAGS += -msummary=none
+# LDFLAGS += -mwarn=-9
 
-SRC += init-test.c
+SRC += test.c
 SRC += init.c
+SRC += uart.c
+SRC += serial.c
+SRC += flex.c
+SRC += accel.c
+SRC += adc.c
 
 BIN = bin
 OBJ = $(SRC:.c=.p1)

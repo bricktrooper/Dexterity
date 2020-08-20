@@ -3,6 +3,7 @@ MODULES += uart
 MODULES += serial
 MODULES += adc
 MODULES += accel
+MODULES += flex
 
 .PHONY: $(MODULES)
 
@@ -18,6 +19,8 @@ adc:
 	@make adc.p1 -C adc
 accel:
 	@make accel.p1 -C accel
+flex:
+	@make flex.p1 -C flex
 
 all-tests:
 	@make -C init
@@ -25,6 +28,7 @@ all-tests:
 	@make -C serial
 	@make -C adc
 	@make -C accel
+	@make -C flex
 
 init-test:
 	@make -C init
@@ -36,6 +40,8 @@ adc-test:
 	@make -C adc
 accel-test:
 	@make -C accel
+flex-test:
+	@make -C flex
 
 clean:
 	@make clean -C init
@@ -43,3 +49,4 @@ clean:
 	@make clean -C serial
 	@make clean -C adc
 	@make clean -C accel
+	@make clean -C flex

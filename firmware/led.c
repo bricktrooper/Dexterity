@@ -2,26 +2,12 @@
 #include <pic16f690.h>
 
 #include "pins.h"
+#include "utils.h"
 #include "led.h"
 
 #define ERROR     -1
 #define WARNING    1
 #define SUCCESS    0
-
-int delay_ms(long duration)
-{
-	if (duration < 0)
-	{
-		return ERROR;
-	}
-
-	for (long i = 0; i < duration; i++)
-	{
-		_delay(1000);   // delay for 1ms
-	}
-
-	return SUCCESS;
-}
 
 void led_init(void)
 {

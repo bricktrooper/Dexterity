@@ -9,6 +9,7 @@
 #include "accel.h"
 #include "flex.h"
 #include "led.h"
+#include "utils.h"
 
 void init_test(void);
 void uart_test(void);

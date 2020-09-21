@@ -1,14 +1,13 @@
 #include <xc.h>
 #include <pic16f690.h>
 
+#include "pins.h"
 #include "init.h"
 #include "uart.h"
 #include "serial.h"
 #include "adc.h"
 #include "accel.h"
 #include "flex.h"
-
-#define FLEX_TEST
 
 int init_test(void);
 int uart_test(void);
@@ -31,6 +30,9 @@ void main(void)
 	accel_test();
 #elif defined FLEX_TEST
 	flex_test();
+#else
+	init_hardware();
+	while (1);
 #endif
 }
 
@@ -43,8 +45,13 @@ int init_test(void)
 	while (1)
 	{
 #ifdef PIC_TEST_BOARD
-		PORTCbits.RC0 = RA5;
-		PORTCbits.RC1 = RA4;
+		RC0 = RA5;
+		RC1 = RA4;
+#else
+		LED = 1;
+		_delay(1000000);
+		LED = 0;
+		_delay(1000000);
 #endif
 	}
 }

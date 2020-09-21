@@ -33,6 +33,7 @@ SRC += serial.c
 SRC += flex.c
 SRC += accel.c
 SRC += adc.c
+SRC += led.c
 
 BIN = bin
 OBJ = $(SRC:.c=.p1)

@@ -3,11 +3,13 @@
 
 // STATUS LED //
 
-#define LED      RA4
+#define LED        RA4
+#define LED_TRIS   TRISA4
 
 // RESET BUTTON //
 
-#define BUTTON   RA5
+#define BUTTON        RA5
+#define BUTTON_TRIS   TRISA5
 
 // ACCELEROMETER //
 

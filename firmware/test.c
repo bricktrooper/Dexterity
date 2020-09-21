@@ -8,13 +8,15 @@
 #include "adc.h"
 #include "accel.h"
 #include "flex.h"
+#include "led.h"
 
-int init_test(void);
-int uart_test(void);
-int serial_test(void);
-int adc_test(void);
-int accel_test(void);
-int flex_test(void);
+void init_test(void);
+void uart_test(void);
+void serial_test(void);
+void adc_test(void);
+void accel_test(void);
+void flex_test(void);
+void led_test(void);
 
 void main(void)
 {
@@ -30,6 +32,8 @@ void main(void)
 	accel_test();
 #elif defined FLEX_TEST
 	flex_test();
+#elif defined LED_TEST
+	led_test();
 #else
 	init_hardware();
 	while (1);
@@ -38,7 +42,7 @@ void main(void)
 
 /* Test code for PIC16F690 startup */
 
-int init_test(void)
+void init_test(void)
 {
 	init_hardware();
 
@@ -58,7 +62,7 @@ int init_test(void)
 
 /* Test code for UART on PIC16F690 */
 
-int uart_test(void)
+void uart_test(void)
 {
 	init_hardware();
 	uart_init();
@@ -73,7 +77,7 @@ int uart_test(void)
 }
 /* Test code for PIC16F690 serial I/O */
 
-int serial_test(void)
+void serial_test(void)
 {
 	init_hardware();
 	uart_init();
@@ -97,7 +101,7 @@ int serial_test(void)
 
 /* Test code for PIC16F690 Analogue-to-Digital Converter */
 
-int adc_test(void)
+void adc_test(void)
 {
 	init_hardware();
 	uart_init();
@@ -125,7 +129,7 @@ int adc_test(void)
 
 /* Test code for ADXL335 accelerometer */
 
-int accel_test(void)
+void accel_test(void)
 {
 	init_hardware();
 	uart_init();
@@ -151,7 +155,7 @@ int accel_test(void)
 
 /* Test code for flex sensors */
 
-int flex_test(void)
+void flex_test(void)
 {
 	init_hardware();
 	uart_init();
@@ -176,5 +180,17 @@ int flex_test(void)
 
 		serial_printf("1: %d, 2: %d, 3: %d, 4: %d, 5: %d" NEWLINE, f1, f2, f3, f4, f5);
 		_delay(10);
+	}
+}
+
+void led_test(void)
+{
+	init_hardware();
+	led_init();
+
+	while (1)
+	{
+		led_blink(3, 100);
+		delay_ms(1000);
 	}
 }

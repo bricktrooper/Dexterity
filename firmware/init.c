@@ -1,6 +1,7 @@
 #include <xc.h>
 #include <pic16f690.h>
 
+#include "pins.h"
 #include "init.h"
 
 #ifdef PIC_TEST_BOARD
@@ -40,7 +41,8 @@ void init_hardware(void)
 	TRISAbits.TRISA4 = 1;   // RA4 button input
 	TRISAbits.TRISA5 = 1;   // RA5 button input
 #else
-	TRISCbits.TRISC5 = 0;   // RC5 status LED
+	TRISAbits.TRISA4 = 0;   // RA4 status LED
+	TRISAbits.TRISA5 = 1;   // RA5 reset button
 #endif
 
 	init_indicator();       // flash status LEDs
@@ -71,9 +73,9 @@ void init_indicator(void)
 #else
 	for (int i = 0; i < 3; i++)
 	{
-		RC5 = 1;
+		LED = 1;
 		_delay(LED_DELAY);
-		RC5 = 0;
+		LED = 0;
 		_delay(LED_DELAY);
 	}
 #endif

@@ -1,6 +1,7 @@
 #include <xc.h>
 #include <pic16f690.h>
 
+#include "pins.h"
 #include "adc.h"
 #include "accel.h"
 
@@ -9,18 +10,6 @@
 #define ERROR     -1
 #define WARNING    1
 #define SUCCESS    0
-
-#define X_CHANNEL   7
-#define Y_CHANNEL   8
-#define Z_CHANNEL   9
-
-#define X_TRIS   TRISC7
-#define Y_TRIS   TRISC6
-#define Z_TRIS   TRISC3
-
-#define X_ANSEL   ANS9
-#define Y_ANSEL   ANS8
-#define Z_ANSEL   ANS7
 
 void accel_init(void)
 {

@@ -9,7 +9,7 @@
 
 void accel_init(void)
 {
-	ADCON0bits.VCFG = 1;   // use external VREF for conversions (3.3V)
+	adc_set_vref(EXTERNAL);   // use external VREF for conversions (3.3V)
 
 	// X Axis //
 

@@ -12,7 +12,7 @@
 
 void flex_init(void)
 {
-	ADCON0bits.VCFG = 0;   // use VDD as VREF for conversions (5V)
+	adc_set_vref(INTERNAL);   // use VDD as VREF for conversions (5V)
 
 	// FINGER 1 //
 

@@ -11,7 +11,7 @@
 
 void led_init(void)
 {
-	LED_TRIS = 0;
+	LED_TRIS = 0;   // set LED as output
 }
 
 void led_on(void)

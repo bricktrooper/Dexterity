@@ -17,10 +17,13 @@ endif
 
 ifeq ($(TARGET), test)
 	SRC += test.c
+	EXE = test.hex
 else ifeq ($(TARGET), dexterity)
 	SRC += dexterity.c
+	EXE = dexterity.hex
 else ifeq ($(TARGET), )
 	SRC += dexterity.c
+	EXE = dexterity.hex
 else ifeq ($(TARGET), clean)
 	# Run clean as usual
 else
@@ -40,7 +43,6 @@ SRC += button.c
 BIN = bin
 OBJ = $(SRC:.c=.p1)
 DEP = $(SRC:.c=.d)
-EXE = dexterity.hex
 ART += $(BIN)
 
 $(shell mkdir -p $(BIN))

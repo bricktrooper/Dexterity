@@ -1,15 +1,11 @@
 #include <xc.h>
 #include <pic16f690.h>
 
+#include "utils.h"
 #include "pins.h"
 #include "adc.h"
+
 #include "flex.h"
-
-#define null       0
-
-#define ERROR     -1
-#define WARNING    1
-#define SUCCESS    0
 
 #define FLEX_MAX   800
 #define FLEX_MIN   500

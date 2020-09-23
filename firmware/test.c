@@ -1,8 +1,8 @@
 #include <xc.h>
 #include <pic16f690.h>
 
-#include "pins.h"
 #include "utils.h"
+#include "pins.h"
 #include "init.h"
 #include "uart.h"
 #include "serial.h"

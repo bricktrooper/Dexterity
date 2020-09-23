@@ -3,10 +3,6 @@
 
 #include "utils.h"
 
-#define ERROR     -1
-#define WARNING    1
-#define SUCCESS    0
-
 #define DELAY_1S    1000000
 #define DELAY_1MS   1000
 #define DELAY_1US   1

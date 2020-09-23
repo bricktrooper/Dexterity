@@ -1,13 +1,10 @@
 #include <xc.h>
 #include <pic16f690.h>
 
-#include "pins.h"
 #include "utils.h"
-#include "led.h"
+#include "pins.h"
 
-#define ERROR     -1
-#define WARNING    1
-#define SUCCESS    0
+#include "led.h"
 
 void led_init(void)
 {

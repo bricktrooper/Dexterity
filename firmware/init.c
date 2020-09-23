@@ -1,7 +1,9 @@
 #include <xc.h>
 #include <pic16f690.h>
 
+#include "utils.h"
 #include "pins.h"
+
 #include "init.h"
 
 #ifdef PIC_TEST_BOARD

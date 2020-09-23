@@ -1,12 +1,10 @@
 #include <xc.h>
 #include <pic16f690.h>
 
+#include "utils.h"
 #include "pins.h"
-#include "button.h"
 
-#define ERROR     -1
-#define WARNING    1
-#define SUCCESS    0
+#include "button.h"
 
 void button_init(void)
 {

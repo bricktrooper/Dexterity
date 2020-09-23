@@ -1,13 +1,9 @@
 #include <xc.h>
 #include <pic16f690.h>
 
+#include "utils.h"
+
 #include "adc.h"
-
-#define null       0
-
-#define ERROR     -1
-#define WARNING    1
-#define SUCCESS    0
 
 void adc_init(void)
 {

@@ -27,6 +27,7 @@ else
   $(error Unknown target '$(TARGET)')
 endif
 
+SRC += utils.c
 SRC += init.c
 SRC += uart.c
 SRC += serial.c
@@ -34,7 +35,7 @@ SRC += flex.c
 SRC += accel.c
 SRC += adc.c
 SRC += led.c
-SRC += utils.c
+SRC += button.c
 
 BIN = bin
 OBJ = $(SRC:.c=.p1)

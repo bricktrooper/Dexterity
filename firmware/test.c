@@ -2,6 +2,7 @@
 #include <pic16f690.h>
 
 #include "pins.h"
+#include "utils.h"
 #include "init.h"
 #include "uart.h"
 #include "serial.h"
@@ -9,7 +10,7 @@
 #include "accel.h"
 #include "flex.h"
 #include "led.h"
-#include "utils.h"
+#include "button.h"
 
 void init_test(void);
 void uart_test(void);
@@ -18,6 +19,7 @@ void adc_test(void);
 void accel_test(void);
 void flex_test(void);
 void led_test(void);
+void button_test(void);
 
 void main(void)
 {
@@ -35,6 +37,8 @@ void main(void)
 	flex_test();
 #elif defined LED_TEST
 	led_test();
+#elif defined BUTTON_TEST
+	button_test();
 #else
 	init_hardware();
 	while (1);
@@ -193,5 +197,20 @@ void led_test(void)
 	{
 		led_blink(3, 100);
 		delay_ms(1000);
+	}
+}
+
+void button_test(void)
+{
+	init_hardware();
+	led_init();
+	button_init();
+
+	led_off();
+
+	while (1)
+	{
+		button_wait_push();
+		led_blink(1, 100);
 	}
 }

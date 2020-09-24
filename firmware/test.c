@@ -5,7 +5,6 @@
 #include "pins.h"
 #include "init.h"
 #include "uart.h"
-#include "serial.h"
 #include "adc.h"
 #include "accel.h"
 #include "flex.h"
@@ -14,7 +13,6 @@
 
 void init_test(void);
 void uart_test(void);
-void serial_test(void);
 void adc_test(void);
 void accel_test(void);
 void flex_test(void);
@@ -27,8 +25,6 @@ void main(void)
 	init_test();
 #elif defined UART_TEST
 	uart_test();
-#elif defined SERIAL_TEST
-	serial_test();
 #elif defined ADC_TEST
 	adc_test();
 #elif defined ACCEL_TEST
@@ -72,36 +68,25 @@ void uart_test(void)
 	init_hardware();
 	uart_init();
 
-	char buffer [50];
+	uart_print(NEWLINE NEWLINE "======= UART Test =======" NEWLINE NEWLINE);
+
+	uart_print("Hello" NEWLINE);
+	uart_print("number = %d" NEWLINE, 7);
+
+	char input [50];
+	uart_print("Please enter some text: ");
+	int received = uart_read(input, 50);
+	uart_print(NEWLINE);
+	uart_print("Bytes read: %d" NEWLINE, received);
+	uart_print("You entered: %s" NEWLINE, input);
+
+	uart_print("Type up to 50 characters and watch them echo back:" NEWLINE);
 
 	while (1)
 	{
-		uart_receive_data(buffer, 50);
-		uart_transmit_data(buffer, 50);
+		uart_receive(input, 50);
+		uart_transmit(input, 50);
 	}
-}
-/* Test code for PIC16F690 serial I/O */
-
-void serial_test(void)
-{
-	init_hardware();
-	uart_init();
-
-	serial_println(NEWLINE NEWLINE "======= SERIAL Test =======" NEWLINE);
-
-	serial_print("serial_print(): Hello" NEWLINE);
-	serial_println("serial_println(): Hello");
-	serial_printf("serial_printf(): number = %d" NEWLINE, 7);
-	serial_print("serial_printc(): ");
-	serial_printc('K');
-	serial_print(NEWLINE);
-
-	char input [50];
-	serial_print("Please enter some text: ");
-	serial_printf(NEWLINE "bytes read: %d" NEWLINE, serial_read(input, 50));
-	serial_printf("You entered: %s" NEWLINE, input);
-
-	while (1);
 }
 
 /* Test code for PIC16F690 Analogue-to-Digital Converter */
@@ -112,7 +97,7 @@ void adc_test(void)
 	uart_init();
 	adc_init();
 
-	serial_println(NEWLINE NEWLINE "======= ADC Test =======" NEWLINE);
+	uart_print(NEWLINE NEWLINE "======= ADC Test =======" NEWLINE NEWLINE);
 
 	TRISB4 = 1;   // set RB4 as an input
 	ANS10 = 1;    // set RB4 as analogue
@@ -127,7 +112,7 @@ void adc_test(void)
 	{
 		reading_AN9 = adc_read(9);
 		reading_AN10 = adc_read(10);
-		serial_printf("AN9: %d, AN10: %d" NEWLINE, reading_AN9, reading_AN10);
+		uart_print("AN9: %d, AN10: %d" NEWLINE, reading_AN9, reading_AN10);
 		_delay(100000);
 	}
 }
@@ -141,7 +126,7 @@ void accel_test(void)
 	adc_init();
 	accel_init();
 
-	serial_println(NEWLINE NEWLINE "======= ACCEL Test =======" NEWLINE);
+	uart_print(NEWLINE NEWLINE "======= ACCEL Test =======" NEWLINE NEWLINE);
 
 	int x = 0;
 	int y = 0;
@@ -153,7 +138,7 @@ void accel_test(void)
 		y = accel_y();
 		z = accel_z();
 
-		serial_printf("X: %d, Y: %d, Z: %d" NEWLINE, x, y, z);
+		uart_print("X: %d, Y: %d, Z: %d" NEWLINE, x, y, z);
 		_delay(100);
 	}
 }
@@ -167,7 +152,7 @@ void flex_test(void)
 	adc_init();
 	flex_init();
 
-	serial_println(NEWLINE NEWLINE "======= FLEX Test =======" NEWLINE);
+	uart_print(NEWLINE NEWLINE "======= FLEX Test =======" NEWLINE NEWLINE);
 
 	int f1 = 0;
 	int f2 = 0;
@@ -183,7 +168,7 @@ void flex_test(void)
 		f4 = flex_f4();
 		f5 = flex_f5();
 
-		serial_printf("1: %d, 2: %d, 3: %d, 4: %d, 5: %d" NEWLINE, f1, f2, f3, f4, f5);
+		uart_print("1: %d, 2: %d, 3: %d, 4: %d, 5: %d" NEWLINE, f1, f2, f3, f4, f5);
 		_delay(10);
 	}
 }

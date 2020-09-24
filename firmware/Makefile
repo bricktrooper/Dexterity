@@ -17,13 +17,13 @@ endif
 
 ifeq ($(TARGET), test)
 	SRC += test.c
-	EXE = test.hex
+	BIN = test.hex
 else ifeq ($(TARGET), dexterity)
 	SRC += dexterity.c
-	EXE = dexterity.hex
+	BIN = dexterity.hex
 else ifeq ($(TARGET), )
 	SRC += dexterity.c
-	EXE = dexterity.hex
+	BIN = dexterity.hex
 else ifeq ($(TARGET), clean)
 	# Run clean as usual
 else
@@ -33,39 +33,39 @@ endif
 SRC += utils.c
 SRC += init.c
 SRC += uart.c
-SRC += serial.c
 SRC += flex.c
 SRC += accel.c
 SRC += adc.c
 SRC += led.c
 SRC += button.c
 
-BIN = bin
+OUT = bin
 OBJ = $(SRC:.c=.p1)
 DEP = $(SRC:.c=.d)
-ART += $(BIN)
+ART += $(OUT)
 
-$(shell mkdir -p $(BIN))
+$(shell mkdir -p $(OUT))
 
 .PHONY:
-dexterity: $(BIN)/$(EXE)
+dexterity: $(OUT)/$(BIN)
 .PHONY:
-test: $(BIN)/$(EXE)
+test: $(OUT)/$(BIN)
 
-$(BIN)/$(EXE): $(addprefix $(BIN)/, $(OBJ))
-	@echo LD $(OBJ)
+$(OUT)/$(BIN): $(addprefix $(OUT)/, $(OBJ))
+	@echo "LD   $(OBJ)"
 	@$(LD) $(LDFLAGS) $^ -o $@
+	@echo "BIN  $(BIN)"
 
-$(BIN)/%.p1: %.c
-	@echo CC $<
+$(OUT)/%.p1: %.c
+	@echo "CC   $<"
 	@$(CC) $(CFLAGS) $(TEST_TYPE) -c $< -o $@
 
-$(BIN)/%.d: %.c
+$(OUT)/%.d: %.c
 	@$(CC) $(CFLAGS) -MM $< -MF $@
-	@mv $(subst .c,.i,$<) $(BIN)
+	@mv $(subst .c,.i,$<) $(OUT)
 
--include $(addprefix $(BIN)/, $(DEP))
+-include $(addprefix $(OUT)/, $(DEP))
 
 clean:
-	@echo RM $(ART)
+	@echo "RM   $(ART)"
 	@rm -rf $(ART)

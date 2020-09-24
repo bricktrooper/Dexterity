@@ -50,68 +50,67 @@ char uart_receive_byte(void)
 	return RCREG;                 // read new byte from RX buffer
 }
 
-int uart_transmit(char * data, int length)
+int uart_transmit(char * data, int size)
 {
-	if (data == null || length < 0)
+	if (data == null || size < 0)
 	{
 		return ERROR;
 	}
 
-	int byte_count = 0;
+	int count = 0;
 
-	for (int i = 0; i < length; i++)
+	for (int i = 0; i < size; i++)
 	{
 		uart_transmit_byte(data[i]);
-		byte_count++;
+		count++;
 	}
 
-	return byte_count;
+	return count;
 }
 
-int uart_receive(char * buffer, int length)
+int uart_receive(char * data, int size)
 {
-	if (buffer == null || length < 0)
+	if (data == null || size < 0)
 	{
 		return ERROR;
 	}
 
-	int byte_count = 0;
+	int count = 0;
 
-	for (int i = 0; i < length; i++)
+	for (int i = 0; i < size; i++)
 	{
-		buffer[i] = uart_receive_byte();
-		byte_count++;
+		data[i] = uart_receive_byte();
+		count++;
 	}
 
-	return byte_count;
+	return count;
 }
 
-int uart_read(char * input, int length)
+int uart_scan(char * data, int size)
 {
-	if (input == null || length < 0)
+	if (data == null || size < 0)
 	{
 		return ERROR;
 	}
 
-	char next_byte = 0;
-	int byte_count = 0;
-	memset(input, 0, length);
+	char next = 0;
+	int count = 0;
+	memset(data, 0, size);
 
-	for (int i = 0; i < length - 1; i++)
+	for (int i = 0; i < size - 1; i++)
 	{
-		next_byte = uart_receive_byte();
+		next = uart_receive_byte();
 
-		if (next_byte == '\r')   // carriage return [Enter] indicates end of transmission
+		if (next == '\r')   // carriage return [Enter] indicates end of transmission
 		{
-
 			break;
 		}
 
-		input[i] = next_byte;    // save new byte in input buffer
-		byte_count++;
+		data[i] = next;    // save new byte in input buffer
+		count++;
 	}
 
-	return byte_count;
+	return count;
 }
 
 void putch(char byte)

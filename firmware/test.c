@@ -75,7 +75,7 @@ void uart_test(void)
 
 	char input [50];
 	uart_print("Please enter some text: ");
-	int received = uart_read(input, 50);
+	int received = uart_scan(input, 50);
 	uart_print(NEWLINE);
 	uart_print("Bytes read: %d" NEWLINE, received);
 	uart_print("You entered: %s" NEWLINE, input);

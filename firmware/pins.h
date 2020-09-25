@@ -13,13 +13,13 @@
 
 // ACCELEROMETER //
 
-#define X_TRIS   TRISC7
+#define X_TRIS   TRISC3
 #define Y_TRIS   TRISC6
-#define Z_TRIS   TRISC3
+#define Z_TRIS   TRISC7
 
-#define X_ANSEL   ANS9
+#define X_ANSEL   ANS7
 #define Y_ANSEL   ANS8
-#define Z_ANSEL   ANS7
+#define Z_ANSEL   ANS9
 
 #define X_CHANNEL   7
 #define Y_CHANNEL   8

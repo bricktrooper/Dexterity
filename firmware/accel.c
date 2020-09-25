@@ -7,6 +7,10 @@
 
 #include "accel.h"
 
+#define ACCEL_DEFAULT_ZERO   100
+
+static struct Analogue sensors [3];
+
 void accel_init(void)
 {
 	adc_set_vref(EXTERNAL);   // use external VREF for conversions (3.3V)
@@ -16,36 +20,55 @@ void accel_init(void)
 	X_TRIS = 1;      // set X-axis pin as an input
 	X_ANSEL = 1;     // set X-axis pin as analogue
 
+	sensors[X].channel = X_CHANNEL;
+	accel_default(X);
+
 	// Y Axis //
 
 	Y_TRIS = 1;      // set Y-axis pin as an input
 	Y_ANSEL = 1;     // set Y-axis pin as analogue
 
+	sensors[Y].channel = Y_CHANNEL;
+	accel_default(Y);
+
 	// Z Axis //
 
 	Z_TRIS = 1;      // set Z-axis pin as an input
 	Z_ANSEL = 1;     // set Z-axis pin as analogue
+
+	sensors[Z].channel = Z_CHANNEL;
+	accel_default(Z);
 }
 
-int accel_scale(int reading)
+int accel_scale(int reading, int min, int max, int zero)
 {
-	/* scale acceleration reading from
-	 * 0 <-> 1023 (511.5 = 0 m/s^2) to
-	 * -100 <-> +100 (0 = 0 m/s^2) */
-	return (int)(200 * ((double)(reading) / (double)(ADC_MAX - ADC_MIN))) - 100;
+	if (max - min == 0)   // avoid divide by 0
+	{
+		return ERROR;
+	}
+
+	// scale acceleration reading from 'min' <-> '1023' to -100 <-> +100 centered at 'zero'
+	return ((200 * (reading - min)) / (max - min)) - zero;
 }
 
-int accel_x(void)
+void accel_calibrate(enum Direction direction, int min, int max, int zero)
 {
-	return accel_scale(adc_read(X_CHANNEL));
+	sensors[direction].min = min;
+	sensors[direction].max = max;
+	sensors[direction].zero = zero;
 }
 
-int accel_y(void)
+void accel_default(enum Direction direction)
 {
-	return accel_scale(adc_read(Y_CHANNEL));
+	accel_calibrate(direction, ADC_MIN, ADC_MAX, ACCEL_DEFAULT_ZERO);
 }
 
-int accel_z(void)
+int accel_read(enum Direction direction)
 {
-	return accel_scale(adc_read(Z_CHANNEL));
+	return accel_scale(accel_raw(direction), sensors[direction].min, sensors[direction].max, sensors[direction].zero);
+}
+
+int accel_raw(enum Direction direction)
+{
+	return adc_read(sensors[direction].channel);
 }

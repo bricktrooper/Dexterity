@@ -134,9 +134,9 @@ void accel_test(void)
 
 	while (1)
 	{
-		x = accel_x();
-		y = accel_y();
-		z = accel_z();
+		x = accel_read(X);
+		y = accel_read(Y);
+		z = accel_read(Z);
 
 		uart_print("X: %d, Y: %d, Z: %d" NEWLINE, x, y, z);
 		_delay(100);
@@ -162,11 +162,11 @@ void flex_test(void)
 
 	while (1)
 	{
-		f1 = flex_f1();
-		f2 = flex_f2();
-		f3 = flex_f3();
-		f4 = flex_f4();
-		f5 = flex_f5();
+		f1 = flex_read(F1);
+		f2 = flex_read(F2);
+		f3 = flex_read(F3);
+		f4 = flex_read(F4);
+		f5 = flex_read(F5);
 
 		uart_print("1: %d, 2: %d, 3: %d, 4: %d, 5: %d" NEWLINE, f1, f2, f3, f4, f5);
 		_delay(10);

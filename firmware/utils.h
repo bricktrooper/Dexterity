@@ -7,9 +7,8 @@
 #define WARNING    1
 #define SUCCESS    0
 
-struct Analogue
+struct Calibration
 {
-	int channel;
 	int max;
 	int min;
 	int zero;

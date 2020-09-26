@@ -9,7 +9,8 @@
 
 #define FLEX_DEFAULT_ZERO   0
 
-static struct Analogue sensors [5];
+static struct Calibration calibration [5];
+static int channels [] = {F1_CHANNEL, F2_CHANNEL, F3_CHANNEL, F4_CHANNEL, F5_CHANNEL};
 
 void flex_init(void)
 {
@@ -17,43 +18,33 @@ void flex_init(void)
 
 	// FINGER 1 //
 
-	F1_TRIS = 1;      // set finger 1 pin as an input
-	F1_ANSEL = 1;     // set finger 1 pin as analogue
-
-	sensors[F1].channel = F1_CHANNEL;
-	flex_default(F1);
+	F1_TRIS = 1;        // set finger 1 pin as an input
+	F1_ANSEL = 1;       // set finger 1 pin as analogue
+	flex_default(F1);   // use default calibration
 
 	// FINGER 2 //
 
-	F2_TRIS = 1;      // set finger 2 pin as an input
-	F2_ANSEL = 1;     // set finger 2 pin as analogue
-
-	sensors[F2].channel = F2_CHANNEL;
-	flex_default(F2);
+	F2_TRIS = 1;        // set finger 2 pin as an input
+	F2_ANSEL = 1;       // set finger 2 pin as analogue
+	flex_default(F2);   // use default calibration
 
 	// FINGER 1 //
 
-	F3_TRIS = 1;      // set finger 3 pin as an input
-	F3_ANSEL = 1;     // set finger 3 pin as analogue
-
-	sensors[F3].channel = F3_CHANNEL;
-	flex_default(F3);
+	F3_TRIS = 1;        // set finger 3 pin as an input
+	F3_ANSEL = 1;       // set finger 3 pin as analogue
+	flex_default(F3);   // use default calibration
 
 	// FINGER 4 //
 
-	F4_TRIS = 1;      // set finger 4 pin as an input
-	F4_ANSEL = 1;     // set finger 4 pin as analogue
-
-	sensors[F4].channel = F4_CHANNEL;
-	flex_default(F4);
+	F4_TRIS = 1;        // set finger 4 pin as an input
+	F4_ANSEL = 1;       // set finger 4 pin as analogue
+	flex_default(F4);   // use default calibration
 
 	// FINGER 5 //
 
-	F5_TRIS = 1;      // set finger 5 pin as an input
-	F5_ANSEL = 1;     // set finger 5 pin as analogue
-
-	sensors[F5].channel = F5_CHANNEL;
-	flex_default(F5);
+	F5_TRIS = 1;        // set finger 5 pin as an input
+	F5_ANSEL = 1;       // set finger 5 pin as analogue
+	flex_default(F5);   // use default calibration
 }
 
 int flex_scale(int reading, int min, int max, int zero)
@@ -69,9 +60,9 @@ int flex_scale(int reading, int min, int max, int zero)
 
 void flex_calibrate(enum Finger finger, int min, int max, int zero)
 {
-	sensors[finger].min = min;
-	sensors[finger].max = max;
-	sensors[finger].zero = zero;
+	calibration[finger].min = min;
+	calibration[finger].max = max;
+	calibration[finger].zero = zero;
 }
 
 void flex_default(enum Finger finger)
@@ -81,10 +72,10 @@ void flex_default(enum Finger finger)
 
 int flex_read(enum Finger finger)
 {
-	return flex_scale(flex_raw(finger), sensors[finger].min, sensors[finger].max, sensors[finger].zero);
+	return flex_scale(flex_raw(finger), calibration[finger].min, calibration[finger].max, calibration[finger].zero);
 }
 
 int flex_raw(enum Finger finger)
 {
-	return adc_read(sensors[finger].channel);
+	return adc_read(channels[finger]);
 }

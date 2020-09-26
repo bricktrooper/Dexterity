@@ -1,9 +1,10 @@
 // screen tty.usbserial-AL065BVB 9600
 // (ctrl + a + k) ---> y
 
-#include <string.h>
 #include <xc.h>
 #include <pic16f690.h>
+
+#include <string.h>
 
 #include "utils.h"
 

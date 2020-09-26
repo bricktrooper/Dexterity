@@ -7,7 +7,7 @@ CFLAGS += -mc90lib
 LDFLAGS += -mcpu=16F690
 LDFLAGS += -mc90lib
 # LDFLAGS += -msummary=none
-LDFLAGS += -mwarn=-2
+LDFLAGS += -mwarn=0
 
 TARGET = $(word 1, $(MAKECMDGOALS))
 

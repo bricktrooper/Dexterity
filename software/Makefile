@@ -1,9 +1,11 @@
 CC = gcc
 LD = gcc
 
-CFLAGS += -Wall -Wpedantic
+CFLAGS += -Wall
+CFLAGS += -Wpedantic
 
-LDFLAGS += -Wall -Wpedantic
+LDFLAGS += -Wall
+LDFLAGS += -Wpedantic
 
 TARGET = $(word 1, $(MAKECMDGOALS))
 
@@ -19,8 +21,8 @@ else
   $(error Unknown target '$(TARGET)')
 endif
 
-SRC += dexterity.c
 SRC += log.c
+SRC += serial.c
 
 OUT = bin
 OBJ = $(SRC:.c=.o)

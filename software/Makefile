@@ -20,6 +20,7 @@ else
 endif
 
 SRC += dexterity.c
+SRC += messages.c
 
 OUT = bin
 OBJ = $(SRC:.c=.o)

@@ -2,13 +2,13 @@
 #include <stdarg.h>
 
 #include "colours.h"
-#include "messages.h"
+#include "log.h"
 
 #define ERROR     -1
 #define WARNING    1
 #define SUCCESS    0
 
-int print_error(const char * format, ...)
+int log_error(const char * format, ...)
 {
 	if (format == NULL)
 	{
@@ -25,7 +25,7 @@ int print_error(const char * format, ...)
 	return SUCCESS;
 }
 
-int print_warning(const char * format, ...)
+int log_warning(const char * format, ...)
 {
 	if (format == NULL)
 	{
@@ -42,7 +42,7 @@ int print_warning(const char * format, ...)
 	return SUCCESS;
 }
 
-int print_success(const char * format, ...)
+int log_success(const char * format, ...)
 {
 	if (format == NULL)
 	{
@@ -59,7 +59,7 @@ int print_success(const char * format, ...)
 	return SUCCESS;
 }
 
-int print_debug(const char * format, ...)
+int log_debug(const char * format, ...)
 {
 	if (format == NULL)
 	{
@@ -76,7 +76,7 @@ int print_debug(const char * format, ...)
 	return SUCCESS;
 }
 
-int print_info(const char * format, ...)
+int log_info(const char * format, ...)
 {
 	if (format == NULL)
 	{

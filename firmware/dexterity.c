@@ -96,7 +96,7 @@ void init(void)
 
 int sample(struct Hand * hand)
 {
-	if (hand == null)
+	if (hand == NULL)
 	{
 		return ERROR;
 	}

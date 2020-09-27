@@ -53,7 +53,7 @@ char uart_receive_byte(void)
 
 int uart_transmit(char * data, int size)
 {
-	if (data == null || size < 0)
+	if (data == NULL || size < 0)
 	{
 		return ERROR;
 	}
@@ -71,7 +71,7 @@ int uart_transmit(char * data, int size)
 
 int uart_receive(char * data, int size)
 {
-	if (data == null || size < 0)
+	if (data == NULL || size < 0)
 	{
 		return ERROR;
 	}
@@ -89,7 +89,7 @@ int uart_receive(char * data, int size)
 
 int uart_scan(char * data, int size)
 {
-	if (data == null || size < 0)
+	if (data == NULL || size < 0)
 	{
 		return ERROR;
 	}

@@ -1,8 +1,6 @@
 #ifndef UTILS_H
 #define UTILS_H
 
-#define null       0
-
 #define ERROR     -1
 #define WARNING    1
 #define SUCCESS    0

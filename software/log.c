@@ -10,11 +10,11 @@
 #define SUCCESS    0
 
 static char * prefixes [] = {
-	RED     "ERROR: "    WHITE,
-	YELLOW  "WARNING: "  WHITE,
-	GREEN   "SUCCESS: "  WHITE,
-	BLUE    "DEBUG: "    WHITE,
-	PURPLE  "-> "        WHITE
+	RED     "X "  WHITE,
+	YELLOW  "! "  WHITE,
+	GREEN   "~ "  WHITE,
+	BLUE    "# "  WHITE,
+	PURPLE  "> "  WHITE
 };
 
 static int supressed [] = {

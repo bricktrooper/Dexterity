@@ -7,11 +7,11 @@
 
 enum LogType
 {
-	ERROR,
-	WARNING,
-	SUCCESS,
-	DEBUG,
-	INFO
+	LOG_ERROR,
+	LOG_WARNING,
+	LOG_SUCCESS,
+	LOG_DEBUG,
+	LOG_INFO
 };
 
 void log_suppress(enum LogType type, bool suppress);

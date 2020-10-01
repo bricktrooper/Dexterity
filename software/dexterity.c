@@ -26,7 +26,7 @@ int main(void)
 	while (1)
 	{
 		memset(buffer, 0, sizeof(buffer));
-		tcflush(serial_port, TCIFLUSH);   // Discard any old data from RX buffer before making a new request
+		serial_purge();   // Discard any old data from RX buffer before making a new request
 		serial_write("sample\r", strlen("sample\r"));
 		serial_read(buffer, sizeof(buffer) - 1);
 		printf("%s\n", buffer);

@@ -20,7 +20,7 @@
 
 extern int errno;
 
-int serial_port = SERIAL_CLOSED;
+static int serial_port = SERIAL_CLOSED;
 static struct termios settings;
 
 static int serial_is_open(void)
@@ -149,6 +149,23 @@ int serial_close(void)
 	close(serial_port);
 	serial_port = -1;
 	log_print(LOG_SUCCESS, "%s(): Closed serial port '%s'\n", __func__, SERIAL_PORT);
+
+	return SUCCESS;
+}
+
+int serial_purge(void)
+{
+	if (!serial_is_open())
+	{
+		log_print(LOG_ERROR, "%s(): The serial port is not open\n", __func__);
+		return ERROR;
+	}
+
+	if (tcflush(serial_port, TCIFLUSH) == ERROR)
+	{
+		log_print(LOG_ERROR, "%s(): Failed to purge serial port RX buffer: %s (%d)\n", __func__, strerror(errno), errno);
+		return ERROR;
+	}
 
 	return SUCCESS;
 }

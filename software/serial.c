@@ -13,38 +13,51 @@
 #define WARNING    1
 #define SUCCESS    0
 
-#define SERIAL_PORT  "/dev/cu.usbserial-AL065BVB"   // Use 'cu' instead of 'tty' to prevent DCD (data-carrier-detect)
-// +++++++++++=======++++++++++++++++++++++++++++++++++ASDASDAS+++++++++++++++++++++++ chane the device name back
+#define SERIAL_PORT        "/dev/cu.usbserial-AQ00PEW7"   // Use 'cu' instead of 'tty' to prevent DCD (data-carrier-detect)
+#define SERIAL_CLOSED     -1                              // Invalid fie descriptor for closed serial port
+#define RX_READ_TIMEOUT    1                              // timeout in deciseconds (10^-1 s)
+#define TX_WRITE_DELAY     1500                           // delay in us between 1B writes to TX (used to avoid RX buffer overrun on PIC)
+
 extern int errno;
 
-static int serial_port = -1;
+int serial_port = SERIAL_CLOSED;
 static struct termios settings;
+
+static int serial_is_open(void)
+{
+	return (serial_port != SERIAL_CLOSED);
+}
 
 int serial_open(void)
 {
 	int rc = ERROR;
 
+	if (serial_is_open())
+	{
+		log_print(LOG_WARNING, "%s(): The serial port is already open\n", __func__);
+		return WARNING;
+	}
+
 	// OPEN SERIAL PORT //
+
 	serial_port = open(SERIAL_PORT, O_RDWR);
 	tcflush(serial_port, TCIOFLUSH);   // Discard any old data from RX and TX buffer
 
 	if (serial_port < 0)
 	{
 		log_print(LOG_ERROR, "%s(): Failed to open serial port '%s': %s (%d)\n", __func__, SERIAL_PORT, strerror(errno), errno);
-		goto EXIT;
+		return ERROR;
 	}
 
 	log_print(LOG_SUCCESS, "%s(): Opened serial port '%s'\n", __func__, SERIAL_PORT);
 
 	// GET SERIAL PORT ATTRIBUTES //
 
-	cfmakeraw(&settings);
-
-	// if (tcgetattr(serial_port, &settings) != 0)
-	// {
-	// 	log_print(LOG_ERROR, "%s(): Failed to get serial port attributes: %s (%d)\n", __func__, strerror(errno), errno);
-	// 	goto EXIT;
-	// }
+	if (tcgetattr(serial_port, &settings) != 0)
+	{
+		log_print(LOG_ERROR, "%s(): Failed to get serial port attributes: %s (%d)\n", __func__, strerror(errno), errno);
+		goto EXIT;
+	}
 
 	// APPLY SETTINGS //
 
@@ -52,93 +65,48 @@ int serial_open(void)
 	// Use these masks to either set or clear settings.
 	// Code adapted from https://blog.mbedded.ninja/programming/operating-systems/linux/linux-serial-ports-using-c-cpp/#overview
 
-	// local modes
-	settings.c_lflag &= ~ICANON;
-	settings.c_lflag &= ~ISIG;
-	settings.c_lflag &= ~IEXTEN;
-	settings.c_lflag &= ~ECHO;
-	settings.c_lflag &= ~ECHOE;
-	settings.c_lflag &= ~ECHOK;
-	settings.c_lflag &= ~ECHOKE;
-	settings.c_lflag &= ~ECHONL;
-	settings.c_lflag &= ~ECHOCTL;
-	settings.c_lflag &= ~ECHOPRT;
-	settings.c_lflag &= ~ALTWERASE;
-	settings.c_lflag &= ~NOFLSH;
-	settings.c_lflag &= ~TOSTOP;
-	settings.c_lflag &= ~FLUSHO;
-	settings.c_lflag &= ~PENDIN;
-	settings.c_lflag &= ~NOKERNINFO;
-	settings.c_lflag &= ~EXTPROC;
+	// LOCAL //
+	settings.c_lflag &= ~ICANON;    // disable canonical mode (newline delimiter)
+	settings.c_lflag &= ~ISIG;      // disable interpretation of INTR, QUIT and SUSP characters
+	settings.c_lflag &= ~IEXTEN;    // disable input processing
+	settings.c_lflag &= ~ECHO;      // disable echo
+	settings.c_lflag &= ~ECHOE;     // disable erasure
+	settings.c_lflag &= ~ECHOK;     // disable kill erasure
+	settings.c_lflag &= ~ECHONL;    // disable newline echo
+	settings.c_iflag &= ~IXON;      // disable output flow control
+	settings.c_iflag &= ~IXOFF;     // disable input flow control
+	settings.c_iflag &= ~IXANY;     // disable restart flow control
 
-	// input modes
-	settings.c_iflag &= ~ISTRIP;
-	settings.c_iflag &= ~ICRNL;
-	settings.c_iflag &= ~INLCR;
-	settings.c_iflag &= ~IGNCR;
-	settings.c_iflag &= ~IXON;
-	settings.c_iflag &= ~IXOFF;
-	settings.c_iflag &= ~IXANY;
-	settings.c_iflag &= ~IMAXBEL;
-	settings.c_iflag &= ~IUTF8;
+	// CONTROL //
+	settings.c_cflag &= ~PARENB;    // disable parity
+	settings.c_cflag &= ~CSTOPB;    // use one stop bit
+	settings.c_cflag &= ~CSIZE;     // clear data size (bits per byte)
+	settings.c_cflag &= ~CRTSCTS;   // Disable RTS/CTS
+	settings.c_cflag |= CS8;        // set data size to 8 bits per byte
+	settings.c_cflag |= CREAD;      // Enable reading
+	settings.c_cflag |= CLOCAL;     // ignore control signals
+
+	// OUTPUT //
+	settings.c_oflag &= ~OPOST;     // Disable special interpretation of output bytes (e.g. newline)
+	settings.c_oflag &= ~ONLCR;     // Disable conversion of newline to carriage return/line feed
+	settings.c_oflag &= ~OXTABS;    // Disable conversion of tabs to spaces
+	settings.c_oflag &= ~ONOEOT;    // Disable removal of C-d chars (0x004) in output
+
+	// INPUT //
+	// disable special handling of received bytes and get raw data instead
 	settings.c_iflag &= ~IGNBRK;
 	settings.c_iflag &= ~BRKINT;
-	settings.c_iflag &= ~INPCK;
-	settings.c_iflag &= ~IGNPAR;
 	settings.c_iflag &= ~PARMRK;
+	settings.c_iflag &= ~ISTRIP;
+	settings.c_iflag &= ~INLCR;
+	settings.c_iflag &= ~IGNCR;
+	settings.c_iflag &= ~ICRNL;
 
-	// output modes
-	settings.c_oflag &= ~OPOST;
-	settings.c_oflag &= ~ONLCR;
-	settings.c_oflag &= ~OXTABS;
-	settings.c_oflag &= ~ONOCR;
-	settings.c_oflag &= ~ONLRET;
+	// SPECIAL CHARACTERS //
+	settings.c_cc[VTIME] = RX_READ_TIMEOUT;   // Timeout in deciseconds (10^-1 s) before timeout
+	settings.c_cc[VMIN] = 0;                  // blocking
 
-	// control modes
-	settings.c_cflag &= ~PARENB;
-	settings.c_cflag &= ~PARODD;
-	settings.c_cflag &= ~CSTOPB;
-	settings.c_cflag &= ~CRTSCTS;
-	settings.c_cflag &= ~CSIZE;
-	// settings.c_cflag &= ~DSRFLOW;
-	// settings.c_cflag &= ~DTRFLOW;
-	settings.c_cflag &= ~CDSR_OFLOW;
-	settings.c_cflag &= ~CDTR_IFLOW;
-	settings.c_cflag &= ~MDMBUF;
-
-	settings.c_cflag |= CREAD;
-	settings.c_cflag |= CS8;
-	settings.c_cflag |= HUPCL;
-	settings.c_cflag |= CLOCAL;
-
-	// settings.c_lflag &= ~ICANON;                   // disable canonical mode (newline delimiter)
-	// settings.c_lflag &= ~ISIG;                     // disable interpretation of INTR, QUIT and SUSP characters
-	// settings.c_lflag &= ~IEXTEN;                   // disable input processing
-	// settings.c_lflag &= ~ECHO;                     // disable echo
-	// settings.c_lflag &= ~ECHOE;                    // disable erasure
-	// settings.c_lflag &= ~ECHOK;
-
-	// settings.c_lflag &= ~ECHONL;                   // disable newline echo
-	// settings.c_iflag &= ~(IXON | IXOFF | IXANY);   // disable software flow ctrl
-
-	// settings.c_cflag &= ~PARENB;                   // disable parity
-	// settings.c_cflag &= ~CSTOPB;                   // use one stop bit
-	// settings.c_cflag &= ~CSIZE;                    // clear data size (bits per byte)
-	// settings.c_cflag |= CS8;                       // set data size to 8 bits per byte
-	// settings.c_cflag &= ~CRTSCTS;                  // Disable RTS/CTS
-	// settings.c_cflag |= CREAD | CLOCAL;            // Enable reading and ignore control signals
-
-	// settings.c_iflag &= ~(IGNBRK | BRKINT | PARMRK | ISTRIP | INLCR | IGNCR | ICRNL);   // disable special handling of received bytes (gives us raw data)
-
-	// settings.c_oflag &= ~OPOST;                    // Disable special interpretation of output bytes (e.g. newline)
-	// settings.c_oflag &= ~ONLCR;                    // Disable conversion of newline to carriage return/line feed
-	// settings.c_oflag &= ~OXTABS;                   // Disable conversion of tabs to spaces
-	// settings.c_oflag &= ~ONOEOT;                   // Disable removal of C-d chars (0x004) in output
-
-	settings.c_cc[VTIME] = 1;                      // Timeout in deciseconds (10^-1 s) before timeout
-	settings.c_cc[VMIN] = 0;                       // blocking
-
-	// SET BAUD RATE //
+	// BAUD RATE //
 
 	if (cfsetispeed(&settings, B9600) < 0)   // Set input baud rate to 9600
 	{
@@ -172,9 +140,9 @@ EXIT:
 
 int serial_close(void)
 {
-	if (serial_port < 0)
+	if (!serial_is_open())
 	{
-		log_print(LOG_WARNING, "%s(): Invalid serial port file descriptor '%d'\n", __func__, serial_port);
+		log_print(LOG_WARNING, "%s(): The serial port is not open\n", __func__);
 		return WARNING;
 	}
 
@@ -193,18 +161,43 @@ int serial_read(char * data, int size)
 		return ERROR;
 	}
 
-	if (serial_port < 0)
+	if (!serial_is_open())
 	{
-		log_print(LOG_ERROR, "%s(): Serial port is not open\n", __func__);
+		log_print(LOG_ERROR, "%s(): The serial port is not open\n", __func__);
 		return ERROR;
 	}
 
-	int received = read(serial_port, data, size);
+	int received = 0;
 
-	if (received < 0)
+	do
 	{
-		log_print(LOG_ERROR, "%s(): Failed to read from serial port: %s (%d)\n", __func__, strerror(errno), errno);
-		return ERROR;
+		int result = read(serial_port, data + received, size - received);
+
+		if (result == 0)   // done reading
+		{
+			break;
+		}
+		else if (result < 0)   // error
+		{
+			received = result;
+			break;
+		}
+
+		received += result;
+	}
+	while (received < size);
+
+	if (received != size)
+	{
+		if (errno == ETIMEDOUT)
+		{
+			log_print(LOG_WARNING, "%s(): %s (%d)\n", __func__, strerror(errno), errno);
+		}
+		else
+		{
+			log_print(LOG_ERROR, "%s(): Failed to read from serial port: %s (%d)\n", __func__, strerror(errno), errno);
+			return ERROR;
+		}
 	}
 
 	log_print(LOG_INFO, "%s(): Read %dB from the serial port\n", __func__, received);
@@ -219,9 +212,9 @@ int serial_write(char * data, int size)
 		return ERROR;
 	}
 
-	if (serial_port < 0)
+	if (!serial_is_open())
 	{
-		log_print(LOG_ERROR, "%s(): Serial port is not open\n", __func__);
+		log_print(LOG_ERROR, "%s(): The serial port is not open\n", __func__);
 		return ERROR;
 	}
 
@@ -229,21 +222,22 @@ int serial_write(char * data, int size)
 
 	for (int i = 0; i < size; i++)
 	{
-		int ret = write(serial_port, data + i, 1);
+		int result = write(serial_port, data + i, 1);
 		tcdrain(serial_port);
-		usleep(15000);
+		usleep(TX_WRITE_DELAY);
 
-		if (ret == 0)
+		if (result == 0)   // done writing
 		{
 			break;
 		}
-		else if (ret < 0)
+		else if (result < 0)   // error
 		{
-			transmitted = ret;
+			transmitted = result;
+			break;
 		}
-		else
+		else   // continue writing
 		{
-			transmitted += ret;
+			transmitted += result;
 		}
 	}
 

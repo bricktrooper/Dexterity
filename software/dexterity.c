@@ -1,21 +1,37 @@
 #include <stdio.h>
+#include <string.h>
+#include <unistd.h>
+
+
+extern int serial_port;
+
+
+
+#include <termios.h>
 
 #include "log.h"
+#include "serial.h"
+
+#define ERROR     -1
+#define WARNING    1
+#define SUCCESS    0
 
 int main(void)
 {
-	printf("Hello World!\n");
+	serial_open();
+	char buffer [62];
 
-	log_suppress(ERROR, false);
-	log_suppress(WARNING, false);
-	log_suppress(SUCCESS, false);
-	log_suppress(DEBUG, false);
-	log_suppress(INFO, false);
+	log_suppress(LOG_INFO, true);
 
-	log_print(ERROR, "Hello World!\n");
-	log_print(WARNING, "Hello World!\n");
-	log_print(SUCCESS, "Hello World!\n");
-	log_print(DEBUG, "Hello World!\n");
-	log_print(INFO , "Hello World!\n");
-	return 0;
+	while (1)
+	{
+		memset(buffer, 0, sizeof(buffer));
+		tcflush(serial_port, TCIFLUSH);   // Discard any old data from RX buffer before making a new request
+		serial_write("sample\r", strlen("sample\r"));
+		serial_read(buffer, sizeof(buffer) - 1);
+		printf("%s\n", buffer);
+	}
+
+	serial_close();
+	return SUCCESS;
 }

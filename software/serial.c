@@ -167,6 +167,7 @@ int serial_purge(void)
 		return ERROR;
 	}
 
+	log_print(LOG_INFO, "%s(): Purged serial port RX buffer\n", __func__);
 	return SUCCESS;
 }
 

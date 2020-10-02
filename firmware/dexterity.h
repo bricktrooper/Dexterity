@@ -19,6 +19,22 @@ typedef int8_t  S8;
 typedef int16_t S16;
 typedef int32_t S32;
 
+enum Direction
+{
+	X,
+	Y,
+	Z
+};
+
+enum Finger
+{
+	F1,
+	F2,
+	F3,
+	F4,
+	F5
+};
+
 struct Hand
 {
 	S16 accel [3];

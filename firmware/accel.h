@@ -1,12 +1,7 @@
 #ifndef ACCEL_H
 #define ACCEL_H
 
-enum Direction
-{
-	X,
-	Y,
-	Z
-};
+#include "dexterity.h"
 
 void accel_init(void);
 S16 accel_scale(S16 reading, S16 min, S16 max, S16 zero);

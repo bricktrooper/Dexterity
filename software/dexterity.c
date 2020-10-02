@@ -22,18 +22,9 @@ int main(void)
 		serial_write(MESSAGE_SAMPLE"\r", strlen(MESSAGE_SAMPLE"\r"));
 		serial_read((char *)&hand, sizeof(hand));
 
-
-		// WE ALSO NEED TO MAKE A common.h. or maybe let's call it dexteroty.h.  Yeah that sounds fitting.
-		printf("X: %d Y: %d Z: %d F1: %d F2: %d F3: %d F4: %d F5: %d\n",
-						hand.accel[0],
-						hand.accel[1],
-						hand.accel[2],
-						hand.flex[0],
-						hand.flex[1],
-						hand.flex[2],
-						hand.flex[3],
-						hand.flex[4]
-						);
+		log_print(LOG_DEBUG, "X: %d Y: %d Z: %d F1: %d F2: %d F3: %d F4: %d F5: %d\n",
+							hand.accel[X], hand.accel[Y], hand.accel[Z],
+							hand.flex[F1], hand.flex[F2], hand.flex[F3], hand.flex[F4], hand.flex[F5]);
 	}
 
 	serial_close();

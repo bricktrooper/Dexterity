@@ -1,7 +1,7 @@
 #include <xc.h>
 #include <pic16f690.h>
 
-#include "utils.h"
+#include "dexterity.h"
 #include "pins.h"
 #include "adc.h"
 

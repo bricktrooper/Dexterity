@@ -35,7 +35,7 @@ void accel_init(void)
 	accel_default(Z);   // use default calibration
 }
 
-int accel_scale(int reading, int min, int max, int zero)
+S16 accel_scale(S16 reading, S16 min, S16 max, S16 zero)
 {
 	if (max - min == 0)   // avoid divide by 0
 	{
@@ -46,7 +46,7 @@ int accel_scale(int reading, int min, int max, int zero)
 	return ((200 * (reading - min)) / (max - min)) - zero;
 }
 
-void accel_calibrate(enum Direction direction, int min, int max, int zero)
+void accel_calibrate(enum Direction direction, S16 min, S16 max, S16 zero)
 {
 	calibration[direction].min = min;
 	calibration[direction].max = max;
@@ -58,12 +58,12 @@ void accel_default(enum Direction direction)
 	accel_calibrate(direction, ADC_MIN, ADC_MAX, ACCEL_DEFAULT_ZERO);
 }
 
-int accel_read(enum Direction direction)
+S16 accel_read(enum Direction direction)
 {
 	return accel_scale(accel_raw(direction), calibration[direction].min, calibration[direction].max, calibration[direction].zero);
 }
 
-int accel_raw(enum Direction direction)
+S16 accel_raw(enum Direction direction)
 {
 	return adc_read(channels[direction]);
 }

@@ -47,7 +47,7 @@ void flex_init(void)
 	flex_default(F5);   // use default calibration
 }
 
-int flex_scale(int reading, int min, int max, int zero)
+S16 flex_scale(S16 reading, S16 min, S16 max, S16 zero)
 {
 	if (max - min == 0)  // avoid divide by 0
 	{
@@ -58,7 +58,7 @@ int flex_scale(int reading, int min, int max, int zero)
 	return ((100 * (reading - min)) / (max - min)) - zero;
 }
 
-void flex_calibrate(enum Finger finger, int min, int max, int zero)
+void flex_calibrate(enum Finger finger, S16 min, S16 max, S16 zero)
 {
 	calibration[finger].min = min;
 	calibration[finger].max = max;
@@ -70,12 +70,12 @@ void flex_default(enum Finger finger)
 	flex_calibrate(finger, ADC_MIN, ADC_MAX, FLEX_DEFAULT_ZERO);
 }
 
-int flex_read(enum Finger finger)
+S16 flex_read(enum Finger finger)
 {
 	return flex_scale(flex_raw(finger), calibration[finger].min, calibration[finger].max, calibration[finger].zero);
 }
 
-int flex_raw(enum Finger finger)
+S16 flex_raw(enum Finger finger)
 {
 	return adc_read(channels[finger]);
 }

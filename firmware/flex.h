@@ -11,10 +11,10 @@ enum Finger
 };
 
 void flex_init(void);
-int flex_scale(int reading, int min, int max, int zero);
-void flex_calibrate(enum Finger finger, int min, int max, int zero);
+S16 flex_scale(S16 reading, S16 min, S16 max, S16 zero);
+void flex_calibrate(enum Finger finger, S16 min, S16 max, S16 zero);
 void flex_default(enum Finger finger);
-int flex_read(enum Finger finger);
-int flex_raw(enum Finger finger);
+S16 flex_read(enum Finger finger);
+S16 flex_raw(enum Finger finger);
 
 #endif /* FLEX_H */

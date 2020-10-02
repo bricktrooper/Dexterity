@@ -12,7 +12,7 @@ enum Vref
 
 void adc_init(void);
 void adc_run(void);
-int adc_read(int channel);
+S16 adc_read(int channel);
 int adc_set_channel(int channel);
 void adc_set_vref(enum Vref vref);
 

@@ -21,15 +21,15 @@ typedef int32_t S32;
 
 struct Hand
 {
-	U16 accel [3];
-	U16 flex [5];
+	S16 accel [3];
+	S16 flex [5];
 };
 
 struct Calibration
 {
-	U16 max;
-	U16 min;
-	U16 zero;
+	S16 max;
+	S16 min;
+	S16 zero;
 };
 
 #endif /* DEXTERITY_H */

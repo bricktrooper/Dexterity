@@ -23,7 +23,7 @@ void adc_run(void)
 	while (GO_DONE == 1);     // wait for the conversion to finish
 }
 
-int adc_read(int channel)
+S16 adc_read(int channel)
 {
 	if (adc_set_channel(channel))
 	{

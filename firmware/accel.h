@@ -9,10 +9,10 @@ enum Direction
 };
 
 void accel_init(void);
-int accel_scale(int reading, int min, int max, int zero);
-void accel_calibrate(enum Direction direction, int min, int max, int zero);
+S16 accel_scale(S16 reading, S16 min, S16 max, S16 zero);
+void accel_calibrate(enum Direction direction, S16 min, S16 max, S16 zero);
 void accel_default(enum Direction direction);
-int accel_read(enum Direction direction);
-int accel_raw(enum Direction direction);
+S16 accel_read(enum Direction direction);
+S16 accel_raw(enum Direction direction);
 
 #endif /* ACCEL_H */

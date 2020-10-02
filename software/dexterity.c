@@ -19,7 +19,7 @@ int main(void)
 	while (1)
 	{
 		serial_purge();   // Discard any old data from RX buffer before making a new request
-		serial_write("sample\r", strlen("sample\r"));
+		serial_write(MESSAGE_SAMPLE"\r", strlen(MESSAGE_SAMPLE"\r"));
 		serial_read((char *)&hand, sizeof(hand));
 
 
@@ -48,7 +48,7 @@ int init(void)
 	log_suppress(LOG_WARNING, false);
 	log_suppress(LOG_SUCCESS, false);
 	log_suppress(LOG_DEBUG, false);
-	log_suppress(LOG_INFO, false);
+	log_suppress(LOG_INFO, true);
 
 	if (serial_open() != SUCCESS)
 	{

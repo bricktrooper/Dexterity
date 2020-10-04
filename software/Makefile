@@ -3,9 +3,11 @@ LD = gcc
 
 CFLAGS += -Wall
 CFLAGS += -Wpedantic
+CFLAGS += -std=c18
 
 LDFLAGS += -Wall
 LDFLAGS += -Wpedantic
+LDFLAGS += -std=c18
 
 TARGET = $(word 1, $(MAKECMDGOALS))
 

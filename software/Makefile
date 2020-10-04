@@ -1,9 +1,17 @@
 CC = gcc
 LD = gcc
+MM = gcc
+
+INCLUDE += ../common
+
+VPATH += $(INCLUDE)
+
+MMFLAGS += $(addprefix -I , $(INCLUDE))
 
 CFLAGS += -Wall
 CFLAGS += -Wpedantic
 CFLAGS += -std=c18
+CFLAGS += $(addprefix -I , $(INCLUDE))
 
 LDFLAGS += -Wall
 LDFLAGS += -Wpedantic
@@ -24,7 +32,9 @@ else
 endif
 
 SRC += log.c
+SRC += utils.c
 SRC += serial.c
+SRC += messages.c
 
 OUT = bin
 OBJ = $(SRC:.c=.o)
@@ -42,14 +52,14 @@ $(OUT)/$(BIN): $(addprefix $(OUT)/, $(OBJ))
 	@echo "BIN  $(BIN)"
 
 $(OUT)/%.o: %.c
-	@echo "CC   $<"
+	@echo "CC   $(notdir $<)"
 	@$(CC) $(CFLAGS) -c $< -o $@
 
 $(OUT)/%.d: %.c
-	@$(CC) $(CFLAGS) -MM $< -MF $@
+	@$(CC) $(MMFLAGS) -MM $< -MF $@
 
 -include $(addprefix $(OUT)/, $(DEP))
 
 clean:
-	@echo "RM   $(ART)"
+	@echo "RM   $(OUT)/" "$(subst $(subst ,, ),\nRM   , $(notdir $(wildcard $(ART)/*)))"
 	@rm -rf $(ART)

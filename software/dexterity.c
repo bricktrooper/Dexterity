@@ -10,17 +10,6 @@
 int init(void);
 void end(int signal);
 
-char * MESSAGES [] = {
-	"SAMPLE",
-	"CALIBRATE",
-	"SETTINGS",
-	"ERROR",
-	"SUCCESS",
-	"UNKNOWN"
-};
-
-int NUM_MESSAGES = sizeof(MESSAGES);
-
 int main(void)
 {
 	init();

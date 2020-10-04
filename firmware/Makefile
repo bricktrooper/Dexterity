@@ -1,8 +1,16 @@
 CC = xc8-cc
 LD = xc8-cc
+MM = gcc
+
+INCLUDE += ../common
+
+VPATH += $(INCLUDE)
+
+MMFLAGS += $(addprefix -I , $(INCLUDE))
 
 CFLAGS += -mcpu=16F690
 CFLAGS += -mc90lib
+CFLAGS += $(addprefix -I , $(INCLUDE))
 
 LDFLAGS += -mcpu=16F690
 LDFLAGS += -mc90lib
@@ -38,6 +46,7 @@ SRC += accel.c
 SRC += adc.c
 SRC += led.c
 SRC += button.c
+SRC += messages.c
 
 OUT = bin
 OBJ = $(SRC:.c=.p1)
@@ -57,15 +66,14 @@ $(OUT)/$(BIN): $(addprefix $(OUT)/, $(OBJ))
 	@echo "BIN  $(BIN)"
 
 $(OUT)/%.p1: %.c
-	@echo "CC   $<"
+	@echo "CC   $(notdir $<)"
 	@$(CC) $(CFLAGS) $(TEST_TYPE) -c $< -o $@
 
 $(OUT)/%.d: %.c
-	@$(CC) $(CFLAGS) -MM $< -MF $@
-	@mv $(subst .c,.i,$<) $(OUT)
+	@$(MM) $(MMFLAGS) -MM $< -MF $@
 
 -include $(addprefix $(OUT)/, $(DEP))
 
 clean:
-	@echo "RM   $(ART)"
+	@echo "RM   $(OUT)/" "$(subst $(subst ,, ),\nRM   , $(notdir $(wildcard $(ART)/*)))"
 	@rm -rf $(ART)

@@ -20,17 +20,6 @@ void flex_test(void);
 void led_test(void);
 void button_test(void);
 
-char * MESSAGES [] = {
-	"SAMPLE",
-	"CALIBRATE",
-	"SETTINGS",
-	"ERROR",
-	"SUCCESS",
-	"UNKNOWN"
-};
-
-int NUM_MESSAGES = sizeof(MESSAGES);
-
 void main(void)
 {
 #if defined INIT_TEST

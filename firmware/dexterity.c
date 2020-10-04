@@ -20,17 +20,6 @@ void calibrate(struct Calibration * calibration);
 int send(void * data, int size);
 int receive(void * data, int size);
 
-char * MESSAGES [] = {
-	"SAMPLE",
-	"CALIBRATE",
-	"SETTINGS",
-	"ERROR",
-	"SUCCESS",
-	"UNKNOWN"
-};
-
-int NUM_MESSAGES = sizeof(MESSAGES);
-
 void main(void)
 {
 	init();

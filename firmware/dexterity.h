@@ -7,9 +7,7 @@
 #define WARNING    1
 #define SUCCESS    0
 
-#define MESSAGE_BUFFER_SIZE   10
-#define MESSAGE_SAMPLE        "SAMPLE"
-#define MESSAGE_CALIBRATE     "CALIBRATE"
+#define MESSAGE_BUFFER_SIZE   15
 
 typedef uint8_t  U8;
 typedef uint16_t U16;
@@ -35,6 +33,19 @@ enum Finger
 	F5
 };
 
+enum Message
+{
+	MESSAGE_SAMPLE,      // read and send all sensor data
+	MESSAGE_CALIBRATE,   // set the device calibration
+	MESSAGE_SETTINGS,    // get the device calibration
+	MESSAGE_ERROR,       // notify the host of an error
+	MESSAGE_SUCCESS,     // notify the host of a successful operation
+	MESSAGE_UNKNOWN      // message is not found in MESSAGES list
+};
+
+extern char * MESSAGES [];
+extern int NUM_MESSAGES;
+
 struct Hand
 {
 	S16 accel [3];
@@ -47,5 +58,6 @@ struct Calibration
 	S16 min;
 	S16 zero;
 };
+
 
 #endif /* DEXTERITY_H */

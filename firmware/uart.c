@@ -47,6 +47,12 @@ void uart_transmit_byte(char byte)
 
 char uart_receive_byte(void)
 {
+	if (RCSTAbits.OERR == 1)   // Reset receiver if RX buffer is overrun
+	{
+		RCSTAbits.CREN = 0;
+		RCSTAbits.CREN = 1;
+	}
+
 	while (PIR1bits.RCIF == 0);   // wait for RX register to receive new byte
 	return RCREG;                 // read new byte from RX buffer
 }
@@ -80,12 +86,6 @@ int uart_receive(char * data, int size)
 
 	for (int i = 0; i < size; i++)
 	{
-		if (RCSTAbits.OERR == 1)   // Reset receiver if RX buffer is overrun
-		{
-			RCSTAbits.CREN = 0;
-			RCSTAbits.CREN = 1;
-		}
-
 		data[i] = uart_receive_byte();
 		count++;
 	}
@@ -93,18 +93,26 @@ int uart_receive(char * data, int size)
 	return count;
 }
 
-int uart_scan(char * data, int size)
+int uart_transmit_message(enum Message message)
 {
-	if (data == NULL || size < 0)
-	{
-		return ERROR;
-	}
+	char * data = MESSAGES[message];
+	int length = strlen(data);
 
+	uart_transmit(data, length);
+	uart_transmit_byte('\r');   // carriage return [Enter] indicates end of transmission
+
+	return length + 1;
+}
+
+enum Message uart_receive_message(void)
+{
 	char next = 0;
-	int count = 0;
-	memset(data, 0, size);
+	char data [MESSAGE_BUFFER_SIZE];
+	int length = sizeof(data);
 
-	for (int i = 0; i < size - 1; i++)
+	memset(data, 0, length);
+
+	for (int i = 0; i < length - 1; i++)
 	{
 		next = uart_receive_byte();
 
@@ -113,11 +121,23 @@ int uart_scan(char * data, int size)
 			break;
 		}
 
-		data[i] = next;    // save new byte in input buffer
-		count++;
+		data[i] = next;
 	}
 
-	return count;
+	if (data[0] == '\0')   // empty message string
+	{
+		return MESSAGE_UNKNOWN;
+	}
+
+	for (int message = 0; message < NUM_MESSAGES; message++)
+	{
+		if (strncmp(data, MESSAGES[message], MESSAGE_BUFFER_SIZE) == 0)
+		{
+			return message;
+		}
+	}
+
+	return MESSAGE_UNKNOWN;
 }
 
 void putch(char byte)

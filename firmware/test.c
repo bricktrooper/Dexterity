@@ -20,6 +20,17 @@ void flex_test(void);
 void led_test(void);
 void button_test(void);
 
+char * MESSAGES [] = {
+	"SAMPLE",
+	"CALIBRATE",
+	"SETTINGS",
+	"ERROR",
+	"SUCCESS",
+	"UNKNOWN"
+};
+
+int NUM_MESSAGES = sizeof(MESSAGES);
+
 void main(void)
 {
 #if defined INIT_TEST
@@ -74,14 +85,15 @@ void uart_test(void)
 	uart_print("Hello" NEWLINE);
 	uart_print("number = %d" NEWLINE, 7);
 
-	char input [50];
-	uart_print("Please enter some text: ");
-	int received = uart_scan(input, 50);
+	uart_print("Please enter a message: ");
+	enum Message message = uart_receive_message();
 	uart_print(NEWLINE);
-	uart_print("Bytes read: %d" NEWLINE, received);
-	uart_print("You entered: %s" NEWLINE, input);
+	uart_print("Your message was: ");
+	uart_transmit_message(message);
+	uart_print(NEWLINE);
 
-	uart_print("Type up to 50 characters and watch them echo back:" NEWLINE);
+	char input [50];
+	uart_print("Type up to %d characters and watch them echo back:" NEWLINE, sizeof(input));
 
 	while (1)
 	{

@@ -5,6 +5,7 @@
 #include <fcntl.h>
 #include <termios.h>
 
+#include "dexterity.h"
 #include "colours.h"
 #include "serial.h"
 #include "log.h"
@@ -267,4 +268,59 @@ int serial_write(char * data, int size)
 
 	log_print(LOG_INFO, "%s(): Wrote %dB to the serial port\n", __func__, transmitted);
 	return transmitted;
+}
+
+enum Message serial_read_message(void)
+{
+	char next = 0;
+	char data [MESSAGE_BUFFER_SIZE];
+	int length = sizeof(data);
+
+	memset(data, 0, length);
+
+	for (int i = 0; i < length - 1; i++)
+	{
+		if (serial_read(&next, 1) != 1)  // read 1B at a time
+		{
+			log_print(LOG_ERROR, "%s(): Failed to read message character #%d\n", __func__, i);
+			return MESSAGE_UNKNOWN;
+		}
+
+		if (next == '\r')   // carriage return [Enter] indicates end of transmission
+		{
+			break;
+		}
+
+		data[i] = next;
+	}
+
+	for (int message = 0; message < NUM_MESSAGES; message++)
+	{
+		if (strncmp(data, MESSAGES[message], MESSAGE_BUFFER_SIZE) == 0)
+		{
+			return message;
+		}
+	}
+
+	return MESSAGE_UNKNOWN;
+}
+
+int serial_write_message(enum Message message)
+{
+	char * data = MESSAGES[message];
+	int length = strlen(data);
+
+	if (serial_write(data, length) != length)   // read 1B at a time
+	{
+		log_print(LOG_ERROR, "%s(): Failed to write message string\n", __func__);
+		return ERROR;
+	}
+
+	if (serial_write("\r", 1) != 1)   // carriage return [Enter] indicates end of transmission
+	{
+		log_print(LOG_ERROR, "%s(): Failed to write message terminator\n", __func__);
+		return ERROR;
+	}
+
+	return length + 1;
 }

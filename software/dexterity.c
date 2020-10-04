@@ -10,16 +10,33 @@
 int init(void);
 void end(int signal);
 
+char * MESSAGES [] = {
+	"SAMPLE",
+	"CALIBRATE",
+	"SETTINGS",
+	"ERROR",
+	"SUCCESS",
+	"UNKNOWN"
+};
+
+int NUM_MESSAGES = sizeof(MESSAGES);
+
 int main(void)
 {
 	init();
+
+	if (serial_open() != SUCCESS)
+	{
+		log_print(LOG_ERROR, "Initialization failed\n");
+		return ERROR;
+	}
 
 	struct Hand hand;
 
 	while (1)
 	{
 		serial_purge();   // Discard any old data from RX buffer before making a new request
-		serial_write(MESSAGE_SAMPLE"\r", strlen(MESSAGE_SAMPLE"\r"));
+		serial_write_message(MESSAGE_SAMPLE);
 		serial_read((char *)&hand, sizeof(hand));
 
 		log_print(LOG_DEBUG, "X: %d Y: %d Z: %d F1: %d F2: %d F3: %d F4: %d F5: %d\n",
@@ -40,12 +57,6 @@ int init(void)
 	log_suppress(LOG_SUCCESS, false);
 	log_suppress(LOG_DEBUG, false);
 	log_suppress(LOG_INFO, true);
-
-	if (serial_open() != SUCCESS)
-	{
-		log_print(LOG_ERROR, "Initialization failed\n");
-		exit(ERROR);
-	}
 
 	return SUCCESS;
 }

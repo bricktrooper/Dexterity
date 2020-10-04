@@ -20,21 +20,34 @@ void calibrate(struct Calibration * calibration);
 int send(void * data, int size);
 int receive(void * data, int size);
 
+char * MESSAGES [] = {
+	"SAMPLE",
+	"CALIBRATE",
+	"SETTINGS",
+	"ERROR",
+	"SUCCESS",
+	"UNKNOWN"
+};
+
+int NUM_MESSAGES = sizeof(MESSAGES);
+
 void main(void)
 {
 	init();
 
 	struct Hand hand;
-	char message [10];
+	enum Message message;
 
 	while (1)
 	{
-		uart_scan(message, sizeof(message));
+		message = uart_receive_message();
 
-		if (strcmp(message, MESSAGE_SAMPLE) == 0)
+		if (message == MESSAGE_SAMPLE)
 		{
+			// led_on();  // lets not do this cause it will burn out the led.  Reserve the LED for special scenarios like calibration
 			sample(&hand);
 			uart_transmit((char *)&hand, sizeof(hand));
+			// led_off();  // lets not do this cause it will burn out the led.  Reserve the LED for special scenarios like calibration
 			// uart_print("X: %d Y: %d Z: %d F1: %d F2: %d F3: %d F4: %d F5: %d" NEWLINE,
 			// 			hand.accel[X],
 			// 			hand.accel[Y],
@@ -46,13 +59,18 @@ void main(void)
 			// 			hand.flex[F5]
 			// 			);
 		}
-		else if (strcmp(message, MESSAGE_CALIBRATE) == 0)
+		else if (message == MESSAGE_CALIBRATE)
 		{
-			// calibrate here
+			// set calibration
+		}
+		else if (message == MESSAGE_SETTINGS)
+		{
+			// send calibration
 		}
 		else
 		{
-			// unknown packet
+			// We don't really care about the receiving the other messages
+			// just continue with the loop here
 		}
 	}
 }

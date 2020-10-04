@@ -273,7 +273,7 @@ int serial_write(char * data, int size)
 enum Message serial_read_message(void)
 {
 	char next = 0;
-	char data [MESSAGE_BUFFER_SIZE];
+	char data [MAX_MESSAGE_SIZE];
 	int length = sizeof(data);
 
 	memset(data, 0, length);
@@ -296,7 +296,7 @@ enum Message serial_read_message(void)
 
 	for (int message = 0; message < NUM_MESSAGES; message++)
 	{
-		if (strncmp(data, MESSAGES[message], MESSAGE_BUFFER_SIZE) == 0)
+		if (strncmp(data, MESSAGES[message], MAX_MESSAGE_SIZE) == 0)
 		{
 			return message;
 		}

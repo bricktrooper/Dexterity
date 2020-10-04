@@ -7,7 +7,7 @@
 #define WARNING    1
 #define SUCCESS    0
 
-#define MESSAGE_BUFFER_SIZE   15
+#define MAX_MESSAGE_SIZE   15
 
 typedef uint8_t  U8;
 typedef uint16_t U16;

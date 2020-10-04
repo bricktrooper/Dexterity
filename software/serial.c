@@ -6,13 +6,8 @@
 #include <termios.h>
 
 #include "dexterity.h"
-#include "colours.h"
 #include "serial.h"
 #include "log.h"
-
-#define ERROR     -1
-#define WARNING    1
-#define SUCCESS    0
 
 #define SERIAL_PORT        "/dev/cu.usbserial-AQ00PEW7"   // Use 'cu' instead of 'tty' to prevent DCD (data-carrier-detect)
 #define SERIAL_CLOSED     -1                              // Invalid fie descriptor for closed serial port

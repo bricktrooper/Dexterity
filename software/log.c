@@ -2,12 +2,10 @@
 #include <stdarg.h>
 #include <stdbool.h>
 
+#include "dexterity.h"
 #include "colours.h"
-#include "log.h"
 
-#define ERROR     -1
-#define WARNING    1
-#define SUCCESS    0
+#include "log.h"
 
 static char * prefixes [] = {
 	RED     "X "  WHITE,

@@ -4,6 +4,7 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <termios.h>
+#include <stdbool.h>
 
 #include "dexterity.h"
 #include "serial.h"
@@ -18,11 +19,6 @@ extern int errno;
 
 static int serial_port = SERIAL_CLOSED;
 static struct termios settings;
-
-static int serial_is_open(void)
-{
-	return (serial_port != SERIAL_CLOSED);
-}
 
 int serial_open(void)
 {
@@ -147,6 +143,11 @@ int serial_close(void)
 	log_print(LOG_SUCCESS, "%s(): Closed serial port '%s'\n", __func__, SERIAL_PORT);
 
 	return SUCCESS;
+}
+
+bool serial_is_open(void)
+{
+	return (serial_port != SERIAL_CLOSED);
 }
 
 int serial_purge(void)

@@ -52,6 +52,8 @@ struct Hand
 {
 	S16 accel [3];
 	S16 flex [5];
+	S8 button;
+	S8 led;
 };
 
 struct Calibration
@@ -61,5 +63,10 @@ struct Calibration
 	S16 zero;
 };
 
+struct Settings
+{
+	struct Calibration accel [3];
+	struct Calibration flex [5];
+};
 
 #endif /* DEXTERITY_H */

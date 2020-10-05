@@ -10,6 +10,9 @@
 int init(void);
 void end(int signal);
 
+static struct Hand hand;
+static struct Settings settings;
+
 int main(void)
 {
 	init();
@@ -20,17 +23,16 @@ int main(void)
 		return ERROR;
 	}
 
-	struct Hand hand;
-
 	while (1)
 	{
 		serial_purge();   // Discard any old data from RX buffer before making a new request
 		serial_write_message(MESSAGE_SAMPLE);
 		serial_read((char *)&hand, sizeof(hand));
 
-		log_print(LOG_DEBUG, "X: %d Y: %d Z: %d F1: %d F2: %d F3: %d F4: %d F5: %d\n",
+		log_print(LOG_DEBUG, "X: %d Y: %d Z: %d F1: %d F2: %d F3: %d F4: %d F5: %d BUTTON: %d LED: %d\n",
 							hand.accel[X], hand.accel[Y], hand.accel[Z],
-							hand.flex[F1], hand.flex[F2], hand.flex[F3], hand.flex[F4], hand.flex[F5]);
+							hand.flex[F1], hand.flex[F2], hand.flex[F3], hand.flex[F4], hand.flex[F5],
+							hand.button, hand.led);
 	}
 
 	serial_close();

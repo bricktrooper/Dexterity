@@ -317,5 +317,5 @@ int serial_write_message(enum Message message)
 		return ERROR;
 	}
 
-	return length + 1;
+	return SUCCESS;
 }

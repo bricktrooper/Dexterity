@@ -17,12 +17,13 @@
 
 void init(void);
 int sample(struct Hand * hand);
-void calibrate(struct Calibration * calibration);
+void calibrate(struct Settings * settings);
 int send(void * data, int size);
 int receive(void * data, int size);
 
 static struct Hand hand;
 static enum Message message;
+static struct Settings settings;
 static bool scale_readings = true;
 
 void main(void)
@@ -37,7 +38,7 @@ void main(void)
 		{
 			sample(&hand);
 			uart_transmit((char *)&hand, sizeof(hand));
-			// uart_print("X: %d Y: %d Z: %d F1: %d F2: %d F3: %d F4: %d F5: %d" NEWLINE,
+			// uart_print("X: %d Y: %d Z: %d F1: %d F2: %d F3: %d F4: %d F5: %d BUTTON: %d LED: %d" NEWLINE,
 			// 			hand.accel[X],
 			// 			hand.accel[Y],
 			// 			hand.accel[Z],
@@ -45,7 +46,9 @@ void main(void)
 			// 			hand.flex[F2],
 			// 			hand.flex[F3],
 			// 			hand.flex[F4],
-			// 			hand.flex[F5]
+			// 			hand.flex[F5],
+			// 			hand.button,
+			// 			hand.led
 			// 			);
 		}
 		else if (message == MESSAGE_RAW)
@@ -129,6 +132,9 @@ int sample(struct Hand * hand)
 		hand->flex[F4] = flex_raw(F4);
 		hand->flex[F5] = flex_raw(F5);
 	}
+
+	hand->button = BUTTON;
+	hand->led = LED;
 
 	return SUCCESS;
 }

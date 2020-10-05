@@ -35,6 +35,7 @@ SRC += dexterity.c
 SRC += log.c
 SRC += utils.c
 SRC += serial.c
+SRC += calibration.c
 
 OUT = bin
 OBJ = $(SRC:.c=.o)

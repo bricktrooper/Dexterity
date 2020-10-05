@@ -129,7 +129,7 @@ enum Message uart_receive_message(void)
 		return MESSAGE_UNKNOWN;
 	}
 
-	for (int message = 0; message < NUM_MESSAGES; message++)
+	for (enum Message message = 0; message < NUM_MESSAGES; message++)
 	{
 		if (strncmp(data, MESSAGES[message], MAX_MESSAGE_SIZE) == 0)
 		{

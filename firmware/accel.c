@@ -1,6 +1,8 @@
 #include <xc.h>
 #include <pic16f690.h>
 
+#include <stdbool.h>
+
 #include "dexterity.h"
 #include "pins.h"
 #include "adc.h"
@@ -11,6 +13,7 @@
 
 static struct Calibration calibration [3];
 static int channels [] = {X_CHANNEL, Y_CHANNEL, Z_CHANNEL};
+static bool scaling_enabled = true;
 
 void accel_init(void)
 {
@@ -46,6 +49,11 @@ S16 accel_scale(S16 reading, S16 min, S16 max, S16 zero)
 	return ((200 * (reading - min)) / (max - min)) - zero;
 }
 
+void accel_enable_scaling(bool enable)
+{
+	scaling_enabled = enable;
+}
+
 void accel_calibrate(enum Direction direction, S16 min, S16 max, S16 zero)
 {
 	calibration[direction].min = min;
@@ -66,4 +74,16 @@ S16 accel_scaled(enum Direction direction)
 S16 accel_raw(enum Direction direction)
 {
 	return adc_read(channels[direction]);
+}
+
+S16 accel_read(enum Direction direction)
+{
+	if (scaling_enabled)
+	{
+		return accel_scaled(direction);
+	}
+	else
+	{
+		return accel_raw(direction);
+	}
 }

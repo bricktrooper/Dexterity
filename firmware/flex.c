@@ -1,6 +1,8 @@
 #include <xc.h>
 #include <pic16f690.h>
 
+#include <stdbool.h>
+
 #include "dexterity.h"
 #include "pins.h"
 #include "adc.h"
@@ -11,6 +13,7 @@
 
 static struct Calibration calibration [5];
 static int channels [] = {F1_CHANNEL, F2_CHANNEL, F3_CHANNEL, F4_CHANNEL, F5_CHANNEL};
+static bool scaling_enabled = true;
 
 void flex_init(void)
 {
@@ -58,6 +61,11 @@ S16 flex_scale(S16 reading, S16 min, S16 max, S16 zero)
 	return ((100 * (reading - min)) / (max - min)) - zero;
 }
 
+void flex_enable_scaling(bool enable)
+{
+	scaling_enabled = enable;
+}
+
 void flex_calibrate(enum Finger finger, S16 min, S16 max, S16 zero)
 {
 	calibration[finger].min = min;
@@ -78,4 +86,16 @@ S16 flex_scaled(enum Finger finger)
 S16 flex_raw(enum Finger finger)
 {
 	return adc_read(channels[finger]);
+}
+
+S16 flex_read(enum Finger finger)
+{
+	if (scaling_enabled)
+	{
+		return flex_scaled(finger);
+	}
+	else
+	{
+		return flex_raw(finger);
+	}
 }

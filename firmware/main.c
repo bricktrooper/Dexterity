@@ -21,14 +21,13 @@ void calibrate(struct Settings * settings);
 int send(void * data, int size);
 int receive(void * data, int size);
 
-static struct Hand hand;
-static enum Message message;
-static struct Settings settings;
-static bool scale_readings = true;
-
 void main(void)
 {
 	init();
+
+	struct Hand hand;
+	struct Settings settings;
+	enum Message message;
 
 	while (1)
 	{
@@ -54,12 +53,14 @@ void main(void)
 		else if (message == MESSAGE_RAW)
 		{
 			// use raw ADC readings
-			scale_readings = false;
+			accel_enable_scaling(false);
+			flex_enable_scaling(false);
 		}
 		else if (message == MESSAGE_SCALED)
 		{
 			// scale ADC readings using the calibration
-			scale_readings = true;
+			accel_enable_scaling(true);
+			flex_enable_scaling(true);
 		}
 		else if (message == MESSAGE_CALIBRATE)
 		{
@@ -99,41 +100,26 @@ int sample(struct Hand * hand)
 
 	adc_set_vref(EXTERNAL);
 
-	if (scale_readings)
-	{
-		hand->accel[X] = accel_scaled(X);
-		hand->accel[Y] = accel_scaled(Y);
-		hand->accel[Z] = accel_scaled(Z);
-	}
-	else
-	{
-		hand->accel[X] = accel_raw(X);
-		hand->accel[Y] = accel_raw(Y);
-		hand->accel[Z] = accel_raw(Z);
-	}
+	hand->accel[X] = accel_read(X);
+	hand->accel[Y] = accel_read(Y);
+	hand->accel[Z] = accel_read(Z);
 
 	// FLEX SENSORS //
 
 	adc_set_vref(INTERNAL);
 
-	if (scale_readings)
-	{
-		hand->flex[F1] = flex_scaled(F1);
-		hand->flex[F2] = flex_scaled(F2);
-		hand->flex[F3] = flex_scaled(F3);
-		hand->flex[F4] = flex_scaled(F4);
-		hand->flex[F5] = flex_scaled(F5);
-	}
-	else
-	{
-		hand->flex[F1] = flex_raw(F1);
-		hand->flex[F2] = flex_raw(F2);
-		hand->flex[F3] = flex_raw(F3);
-		hand->flex[F4] = flex_raw(F4);
-		hand->flex[F5] = flex_raw(F5);
-	}
+	hand->flex[F1] = flex_read(F1);
+	hand->flex[F2] = flex_read(F2);
+	hand->flex[F3] = flex_read(F3);
+	hand->flex[F4] = flex_read(F4);
+	hand->flex[F5] = flex_read(F5);
+
+	// BUTTON STATE //
 
 	hand->button = BUTTON;
+
+	// LED STATE //
+
 	hand->led = LED;
 
 	return SUCCESS;

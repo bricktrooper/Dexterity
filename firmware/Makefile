@@ -27,10 +27,10 @@ ifeq ($(TARGET), test)
 	SRC += test.c
 	BIN = test.hex
 else ifeq ($(TARGET), dexterity)
-	SRC += dexterity.c
+	SRC += main.c
 	BIN = dexterity.hex
 else ifeq ($(TARGET), )
-	SRC += dexterity.c
+	SRC += main.c
 	BIN = dexterity.hex
 else ifeq ($(TARGET), clean)
 	# Run clean as usual
@@ -38,6 +38,7 @@ else
   $(error Unknown target '$(TARGET)')
 endif
 
+SRC += dexterity.c
 SRC += utils.c
 SRC += init.c
 SRC += uart.c
@@ -46,7 +47,6 @@ SRC += accel.c
 SRC += adc.c
 SRC += led.c
 SRC += button.c
-SRC += messages.c
 
 OUT = bin
 OBJ = $(SRC:.c=.p1)

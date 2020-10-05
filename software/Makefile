@@ -20,10 +20,10 @@ LDFLAGS += -std=c18
 TARGET = $(word 1, $(MAKECMDGOALS))
 
 ifeq ($(TARGET), dexterity)
-	SRC += dexterity.c
+	SRC += main.c
 	BIN = dexterity
 else ifeq ($(TARGET), )
-	SRC += dexterity.c
+	SRC += main.c
 	BIN = dexterity
 else ifeq ($(TARGET), clean)
 	# Run clean as usual
@@ -31,10 +31,10 @@ else
   $(error Unknown target '$(TARGET)')
 endif
 
+SRC += dexterity.c
 SRC += log.c
 SRC += utils.c
 SRC += serial.c
-SRC += messages.c
 
 OUT = bin
 OBJ = $(SRC:.c=.o)

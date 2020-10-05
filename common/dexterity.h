@@ -7,6 +7,12 @@
 #define WARNING    1
 #define SUCCESS    0
 
+#define BUTTON_PRESSED     1
+#define BUTTON_RELEASED    0
+
+#define NUM_DIRECTIONS     3
+#define NUM_FINGERS        5
+
 #define MAX_MESSAGE_SIZE   15
 
 typedef uint8_t  U8;
@@ -45,13 +51,10 @@ enum Message
 	MESSAGE_UNKNOWN      // message is not found in MESSAGES list
 };
 
-extern char * MESSAGES [];
-extern int NUM_MESSAGES;
-
 struct Hand
 {
-	S16 accel [3];
-	S16 flex [5];
+	S16 accel [NUM_DIRECTIONS];
+	S16 flex [NUM_FINGERS];
 	S8 button;
 	S8 led;
 };
@@ -68,5 +71,11 @@ struct Settings
 	struct Calibration accel [3];
 	struct Calibration flex [5];
 };
+
+extern char * MESSAGES [];
+extern char * DIRECTIONS [];
+extern char * FINGERS [];
+
+extern int NUM_MESSAGES;
 
 #endif /* DEXTERITY_H */

@@ -58,7 +58,7 @@ void accel_default(enum Direction direction)
 	accel_calibrate(direction, ADC_MIN, ADC_MAX, ACCEL_DEFAULT_ZERO);
 }
 
-S16 accel_read(enum Direction direction)
+S16 accel_scaled(enum Direction direction)
 {
 	return accel_scale(accel_raw(direction), calibration[direction].min, calibration[direction].max, calibration[direction].zero);
 }

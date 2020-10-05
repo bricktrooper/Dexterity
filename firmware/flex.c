@@ -70,7 +70,7 @@ void flex_default(enum Finger finger)
 	flex_calibrate(finger, ADC_MIN, ADC_MAX, FLEX_DEFAULT_ZERO);
 }
 
-S16 flex_read(enum Finger finger)
+S16 flex_scaled(enum Finger finger)
 {
 	return flex_scale(flex_raw(finger), calibration[finger].min, calibration[finger].max, calibration[finger].zero);
 }

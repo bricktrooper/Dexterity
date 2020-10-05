@@ -4,6 +4,8 @@ char * MESSAGES [] = {
 	"SAMPLE",
 	"CALIBRATE",
 	"SETTINGS",
+	"RAW",
+	"SCALED"
 	"ERROR",
 	"SUCCESS",
 	"UNKNOWN"

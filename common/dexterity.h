@@ -38,6 +38,8 @@ enum Message
 	MESSAGE_SAMPLE,      // read and send all sensor data
 	MESSAGE_CALIBRATE,   // set the device calibration
 	MESSAGE_SETTINGS,    // get the device calibration
+	MESSAGE_RAW,         // return raw sampled data
+	MESSAGE_SCALED,      // return scaled sample data based on calibration
 	MESSAGE_ERROR,       // notify the host of an error
 	MESSAGE_SUCCESS,     // notify the host of a successful operation
 	MESSAGE_UNKNOWN      // message is not found in MESSAGES list

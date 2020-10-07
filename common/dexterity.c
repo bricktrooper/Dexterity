@@ -1,28 +1,32 @@
 #include "dexterity.h"
 
-char * MESSAGES [] = {
-	"SAMPLE",
-	"CALIBRATE",
-	"SETTINGS",
-	"RAW",
-	"SCALED"
-	"ERROR",
-	"SUCCESS",
-	"UNKNOWN"
-};
-
-int NUM_MESSAGES = sizeof(MESSAGES);
-
-char * DIRECTIONS [] = {
+char * DIRECTIONS [NUM_DIRECTIONS] = {
 	"X",
 	"Y",
 	"Z"
 };
 
-char * FINGERS [] = {
+char * FINGERS [NUM_FINGERS] = {
 	"F1 (THUMB)",
 	"F2 (INDEX)",
 	"F3 (MIDDLE)",
 	"F4 (RING)",
-	"F5 (PINKY)"
+	"F5 (PINKY)",
+};
+
+char * MESSAGES [NUM_MESSAGES] = {
+	"SAMPLE",
+	"CALIBRATE",
+	"SETTINGS",
+	"RAW",
+	"SCALED",
+	"ERROR",
+	"SUCCESS",
+	"UNKNOWN",
+};
+
+char * PARAMETERS [NUM_PARAMETERS] = {
+	"MAX",
+	"MIN",
+	"ZERO"
 };

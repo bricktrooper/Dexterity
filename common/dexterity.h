@@ -12,6 +12,8 @@
 
 #define NUM_DIRECTIONS     3
 #define NUM_FINGERS        5
+#define NUM_MESSAGES       8
+#define NUM_PARAMETERS     3
 
 #define MAX_MESSAGE_SIZE   15
 
@@ -25,18 +27,18 @@ typedef int32_t S32;
 
 enum Direction
 {
-	X,
-	Y,
-	Z
+	X,   // X-Axis acceleration
+	Y,   // Y-Axis acceleration
+	Z    // Z-Axis acceleration
 };
 
 enum Finger
 {
-	F1,
-	F2,
-	F3,
-	F4,
-	F5
+	F1,   // Thumb
+	F2,   // Index
+	F3,   // Middle
+	F4,   // Ring
+	F5    // Pinky
 };
 
 enum Message
@@ -49,6 +51,13 @@ enum Message
 	MESSAGE_ERROR,       // notify the host of an error
 	MESSAGE_SUCCESS,     // notify the host of a successful operation
 	MESSAGE_UNKNOWN      // message is not found in MESSAGES list
+};
+
+enum Parameter
+{
+	PARAMETER_MAX,   // Minimum analogue value for sclaing
+	PARAMETER_MIN,   // Maximum analogue value for sclaing
+	PARAMETER_ZERO   // Centre analogue value for scaling
 };
 
 struct Hand
@@ -68,14 +77,13 @@ struct Calibration
 
 struct Settings
 {
-	struct Calibration accel [3];
-	struct Calibration flex [5];
+	struct Calibration accel [NUM_DIRECTIONS];
+	struct Calibration flex [NUM_FINGERS];
 };
 
-extern char * MESSAGES [];
 extern char * DIRECTIONS [];
 extern char * FINGERS [];
-
-extern int NUM_MESSAGES;
+extern char * MESSAGES [];
+extern char * PARAMETERS [];
 
 #endif /* DEXTERITY_H */

@@ -11,11 +11,13 @@ MMFLAGS += $(addprefix -I , $(INCLUDE))
 CFLAGS += -Wall
 CFLAGS += -Wpedantic
 CFLAGS += -std=c18
+CFLAGS += -g
 CFLAGS += $(addprefix -I , $(INCLUDE))
 
 LDFLAGS += -Wall
 LDFLAGS += -Wpedantic
 LDFLAGS += -std=c18
+LDFLAGS += -g
 
 TARGET = $(word 1, $(MAKECMDGOALS))
 

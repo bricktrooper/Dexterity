@@ -11,7 +11,7 @@ char * FINGERS [NUM_FINGERS] = {
 	"F2 (INDEX)",
 	"F3 (MIDDLE)",
 	"F4 (RING)",
-	"F5 (PINKY)",
+	"F5 (PINKY)"
 };
 
 char * MESSAGES [NUM_MESSAGES] = {
@@ -22,11 +22,11 @@ char * MESSAGES [NUM_MESSAGES] = {
 	"SCALED",
 	"ERROR",
 	"SUCCESS",
-	"UNKNOWN",
+	"UNKNOWN"
 };
 
 char * PARAMETERS [NUM_PARAMETERS] = {
-	"MAX",
 	"MIN",
+	"MAX",
 	"ZERO"
 };

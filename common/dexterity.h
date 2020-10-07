@@ -55,8 +55,8 @@ enum Message
 
 enum Parameter
 {
-	PARAMETER_MAX,   // Minimum analogue value for sclaing
 	PARAMETER_MIN,   // Maximum analogue value for sclaing
+	PARAMETER_MAX,   // Minimum analogue value for sclaing
 	PARAMETER_ZERO   // Centre analogue value for scaling
 };
 
@@ -70,8 +70,8 @@ struct Hand
 
 struct Calibration
 {
-	S16 max;
 	S16 min;
+	S16 max;
 	S16 zero;
 };
 

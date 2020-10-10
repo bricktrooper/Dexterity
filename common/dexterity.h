@@ -7,15 +7,18 @@
 #define WARNING    1
 #define SUCCESS    0
 
-#define BUTTON_PRESSED     1
-#define BUTTON_RELEASED    0
+#define BUTTON_PRESSED      1
+#define BUTTON_RELEASED     0
 
-#define NUM_DIRECTIONS     3
-#define NUM_FINGERS        5
-#define NUM_MESSAGES       8
-#define NUM_PARAMETERS     3
+#define NUM_DIRECTIONS      3
+#define NUM_FINGERS         5
+#define NUM_MESSAGES        8
+#define NUM_PARAMETERS      3
 
-#define MAX_MESSAGE_SIZE   15
+#define MAX_MESSAGE_SIZE    15
+
+#define ACCEL_SCALE_RANGE   200
+#define FLEX_SCALE_RANGE    100
 
 typedef uint8_t  U8;
 typedef uint16_t U16;
@@ -81,9 +84,13 @@ struct Calibration
 	struct Analogue flex [NUM_FINGERS];
 };
 
-extern char * DIRECTIONS [];
-extern char * FINGERS [];
-extern char * MESSAGES [];
-extern char * PARAMETERS [];
+extern char * DIRECTIONS [NUM_DIRECTIONS];
+extern char * FINGERS [NUM_FINGERS];
+extern char * DIRECTION_NAMES [NUM_DIRECTIONS];
+extern char * FINGER_NAMES [NUM_FINGERS];
+extern char * MESSAGES [NUM_MESSAGES];
+extern char * PARAMETERS [NUM_PARAMETERS];
+
+S16 scale(S16 reading, S16 range, S16 min, S16 max, S16 zero);
 
 #endif /* DEXTERITY_H */

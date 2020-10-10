@@ -50,17 +50,6 @@ void flex_init(void)
 	flex_default(F5);   // use default analogue settings
 }
 
-S16 flex_scale(S16 reading, S16 min, S16 max, S16 zero)
-{
-	if (max == min)  // avoid divide by 0
-	{
-		return ERROR;
-	}
-
-	// scale flex reading from 'min' <-> 'max' to 0 <-> 100 centred at 'zero'
-	return ((100 * (reading - min)) / (max - min)) - zero;
-}
-
 void flex_enable_scaling(bool enable)
 {
 	scaling_enabled = enable;
@@ -80,7 +69,8 @@ void flex_default(enum Finger finger)
 
 S16 flex_scaled(enum Finger finger)
 {
-	return flex_scale(flex_raw(finger), settings[finger].min, settings[finger].max, settings[finger].zero);
+	// scale flex reading from 'min' <-> 'max' to 0 <-> 100 centred at 'zero'
+	return scale(flex_raw(finger), FLEX_SCALE_RANGE, settings[finger].min, settings[finger].max, settings[finger].zero);
 }
 
 S16 flex_raw(enum Finger finger)

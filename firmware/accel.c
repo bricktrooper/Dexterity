@@ -38,17 +38,6 @@ void accel_init(void)
 	accel_default(Z);   // use default analogue settings
 }
 
-S16 accel_scale(S16 reading, S16 min, S16 max, S16 zero)
-{
-	if (max == min)   // avoid divide by 0
-	{
-		return ERROR;
-	}
-
-	// scale acceleration reading from 'min' <-> '1023' to -100 <-> +100 centered at 'zero'
-	return ((200 * (reading - min)) / (max - min)) - zero;
-}
-
 void accel_enable_scaling(bool enable)
 {
 	scaling_enabled = enable;
@@ -68,7 +57,8 @@ void accel_default(enum Direction direction)
 
 S16 accel_scaled(enum Direction direction)
 {
-	return accel_scale(accel_raw(direction), settings[direction].min, settings[direction].max, settings[direction].zero);
+	// scale acceleration reading from 'min' <-> '1023' to -100 <-> +100 centered at 'zero'
+	return scale(accel_raw(direction), ACCEL_SCALE_RANGE, settings[direction].min, settings[direction].max, settings[direction].zero);
 }
 
 S16 accel_raw(enum Direction direction)

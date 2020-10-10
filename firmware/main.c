@@ -17,7 +17,7 @@
 
 void init(void);
 int sample(struct Hand * hand);
-void calibrate(struct Settings * settings);
+int calibrate(struct Calibration * calibration);
 int send(void * data, int size);
 int receive(void * data, int size);
 
@@ -26,7 +26,7 @@ void main(void)
 	init();
 
 	struct Hand hand;
-	struct Settings settings;
+	struct Calibration calibration;
 	enum Message message;
 
 	while (1)
@@ -64,7 +64,17 @@ void main(void)
 		}
 		else if (message == MESSAGE_CALIBRATE)
 		{
-			// set calibration
+			int size = sizeof(struct Calibration);
+
+			if (uart_receive((char *)&calibration, size) != size)
+			{
+				// TODO TODO TODO should probably send an back error message here as well!!!!!!!!
+				continue;
+			}
+			else
+			{
+				calibrate(&calibration);
+			}
 		}
 		else if (message == MESSAGE_SETTINGS)
 		{
@@ -121,6 +131,21 @@ int sample(struct Hand * hand)
 	// LED STATE //
 
 	hand->led = LED;
+
+	return SUCCESS;
+}
+
+int calibrate(struct Calibration * calibration)
+{
+	for (enum Direction direction = 0; direction < NUM_DIRECTIONS; direction++)
+	{
+		accel_calibrate(direction, calibration->accel[direction].min, calibration->accel[direction].max, calibration->accel[direction].zero);
+	}
+
+	for (enum Finger finger = 0; finger < NUM_FINGERS; finger++)
+	{
+		flex_calibrate(finger, calibration->flex[finger].min, calibration->flex[finger].max, calibration->flex[finger].zero);
+	}
 
 	return SUCCESS;
 }

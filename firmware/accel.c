@@ -11,7 +11,7 @@
 
 #define ACCEL_DEFAULT_ZERO   100
 
-static struct Calibration calibration [3];
+static struct Analogue settings [3];
 static int channels [] = {X_CHANNEL, Y_CHANNEL, Z_CHANNEL};
 static bool scaling_enabled = true;
 
@@ -23,24 +23,24 @@ void accel_init(void)
 
 	X_TRIS = 1;         // set X-axis pin as an input
 	X_ANSEL = 1;        // set X-axis pin as analogue
-	accel_default(X);   // use default calibration
+	accel_default(X);   // use default analogue settings
 
 	// Y Axis //
 
 	Y_TRIS = 1;         // set Y-axis pin as an input
 	Y_ANSEL = 1;        // set Y-axis pin as analogue
-	accel_default(Y);   // use default calibration
+	accel_default(Y);   // use default analogue settings
 
 	// Z Axis //
 
 	Z_TRIS = 1;         // set Z-axis pin as an input
 	Z_ANSEL = 1;        // set Z-axis pin as analogue
-	accel_default(Z);   // use default calibration
+	accel_default(Z);   // use default analogue settings
 }
 
 S16 accel_scale(S16 reading, S16 min, S16 max, S16 zero)
 {
-	if (max - min == 0)   // avoid divide by 0
+	if (max == min)   // avoid divide by 0
 	{
 		return ERROR;
 	}
@@ -56,9 +56,9 @@ void accel_enable_scaling(bool enable)
 
 void accel_calibrate(enum Direction direction, S16 min, S16 max, S16 zero)
 {
-	calibration[direction].min = min;
-	calibration[direction].max = max;
-	calibration[direction].zero = zero;
+	settings[direction].min = min;
+	settings[direction].max = max;
+	settings[direction].zero = zero;
 }
 
 void accel_default(enum Direction direction)
@@ -68,7 +68,7 @@ void accel_default(enum Direction direction)
 
 S16 accel_scaled(enum Direction direction)
 {
-	return accel_scale(accel_raw(direction), calibration[direction].min, calibration[direction].max, calibration[direction].zero);
+	return accel_scale(accel_raw(direction), settings[direction].min, settings[direction].max, settings[direction].zero);
 }
 
 S16 accel_raw(enum Direction direction)

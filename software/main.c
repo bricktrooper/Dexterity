@@ -12,12 +12,12 @@
 int init(void);
 void end(int signal);
 
-static struct Hand hand;
-static struct Settings settings;
-
 int main(void)
 {
 	init();
+
+	struct Hand hand;
+	struct Calibration calibration;
 
 	if (serial_open() != SUCCESS)
 	{
@@ -28,10 +28,23 @@ int main(void)
 	serial_purge();   // Discard any old data from RX buffer before making a new request
 	serial_write_message(MESSAGE_SCALED);
 
-	if (calibration_interactive(&settings) != SUCCESS)
+	if (calibration_interactive(&calibration) != SUCCESS)
 	{
 		return ERROR;
 	}
+
+	calibration_export("calib.txt", &calibration);
+
+	calibration_print(&calibration);
+
+	return 0;
+	serial_purge();
+	serial_write_message(MESSAGE_CALIBRATE);
+	usleep(10000);
+	serial_write((char *)&calibration, sizeof(struct Calibration));
+	usleep(10000); // need these otherwise we drown the PIC with RX data
+	serial_write_message(MESSAGE_SCALED);
+	usleep(10000); // need these otherwise we drown the PIC with RX data
 
 	while (1)
 	{

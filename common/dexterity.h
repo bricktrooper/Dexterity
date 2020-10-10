@@ -55,9 +55,9 @@ enum Message
 
 enum Parameter
 {
-	PARAMETER_MIN,   // Maximum analogue value for sclaing
-	PARAMETER_MAX,   // Minimum analogue value for sclaing
-	PARAMETER_ZERO   // Centre analogue value for scaling
+	ANALOGUE_MIN,   // Maximum analogue value for sclaing
+	ANALOGUE_MAX,   // Minimum analogue value for sclaing
+	ANALOGUE_ZERO   // Centre analogue value for scaling
 };
 
 struct Hand
@@ -68,17 +68,17 @@ struct Hand
 	S8 led;
 };
 
-struct Calibration
+struct Analogue
 {
 	S16 min;
 	S16 max;
 	S16 zero;
 };
 
-struct Settings
+struct Calibration
 {
-	struct Calibration accel [NUM_DIRECTIONS];
-	struct Calibration flex [NUM_FINGERS];
+	struct Analogue accel [NUM_DIRECTIONS];
+	struct Analogue flex [NUM_FINGERS];
 };
 
 extern char * DIRECTIONS [];

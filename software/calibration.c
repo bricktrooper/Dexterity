@@ -32,7 +32,7 @@ int calibration_import(char * file_name, struct Calibration * calibration)
 
 	for (enum Direction direction = 0; direction < NUM_DIRECTIONS; direction++)
 	{
-		int tokens = fscanf(file, "%*s min=%hd max=%hd zero=%hd\n",
+		int tokens = fscanf(file, "%*s %*s min=%hd max=%hd zero=%hd\n",
 							&(calibration->accel[direction].min),
 							&(calibration->accel[direction].max),
 							&(calibration->accel[direction].zero));
@@ -46,7 +46,7 @@ int calibration_import(char * file_name, struct Calibration * calibration)
 
 	for (enum Finger finger = 0; finger < NUM_FINGERS; finger++)
 	{
-		int tokens = fscanf(file, "%*s min=%hd max=%hd zero=%hd\n",
+		int tokens = fscanf(file, "%*s %*s min=%hd max=%hd zero=%hd\n",
 							&(calibration->flex[finger].min),
 							&(calibration->flex[finger].max),
 							&(calibration->flex[finger].zero));
@@ -82,8 +82,9 @@ int calibration_export(char * file_name, struct Calibration * calibration)
 
 	for (enum Direction direction = 0; direction < NUM_DIRECTIONS; direction++)
 	{
-		fprintf(file, "%-8s min=%hd max=%hd zero=%hd\n",
+		fprintf(file, "%-2s %-8s min=%hd max=%hd zero=%hd\n",
 				DIRECTIONS[direction],
+				DIRECTION_NAMES[direction],
 				calibration->accel[direction].min,
 				calibration->accel[direction].max,
 				calibration->accel[direction].zero);
@@ -91,8 +92,9 @@ int calibration_export(char * file_name, struct Calibration * calibration)
 
 	for (enum Finger finger = 0; finger < NUM_FINGERS; finger++)
 	{
-		fprintf(file, "%-8s min=%hd max=%hd zero=%hd\n",
+		fprintf(file, "%-2s %-8s min=%hd max=%hd zero=%hd\n",
 				FINGERS[finger],
+				FINGER_NAMES[finger],
 				calibration->flex[finger].min,
 				calibration->flex[finger].max,
 				calibration->flex[finger].zero);
@@ -186,8 +188,7 @@ int calibration_interactive(struct Calibration * calibration)
 
 					if (scaled == ERROR)
 					{
-						log_print(LOG_ERROR, "%s(): Failed to scale sample while calibrating '%s %s'\n",
-											__func__, DIRECTIONS[direction], PARAMETERS[parameter]);
+						log_print(LOG_ERROR, "%s(): Failed to scale sample while calibrating '%s %s'\n", __func__, DIRECTIONS[direction], PARAMETERS[parameter]);
 						return ERROR;
 					}
 

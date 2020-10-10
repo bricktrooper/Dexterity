@@ -3,11 +3,11 @@
 
 #include "dexterity.h"
 
-int calibration_import(char * filename, struct Calibration * calibration);
-int calibration_export(char * filename, struct Calibration * calibration);
+int calibration_import(char * file_name, struct Calibration * calibration);
+int calibration_export(char * file_name, struct Calibration * calibration);
 int calibration_download(struct Calibration * calibration);
 int calibration_upload(struct Calibration * calibration);
-int calibration_interactive(struct Settings * settings);
-int calibration_print(struct Settings * settings);
+int calibration_interactive(struct Calibration * calibration);
+int calibration_print(struct Calibration * calibration);
 
 #endif /* CALIBRATION_H */

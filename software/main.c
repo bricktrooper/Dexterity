@@ -28,16 +28,17 @@ int main(void)
 	serial_purge();   // Discard any old data from RX buffer before making a new request
 	serial_write_message(MESSAGE_SCALED);
 
-	if (calibration_interactive(&calibration) != SUCCESS)
-	{
-		return ERROR;
-	}
+	// if (calibration_interactive(&calibration) != SUCCESS)
+	// {
+	// 	end(ERROR);
+	// }
 
-	calibration_export("calib.txt", &calibration);
+	// calibration_export("calibration.txt", &calibration);
+
+	calibration_import("calibration.txt", &calibration);
 
 	calibration_print(&calibration);
 
-	return 0;
 	serial_purge();
 	serial_write_message(MESSAGE_CALIBRATE);
 	usleep(10000);
@@ -84,5 +85,5 @@ void end(int signal)
 	serial_purge();
 	serial_close();
 	log_print(LOG_SUCCESS, "Terminated Dexterity\n");
-	exit(0);
+	exit(signal);
 }

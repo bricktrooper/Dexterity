@@ -33,57 +33,61 @@ void main(void)
 	{
 		message = uart_receive_message();
 
-		if (message == MESSAGE_SAMPLE)
+		switch (message)
 		{
-			sample(&hand);
-			uart_transmit((char *)&hand, sizeof(struct Hand));
-			// uart_print("X: %d Y: %d Z: %d F1: %d F2: %d F3: %d F4: %d F5: %d BUTTON: %d LED: %d" NEWLINE,
-			// 			hand.accel[X],
-			// 			hand.accel[Y],
-			// 			hand.accel[Z],
-			// 			hand.flex[F1],
-			// 			hand.flex[F2],
-			// 			hand.flex[F3],
-			// 			hand.flex[F4],
-			// 			hand.flex[F5],
-			// 			hand.button,
-			// 			hand.led
-			// 			);
-		}
-		else if (message == MESSAGE_RAW)
-		{
-			// use raw ADC readings
-			accel_enable_scaling(false);
-			flex_enable_scaling(false);
-		}
-		else if (message == MESSAGE_SCALED)
-		{
-			// scale ADC readings using the calibration
-			accel_enable_scaling(true);
-			flex_enable_scaling(true);
-		}
-		else if (message == MESSAGE_CALIBRATE)
-		{
-			int size = sizeof(struct Calibration);
+			case MESSAGE_SAMPLE:   // read the analogue sensors and transmit the results
 
-			if (uart_receive((char *)&calibration, size) != size)
-			{
-				// TODO TODO TODO should probably send an back error message here as well!!!!!!!!
-				continue;
-			}
-			else
-			{
-				calibrate(&calibration);
-			}
-		}
-		else if (message == MESSAGE_SETTINGS)
-		{
-			uart_transmit((char *)&calibration, sizeof(struct Calibration));
-		}
-		else
-		{
-			// We don't really care about the receiving the other messages
-			// just continue with the loop here
+				sample(&hand);
+				uart_transmit((char *)&hand, sizeof(struct Hand));
+				// uart_print("X: %d Y: %d Z: %d F1: %d F2: %d F3: %d F4: %d F5: %d BUTTON: %d LED: %d" NEWLINE,
+				// 			hand.accel[X],
+				// 			hand.accel[Y],
+				// 			hand.accel[Z],
+				// 			hand.flex[F1],
+				// 			hand.flex[F2],
+				// 			hand.flex[F3],
+				// 			hand.flex[F4],
+				// 			hand.flex[F5],
+				// 			hand.button,
+				// 			hand.led
+				// 			);
+				break;
+
+			case MESSAGE_RAW:   // use raw ADC readings
+
+				accel_enable_scaling(false);
+				flex_enable_scaling(false);
+				break;
+
+			case MESSAGE_SCALED:   // scale ADC readings using the calibration
+
+				accel_enable_scaling(true);
+				flex_enable_scaling(true);
+				break;
+
+			case MESSAGE_CALIBRATE:   // receive the calibration settings and apply them
+
+				if (uart_receive((char *)&calibration, sizeof(struct Calibration)) != sizeof(struct Calibration))
+				{
+					// TODO TODO TODO should probably send an back error message here as well!!!!!!!!
+					continue;
+				}
+				else
+				{
+					calibrate(&calibration);
+				}
+
+				break;
+
+			case MESSAGE_SETTINGS:   // transmit the current calibration settings
+				uart_transmit((char *)&calibration, sizeof(struct Calibration));
+				break;
+
+			default:
+				// We don't really care about the receiving the other messages
+				// just continue with the loop here
+				break;
+
 		}
 	}
 }

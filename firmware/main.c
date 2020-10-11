@@ -67,23 +67,27 @@ void main(void)
 
 			case MESSAGE_CALIBRATE:   // receive the calibration settings and apply them
 
+				uart_transmit_message(MESSAGE_SUCCESS);
+
 				if (uart_receive((char *)&calibration, sizeof(struct Calibration)) != sizeof(struct Calibration))
 				{
-					// TODO TODO TODO should probably send an back error message here as well!!!!!!!!
-					continue;
+					uart_transmit_message(MESSAGE_ERROR);
 				}
 				else
 				{
 					calibrate(&calibration);
+					// uart_send_message(MESSAGE_SUCCESS);
 				}
 
 				break;
 
 			case MESSAGE_SETTINGS:   // transmit the current calibration settings
+
 				uart_transmit((char *)&calibration, sizeof(struct Calibration));
 				break;
 
 			default:
+
 				// We don't really care about the receiving the other messages
 				// just continue with the loop here
 				break;

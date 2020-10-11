@@ -113,7 +113,14 @@ int calibration_download(struct Calibration * calibration)
 		return ERROR;
 	}
 
-	if (serial_purge() != SUCCESS || serial_write_message(MESSAGE_SETTINGS) != SUCCESS)
+	if (!serial_is_open())
+	{
+		log_print(LOG_ERROR, "%s(): The serial port is not open\n", __func__);
+		return ERROR;
+	}
+
+	if (serial_purge() != SUCCESS ||
+		serial_write_message(MESSAGE_SETTINGS) != SUCCESS)
 	{
 		log_print(LOG_ERROR, "%s(): Failed to request calibration settings from device\n", __func__);
 		return ERROR;
@@ -125,7 +132,7 @@ int calibration_download(struct Calibration * calibration)
 		return ERROR;
 	}
 
-	log_print(LOG_SUCCESS, "%s(): Calibration data received\n", __func__);
+	log_print(LOG_SUCCESS, "%s(): Calibration downloaded from device\n", __func__);
 	return SUCCESS;
 }
 
@@ -143,17 +150,29 @@ int calibration_upload(struct Calibration * calibration)
 		return ERROR;
 	}
 
-	// int size = sizeof(struct Calibration)
+	if (serial_purge() != SUCCESS ||
+		serial_write_message(MESSAGE_CALIBRATE) != SUCCESS)
+	{
+		log_print(LOG_ERROR, "%s(): Failed to send calibration request to device\n", __func__);
+		return ERROR;
+	}
 
-	// if (serial_purge() != SUCCESS ||
-	// 	serial_write_message(MESSAGE_CALIBRATE) != SUCCESS ||
-	// 	serial_write((char *)calibration, size) != size)
-	// {
-	// 	log_print(LOG_ERROR, "%s(): Failed to send calibration\n", __func__);
-	// 	return ERROR;
-	// }
+	enum Message response = serial_read_message();
 
-	log_print(LOG_SUCCESS, "%s(): Sent calibration but we should probably wait for the device to ACK.....\n", __func__);
+	if (response != MESSAGE_SUCCESS)
+	{
+		log_print(LOG_ERROR, "%s(): Device refused calibration request\n", __func__);
+		return ERROR;
+	}
+
+	if (serial_purge() != SUCCESS ||
+		serial_write((char *)calibration, sizeof(struct Calibration)) != sizeof(struct Calibration))
+	{
+		log_print(LOG_ERROR, "%s(): Failed to send calibration data to device\n", __func__);
+		return ERROR;
+	}
+
+	log_print(LOG_SUCCESS, "%s(): Calibration uploaded to device\n", __func__);
 	return SUCCESS;
 }
 
@@ -165,7 +184,8 @@ int calibration_interactive(struct Calibration * calibration)
 		return ERROR;
 	}
 
-	if (serial_purge() != SUCCESS || serial_write_message(MESSAGE_RAW) != SUCCESS)
+	if (serial_purge() != SUCCESS ||
+	    serial_write_message(MESSAGE_RAW) != SUCCESS)
 	{
 		log_print(LOG_ERROR, "%s(): Failed to set device to raw sampling mode\n");
 		return ERROR;

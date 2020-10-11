@@ -113,6 +113,19 @@ int calibration_download(struct Calibration * calibration)
 		return ERROR;
 	}
 
+	if (serial_purge() != SUCCESS || serial_write_message(MESSAGE_SETTINGS) != SUCCESS)
+	{
+		log_print(LOG_ERROR, "%s(): Failed to request calibration settings from device\n", __func__);
+		return ERROR;
+	}
+
+	if (serial_read((char *)calibration, sizeof(struct Calibration)) != sizeof(struct Calibration))
+	{
+		log_print(LOG_ERROR, "%s(): Failed to receive calibration settings from device\n", __func__);
+		return ERROR;
+	}
+
+	log_print(LOG_SUCCESS, "%s(): Calibration data received\n", __func__);
 	return SUCCESS;
 }
 
@@ -129,9 +142,7 @@ int calibration_upload(struct Calibration * calibration)
 		log_print(LOG_ERROR, "%s(): The serial port is not open\n", __func__);
 		return ERROR;
 	}
-	// we should probably send the calibration message so that the device reverts to raw data (no scaling)
-	// then send it again to apply the data?
-	// maybe some more messages for RAW and SCALE mode?
+
 	// int size = sizeof(struct Calibration)
 
 	// if (serial_purge() != SUCCESS ||
@@ -255,12 +266,6 @@ int calibration_interactive(struct Calibration * calibration)
 
 			// save parameter to Calibration struct
 			S16 * param = (S16 *)(&calibration->flex[finger]);
-
-			// if (parameter == ANALOGUE_ZERO)
-			// {
-			// 	hand.flex[finger] = 0;
-			// }
-
 			param[parameter] = hand.flex[finger];
 			printf("\r%-2s  %-8s : %-12hd ~\n", FINGERS[finger], FINGER_NAMES[finger], hand.flex[finger]);
 

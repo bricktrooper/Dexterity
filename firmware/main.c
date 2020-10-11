@@ -36,7 +36,7 @@ void main(void)
 		if (message == MESSAGE_SAMPLE)
 		{
 			sample(&hand);
-			uart_transmit((char *)&hand, sizeof(hand));
+			uart_transmit((char *)&hand, sizeof(struct Hand));
 			// uart_print("X: %d Y: %d Z: %d F1: %d F2: %d F3: %d F4: %d F5: %d BUTTON: %d LED: %d" NEWLINE,
 			// 			hand.accel[X],
 			// 			hand.accel[Y],
@@ -78,7 +78,7 @@ void main(void)
 		}
 		else if (message == MESSAGE_SETTINGS)
 		{
-			// send calibration
+			uart_transmit((char *)&calibration, sizeof(struct Calibration));
 		}
 		else
 		{

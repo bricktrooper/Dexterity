@@ -12,6 +12,10 @@
 int init(void);
 void end(int signal);
 
+// when we calibrate we should 1. have the devie send an ack to affim that it is ready,
+// and 2. check the data we just updloaded by requesting a download and comparing it immediately after
+// 3. send an ack after the device applies the data
+
 int main(void)
 {
 	init();
@@ -30,36 +34,30 @@ int main(void)
 
 	// if (calibration_interactive(&calibration) != SUCCESS)
 	// {
-	// 	end(ERROR);
+		// end(ERROR);
 	// }
 
 	// calibration_export("calibration.txt", &calibration);
 
 	calibration_import("calibration.txt", &calibration);
-
 	calibration_print(&calibration);
+	calibration_upload(&calibration);
 
-	serial_purge();
-	serial_write_message(MESSAGE_CALIBRATE);
-	usleep(10000);
-	serial_write((char *)&calibration, sizeof(struct Calibration));
-	usleep(10000); // need these otherwise we drown the PIC with RX data
-	serial_write_message(MESSAGE_SCALED);
-	usleep(10000); // need these otherwise we drown the PIC with RX data
+	calibration_download(&calibration);
+	calibration_print(&calibration);
 
 	while (1)
 	{
-
 		if (sample(&hand) != SUCCESS)
 		{
 			break;
 		}
 
-		printf("\rX: %d Y: %d Z: %d F1: %d F2: %d F3: %d F4: %d F5: %d BUTTON: %d LED: %d",
-							hand.accel[X], hand.accel[Y], hand.accel[Z],
-							hand.flex[F1], hand.flex[F2], hand.flex[F3], hand.flex[F4], hand.flex[F5],
-							hand.button, hand.led);
-		fflush(stdout);
+		// printf("\rX: %hd Y: %hd Z: %hd F1: %hd F2: %hd F3: %hd F4: %hd F5: %hd BUTTON: %hd LED: %hd",
+		// 					hand.accel[X], hand.accel[Y], hand.accel[Z],
+		// 					hand.flex[F1], hand.flex[F2], hand.flex[F3], hand.flex[F4], hand.flex[F5],
+		// 					hand.button, hand.led);
+		// fflush(stdout);
 	}
 
 	serial_close();
@@ -73,7 +71,7 @@ int init(void)
 	log_suppress(LOG_ERROR, false);
 	log_suppress(LOG_WARNING, false);
 	log_suppress(LOG_SUCCESS, false);
-	log_suppress(LOG_DEBUG, true);
+	log_suppress(LOG_DEBUG, false);
 	log_suppress(LOG_INFO, true);
 
 	return SUCCESS;

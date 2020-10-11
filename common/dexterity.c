@@ -52,5 +52,5 @@ S16 scale(S16 reading, S16 range, S16 min, S16 max, S16 zero)
 		return ERROR;
 	}
 
-	return ((range * (reading - min)) / (max - min)) - zero;
+	return ((range * ((S32)reading - min)) / (max - min)) - zero;
 }

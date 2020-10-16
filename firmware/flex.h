@@ -1,6 +1,8 @@
 #ifndef FLEX_H
 #define ACCEL_H
 
+#include <stdbool.h>
+
 #include "dexterity.h"
 
 void flex_init(void);

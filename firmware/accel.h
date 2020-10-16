@@ -1,6 +1,8 @@
 #ifndef ACCEL_H
 #define ACCEL_H
 
+#include <stdbool.h>
+
 #include "dexterity.h"
 
 void accel_init(void);

@@ -290,7 +290,7 @@ enum Message serial_read_message(void)
 		data[i] = next;
 	}
 
-	for (int message = 0; message < NUM_MESSAGES; message++)
+	for (enum Message message = 0; message < NUM_MESSAGES; message++)
 	{
 		if (strncmp(data, MESSAGES[message], MAX_MESSAGE_SIZE) == 0)
 		{

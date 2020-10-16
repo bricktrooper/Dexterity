@@ -1,9 +1,9 @@
 MAKE = /usr/bin/make
 
-FIRMWARE = firmware
-SOFTWARE = software
+FIRMWARE = firmware.hex
+SOFTWARE = software.bin
 
-ART = bin
+ART = artifacts
 
 $(shell mkdir -p $(ART))
 

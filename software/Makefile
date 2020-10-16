@@ -59,7 +59,7 @@ $(OUT)/%.o: %.c
 	@$(CC) $(CFLAGS) -c $< -o $@
 
 $(OUT)/%.d: %.c
-	@$(CC) $(MMFLAGS) -MM $< -MF $@
+	@$(MM) $(MMFLAGS) -MM $< -MT $(subst .d,.o,$@) -MF $@
 
 ifneq ($(TARGET), clean)
 -include $(addprefix $(OUT)/, $(DEP))

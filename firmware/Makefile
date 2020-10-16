@@ -70,7 +70,7 @@ $(OUT)/%.p1: %.c
 	@$(CC) $(CFLAGS) $(TEST_TYPE) -c $< -o $@
 
 $(OUT)/%.d: %.c
-	@$(MM) $(MMFLAGS) -MM $< -MF $@
+	@$(MM) $(MMFLAGS) -MM $< -MT $(subst .d,.p1,$@) -MF $@
 
 ifneq ($(TARGET), clean)
 -include $(addprefix $(OUT)/, $(DEP))

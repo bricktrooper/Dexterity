@@ -39,32 +39,32 @@ SRC += utils.c
 SRC += serial.c
 SRC += calibration.c
 
-OUT = bin
 OBJ = $(SRC:.c=.o)
 DEP = $(SRC:.c=.d)
-ART += $(OUT)
 
-$(shell mkdir -p $(OUT))
+ART = bin
+
+$(shell mkdir -p $(ART))
 
 .PHONY:
-dexterity: $(OUT)/$(BIN)
+dexterity: $(ART)/$(BIN)
 
-$(OUT)/$(BIN): $(addprefix $(OUT)/, $(OBJ))
+$(ART)/$(BIN): $(addprefix $(ART)/, $(OBJ))
 	@echo "LD   $(OBJ)"
 	@$(LD) $(LDFLAGS) $^ -o $@
 	@echo "BIN  $(BIN)"
 
-$(OUT)/%.o: %.c
+$(ART)/%.o: %.c
 	@echo "CC   $(notdir $<)"
 	@$(CC) $(CFLAGS) -c $< -o $@
 
-$(OUT)/%.d: %.c
+$(ART)/%.d: %.c
 	@$(MM) $(MMFLAGS) -MM $< -MT $(subst .d,.o,$@) -MF $@
 
 ifneq ($(TARGET), clean)
--include $(addprefix $(OUT)/, $(DEP))
+-include $(addprefix $(ART)/, $(DEP))
 endif
 
 clean:
-	@for ARTIFACT in $(notdir $(wildcard $(OUT)/*)); do echo "RM   $$ARTIFACT"; done
+	@for ARTIFACT in $(notdir $(wildcard $(ART)/*)); do echo "RM   $$ARTIFACT"; done
 	@rm -rf $(ART)

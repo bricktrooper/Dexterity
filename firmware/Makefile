@@ -48,34 +48,34 @@ SRC += adc.c
 SRC += led.c
 SRC += button.c
 
-OUT = bin
 OBJ = $(SRC:.c=.p1)
 DEP = $(SRC:.c=.d)
-ART += $(OUT)
 
-$(shell mkdir -p $(OUT))
+ART = bin
+
+$(shell mkdir -p $(ART))
 
 .PHONY:
-dexterity: $(OUT)/$(BIN)
+dexterity: $(ART)/$(BIN)
 .PHONY:
-test: $(OUT)/$(BIN)
+test: $(ART)/$(BIN)
 
-$(OUT)/$(BIN): $(addprefix $(OUT)/, $(OBJ))
+$(ART)/$(BIN): $(addprefix $(ART)/, $(OBJ))
 	@echo "LD   $(OBJ)"
 	@$(LD) $(LDFLAGS) $^ -o $@
 	@echo "BIN  $(BIN)"
 
-$(OUT)/%.p1: %.c
+$(ART)/%.p1: %.c
 	@echo "CC   $(notdir $<)"
 	@$(CC) $(CFLAGS) $(TEST_TYPE) -c $< -o $@
 
-$(OUT)/%.d: %.c
+$(ART)/%.d: %.c
 	@$(MM) $(MMFLAGS) -MM $< -MT $(subst .d,.p1,$@) -MF $@
 
 ifneq ($(TARGET), clean)
--include $(addprefix $(OUT)/, $(DEP))
+-include $(addprefix $(ART)/, $(DEP))
 endif
 
 clean:
-	@for ARTIFACT in $(notdir $(wildcard $(OUT)/*)); do echo "RM   $$ARTIFACT"; done
+	@for ARTIFACT in $(notdir $(wildcard $(ART)/*)); do echo "RM   $$ARTIFACT"; done
 	@rm -rf $(ART)

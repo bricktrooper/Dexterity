@@ -72,8 +72,10 @@ $(OUT)/%.p1: %.c
 $(OUT)/%.d: %.c
 	@$(MM) $(MMFLAGS) -MM $< -MF $@
 
+ifneq ($(TARGET), clean)
 -include $(addprefix $(OUT)/, $(DEP))
+endif
 
 clean:
-	@echo "RM   $(OUT)/" "$(subst $(subst ,, ),\nRM   , $(notdir $(wildcard $(ART)/*)))"
+	@for ARTIFACT in $(notdir $(wildcard $(OUT)/*)); do echo "RM   $$ARTIFACT"; done
 	@rm -rf $(ART)

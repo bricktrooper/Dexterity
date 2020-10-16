@@ -7,7 +7,6 @@
 
 void adc_init(void)
 {
-
 	ADCON0bits.ADFM = 1;      // right justify result
 	adc_set_vref(INTERNAL);   // use VDD as VREF for conversions
 	ADCON0bits.CHS = 11;      // set default channel to AN11

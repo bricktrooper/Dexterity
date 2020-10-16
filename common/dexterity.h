@@ -10,11 +10,6 @@
 #define BUTTON_PRESSED      1
 #define BUTTON_RELEASED     0
 
-#define NUM_DIRECTIONS      3
-#define NUM_FINGERS         5
-#define NUM_MESSAGES        8
-#define NUM_PARAMETERS      3
-
 #define MAX_MESSAGE_SIZE    15
 
 #define ACCEL_SCALE_RANGE   200
@@ -32,7 +27,9 @@ enum Direction
 {
 	X,   // X-Axis acceleration
 	Y,   // Y-Axis acceleration
-	Z    // Z-Axis acceleration
+	Z,    // Z-Axis acceleration
+
+	NUM_DIRECTIONS
 };
 
 enum Finger
@@ -41,7 +38,9 @@ enum Finger
 	F2,   // Index
 	F3,   // Middle
 	F4,   // Ring
-	F5    // Pinky
+	F5,    // Pinky
+
+	NUM_FINGERS
 };
 
 enum Message
@@ -53,14 +52,18 @@ enum Message
 	MESSAGE_SCALED,      // return scaled sample data based on calibration
 	MESSAGE_ERROR,       // notify the host of an error
 	MESSAGE_SUCCESS,     // notify the host of a successful operation
-	MESSAGE_UNKNOWN      // message is not found in MESSAGES list
+	MESSAGE_UNKNOWN,     // message is not found in MESSAGES list
+
+	NUM_MESSAGES
 };
 
 enum Parameter
 {
 	ANALOGUE_MIN,   // Maximum analogue value for sclaing
 	ANALOGUE_MAX,   // Minimum analogue value for sclaing
-	ANALOGUE_ZERO   // Centre analogue value for scaling
+	ANALOGUE_ZERO,  // Centre analogue value for scaling
+
+	NUM_PARAMETERS
 };
 
 struct Hand

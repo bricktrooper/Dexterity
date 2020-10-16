@@ -116,7 +116,7 @@ int sample(struct Hand * hand)
 
 	// ACCELEROMETER //
 
-	adc_set_vref(EXTERNAL);
+	adc_set_vref(VREF_EXTERNAL);
 
 	hand->accel[X] = accel_read(X);
 	hand->accel[Y] = accel_read(Y);
@@ -124,7 +124,7 @@ int sample(struct Hand * hand)
 
 	// FLEX SENSORS //
 
-	adc_set_vref(INTERNAL);
+	adc_set_vref(VREF_INTERNAL);
 
 	hand->flex[F1] = flex_read(F1);
 	hand->flex[F2] = flex_read(F2);

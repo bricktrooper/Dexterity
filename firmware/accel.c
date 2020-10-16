@@ -17,7 +17,7 @@ static bool scaling_enabled = true;
 
 void accel_init(void)
 {
-	adc_set_vref(EXTERNAL);   // use external VREF for conversions (3.3V)
+	adc_set_vref(VREF_EXTERNAL);   // use external VREF for conversions (3.3V)
 
 	// X Axis //
 

@@ -17,7 +17,7 @@ static bool scaling_enabled = true;
 
 void flex_init(void)
 {
-	adc_set_vref(INTERNAL);   // use VDD as VREF for conversions (5V)
+	adc_set_vref(VREF_INTERNAL);   // use VDD as VREF for conversions (5V)
 
 	// FINGER 1 //
 

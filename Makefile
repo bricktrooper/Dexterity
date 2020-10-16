@@ -8,31 +8,19 @@ ART = artifacts
 $(shell mkdir -p $(ART))
 
 .PHONY: dexterity
-dexterity: firmware software artifacts
+dexterity: firmware software
 
 .PHONY: firmware
 firmware:
-	@echo
-	@echo "-------------------< FIRMWARE >-------------------"
+	@echo Building firmware.......
 	@$(MAKE) -C firmware
-	@echo "--------------------------------------------------"
+	@cp firmware/bin/dexterity.hex $(ART)/$(FIRMWARE)
 
 .PHONY: software
 software:
-	@echo
-	@echo "-------------------< SOFTWARE >-------------------"
+	@echo Building software.......
 	@$(MAKE) -C software
-	@echo "--------------------------------------------------"
-
-.PHONY: artifacts
-artifacts:
-	@echo
-	@echo "-------------------< ARTIFACTS >------------------"
-	@echo "BIN  $(FIRMWARE)"
-	@cp firmware/bin/dexterity.hex $(ART)/$(FIRMWARE)
-	@echo "BIN  $(SOFTWARE)"
 	@cp software/bin/dexterity $(ART)/$(SOFTWARE)
-	@echo "--------------------------------------------------"
 
 clean:
 	@$(MAKE) clean -C firmware

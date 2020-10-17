@@ -18,8 +18,7 @@
 void init(void);
 int sample(struct Hand * hand);
 int calibrate(struct Calibration * calibration);
-int send(void * data, int size);
-int receive(void * data, int size);
+int settings(struct Calibration * calibration);
 
 void main(void)
 {
@@ -83,6 +82,7 @@ void main(void)
 
 			case MESSAGE_SETTINGS:   // transmit the current calibration settings
 
+				settings(&calibration);
 				uart_transmit((char *)&calibration, sizeof(struct Calibration));
 				break;
 
@@ -145,6 +145,11 @@ int sample(struct Hand * hand)
 
 int calibrate(struct Calibration * calibration)
 {
+	if (calibration == NULL)
+	{
+		return ERROR;
+	}
+
 	for (enum Direction direction = 0; direction < NUM_DIRECTIONS; direction++)
 	{
 		accel_calibrate(direction, calibration->accel[direction].min, calibration->accel[direction].max, calibration->accel[direction].zero);
@@ -153,6 +158,26 @@ int calibrate(struct Calibration * calibration)
 	for (enum Finger finger = 0; finger < NUM_FINGERS; finger++)
 	{
 		flex_calibrate(finger, calibration->flex[finger].min, calibration->flex[finger].max, calibration->flex[finger].zero);
+	}
+
+	return SUCCESS;
+}
+
+int settings(struct Calibration * calibration)
+{
+	if (calibration == NULL)
+	{
+		return ERROR;
+	}
+
+	for (enum Direction direction = 0; direction < NUM_DIRECTIONS; direction++)
+	{
+		accel_settings(direction, &(calibration->accel[direction]));
+	}
+
+	for (enum Finger finger = 0; finger < NUM_FINGERS; finger++)
+	{
+		flex_settings(finger, &(calibration->flex[finger]));
 	}
 
 	return SUCCESS;

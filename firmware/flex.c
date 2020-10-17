@@ -1,6 +1,7 @@
 #include <xc.h>
 #include <pic16f690.h>
 
+#include <stddef.h>
 #include <stdbool.h>
 
 #include "dexterity.h"
@@ -65,6 +66,20 @@ void flex_calibrate(enum Finger finger, S16 min, S16 max, S16 zero)
 void flex_default(enum Finger finger)
 {
 	flex_calibrate(finger, ADC_MIN, ADC_MAX, FLEX_DEFAULT_ZERO);
+}
+
+int flex_settings(enum Finger finger, struct Analogue * analogue)
+{
+	if (analogue == NULL)
+	{
+		return ERROR;
+	}
+
+	analogue->min = settings[finger].min;
+	analogue->max = settings[finger].max;
+	analogue->zero = settings[finger].zero;
+
+	return SUCCESS;
 }
 
 S16 flex_scaled(enum Finger finger)

@@ -1,6 +1,7 @@
 #include <xc.h>
 #include <pic16f690.h>
 
+#include <stddef.h>
 #include <stdbool.h>
 
 #include "dexterity.h"
@@ -53,6 +54,20 @@ void accel_calibrate(enum Direction direction, S16 min, S16 max, S16 zero)
 void accel_default(enum Direction direction)
 {
 	accel_calibrate(direction, ADC_MIN, ADC_MAX, ACCEL_DEFAULT_ZERO);
+}
+
+int accel_settings(enum Direction direction, struct Analogue * analogue)
+{
+	if (analogue == NULL)
+	{
+		return ERROR;
+	}
+
+	analogue->min = settings[direction].min;
+	analogue->max = settings[direction].max;
+	analogue->zero = settings[direction].zero;
+
+	return SUCCESS;
 }
 
 S16 accel_scaled(enum Direction direction)

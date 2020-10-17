@@ -14,13 +14,18 @@ CFLAGS += $(addprefix -I , $(INCLUDE))
 
 LDFLAGS += -mcpu=16F690
 LDFLAGS += -mc90lib
-LDFLAGS += -msummary=none
 LDFLAGS += -mwarn=0
 
 TARGET = $(word 1, $(MAKECMDGOALS))
 
 ifneq ($(TYPE), )
 	TEST_TYPE = -D$(TYPE)
+endif
+
+ifeq ($(MEMORY), show)
+	LDFLAGS += -msummary=mem
+else
+	LDFLAGS += -msummary=none
 endif
 
 ifeq ($(TARGET), test)

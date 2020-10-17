@@ -2,65 +2,69 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <libgen.h>
 
 #include "dexterity.h"
 #include "log.h"
-#include "utils.h"
-#include "serial.h"
 #include "calibration.h"
+#include "command.h"
+#include "serial.h"
+
+#define ARGV_MIN          1   // no subcommand
+#define ARGV_MAX          3   // subcommand + argument
+#define ARGV_PROGRAM      0
+#define ARGV_SUBCOMMAND   1
+#define ARGV_ARGUMENT     2
 
 int init(void);
 void end(int signal);
+void print_usage(void);
 
 // when we calibrate we should 1. have the devie send an ack to affim that it is ready,
 // and 2. check the data we just updloaded by requesting a download and comparing it immediately after
 // 3. send an ack after the device applies the data
 
-int main(void)
+int main(int argc, char ** argv)
 {
-	init();
+	char * program = basename(argv[ARGV_PROGRAM]);
 
-	struct Hand hand;
-	struct Calibration calibration;
-
-	if (serial_open() != SUCCESS)
+	if (argc < ARGV_MIN || argc > ARGV_MAX || argv == NULL)
 	{
-		log_print(LOG_ERROR, "Initialization failed\n");
+		log_print(LOG_ERROR, "%s: Invalid arguments\n", program);
 		return ERROR;
 	}
 
-	serial_purge();   // Discard any old data from RX buffer before making a new request
-	serial_write_message(MESSAGE_SCALED);
+	char * subcommand = NULL;
+	char * argument = NULL;
 
-	// if (calibration_interactive(&calibration) != SUCCESS)
-	// {
-		// end(ERROR);
-	// }
-
-	// calibration_export("calibration.txt", &calibration);
-
-	calibration_import("calibration.txt", &calibration);
-	calibration_print(&calibration);
-	calibration_upload(&calibration);
-
-	calibration_download(&calibration);
-	calibration_print(&calibration);
-
-	while (1)
+	if (argc > 1)
 	{
-		if (sample(&hand) != SUCCESS)
-		{
-			break;
-		}
-
-		// printf("\rX: %hd Y: %hd Z: %hd F1: %hd F2: %hd F3: %hd F4: %hd F5: %hd BUTTON: %hd LED: %hd",
-		// 					hand.accel[X], hand.accel[Y], hand.accel[Z],
-		// 					hand.flex[F1], hand.flex[F2], hand.flex[F3], hand.flex[F4], hand.flex[F5],
-		// 					hand.button, hand.led);
-		// fflush(stdout);
+		subcommand = argv[ARGV_SUBCOMMAND];
 	}
 
-	serial_close();
+	if (argc > 2)
+	{
+		argument = argv[ARGV_ARGUMENT];
+	}
+
+	enum Command command = command_identify(subcommand);
+
+	if (command == COMMAND_UNKNOWN)
+	{
+		log_print(LOG_ERROR, "%s: Unknown subcommand '%s'\n", program, subcommand);
+		return ERROR;
+	}
+
+	int result = init();
+
+	if (result != SUCCESS)
+	{
+		return result;
+	}
+
+	result = command_execute(program, command, argument);
+	end(result);
+
 	return SUCCESS;
 }
 
@@ -74,14 +78,25 @@ int init(void)
 	log_suppress(LOG_DEBUG, false);
 	log_suppress(LOG_INFO, true);
 
+	if (serial_open() != SUCCESS)
+	{
+		log_print(LOG_ERROR, "Initialization failed\n");
+		return ERROR;
+	}
+
+	log_print(LOG_SUCCESS, "Initialized Dexterity\n");
 	return SUCCESS;
 }
 
-void end(int signal)
+void end(int code)
 {
-	printf("\n");
+	if (code == SIGINT)
+	{
+		printf("\n");
+	}
+
 	serial_purge();
 	serial_close();
 	log_print(LOG_SUCCESS, "Terminated Dexterity\n");
-	exit(signal);
+	exit(code);
 }

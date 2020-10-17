@@ -49,7 +49,7 @@ S16 scale(S16 reading, S16 range, S16 min, S16 max, S16 zero)
 {
 	if (max == min)  // avoid divide by 0
 	{
-		return ERROR;
+		return reading;
 	}
 
 	return ((range * ((S32)reading - min)) / (max - min)) - zero;

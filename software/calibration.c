@@ -215,15 +215,7 @@ int calibration_interactive(struct Calibration * calibration)
 
 				if (parameter == ANALOGUE_ZERO)
 				{
-					S16 scaled = scale(hand.accel[direction], ACCEL_SCALE_RANGE, calibration->accel[direction].min, calibration->accel[direction].max, 0);
-
-					if (scaled == ERROR)
-					{
-						log_print(LOG_ERROR, "%s(): Failed to scale sample while calibrating '%s %s'\n", __func__, DIRECTIONS[direction], PARAMETERS[parameter]);
-						return ERROR;
-					}
-
-					hand.accel[direction] = scaled;
+					hand.accel[direction] = scale(hand.accel[direction], ACCEL_SCALE_RANGE, calibration->accel[direction].min, calibration->accel[direction].max, 0);
 				}
 
 				printf("\r%-2s  %-8s : %-12hd", DIRECTIONS[direction], DIRECTION_NAMES[direction], hand.accel[direction]);
@@ -233,12 +225,6 @@ int calibration_interactive(struct Calibration * calibration)
 
 			// save parameter to Calibration struct
 			S16 * param = (S16 *)(&calibration->accel[direction]);
-
-			if (parameter == ANALOGUE_ZERO)
-			{
-				hand.accel[direction] = 0;
-			}
-
 			param[parameter] = hand.accel[direction];
 			printf("\r%-2s  %-8s : %-12hd ~\n", DIRECTIONS[direction], DIRECTION_NAMES[direction], hand.accel[direction]);
 
@@ -268,15 +254,7 @@ int calibration_interactive(struct Calibration * calibration)
 
 				if (parameter == ANALOGUE_ZERO)
 				{
-					S16 scaled = scale(hand.flex[finger], FLEX_SCALE_RANGE, calibration->flex[finger].min, calibration->flex[finger].max, 0);
-
-					if (scaled == ERROR)
-					{
-						log_print(LOG_ERROR, "%s(): Failed to scale sample while calibrating '%s %s'\n", __func__, FINGERS[finger], PARAMETERS[parameter]);
-						return ERROR;
-					}
-
-					hand.flex[finger] = scaled;
+					hand.flex[finger] = scale(hand.flex[finger], FLEX_SCALE_RANGE, calibration->flex[finger].min, calibration->flex[finger].max, 0);
 				}
 
 				printf("\r%-2s  %-8s : %-12hd", FINGERS[finger], FINGER_NAMES[finger], hand.flex[finger]);

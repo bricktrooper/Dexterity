@@ -55,7 +55,7 @@ static int command_sample(void)
 
 		latency = ((double)(end - begin) / CLOCKS_PER_SEC) * 1000;   // calculate sampling latency in milliseconds
 
-		printf("[%0.3fms] X: %hd Y: %hd Z: %hd F1: %hd F2: %hd F3: %hd F4: %hd F5: %hd BUTTON: %hd LED: %hd\n",
+		printf("[%0.3fms] X: %hd Y: %hd Z: %hd F1: %hd F2: %hd F3: %hd F4: %hd F5: %hd BUTTON: %hhd LED: %hhd\n",
 				latency,
 				hand.accel[X], hand.accel[Y], hand.accel[Z],
 				hand.flex[F1], hand.flex[F2], hand.flex[F3], hand.flex[F4], hand.flex[F5],

@@ -43,7 +43,7 @@ int log_print(enum LogType type, const char * format, ...)
 	va_list args;
     va_start(args, format);
 
-	printf(prefixes[type]);
+	printf("%s", prefixes[type]);
 	vprintf(format, args);
 
     va_end(args);

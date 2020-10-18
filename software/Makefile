@@ -1,6 +1,6 @@
-CC = gcc
-LD = gcc
-MM = gcc
+CC = clang
+LD = clang
+MM = clang
 
 INCLUDE += ../common
 
@@ -10,13 +10,13 @@ MMFLAGS += $(addprefix -I , $(INCLUDE))
 
 CFLAGS += -Wall
 CFLAGS += -Wpedantic
-CFLAGS += -std=c18
+CFLAGS += -std=c17
 CFLAGS += -g
 CFLAGS += $(addprefix -I , $(INCLUDE))
 
 LDFLAGS += -Wall
 LDFLAGS += -Wpedantic
-LDFLAGS += -std=c18
+LDFLAGS += -std=c17
 LDFLAGS += -g
 
 TARGET = $(word 1, $(MAKECMDGOALS))

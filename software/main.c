@@ -10,6 +10,23 @@
 #include "command.h"
 #include "serial.h"
 
+
+
+
+
+
+
+
+
+#include "ui.h"
+
+
+
+
+
+
+
+
 #define ARGV_MIN          1   // no subcommand
 #define ARGV_MAX          3   // subcommand + argument
 #define ARGV_PROGRAM      0
@@ -26,6 +43,10 @@ void print_usage(void);
 
 int main(int argc, char ** argv)
 {
+	ui_init();   // pu thtis in init
+	ui_test();
+	ui_cleanup();  // put this in end
+	return 0;
 	char * program = basename(argv[ARGV_PROGRAM]);
 
 	if (argc < ARGV_MIN || argc > ARGV_MAX || argv == NULL)

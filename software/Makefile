@@ -18,6 +18,7 @@ LDFLAGS += -Wall
 LDFLAGS += -Wpedantic
 LDFLAGS += -std=c17
 LDFLAGS += -g
+LDFLAGS += -framework ApplicationServices
 
 TARGET = $(word 1, $(MAKECMDGOALS))
 
@@ -39,6 +40,7 @@ SRC += utils.c
 SRC += serial.c
 SRC += calibration.c
 SRC += command.c
+SRC += ui.c
 
 OBJ = $(SRC:.c=.o)
 DEP = $(SRC:.c=.d)

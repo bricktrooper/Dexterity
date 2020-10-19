@@ -9,23 +9,7 @@
 #include "calibration.h"
 #include "command.h"
 #include "serial.h"
-
-
-
-
-
-
-
-
-
-#include "ui.h"
-
-
-
-
-
-
-
+#include "mouse.h"
 
 #define ARGV_MIN          1   // no subcommand
 #define ARGV_MAX          3   // subcommand + argument
@@ -43,9 +27,10 @@ void print_usage(void);
 
 int main(int argc, char ** argv)
 {
-	ui_init();   // pu thtis in init
-	ui_test();
-	ui_cleanup();  // put this in end
+	mouse_init();
+	signal(SIGINT, end);   // register signal handler for CTRL+C
+	mouse_test();
+	end(SUCCESS);
 	return 0;
 	char * program = basename(argv[ARGV_PROGRAM]);
 
@@ -99,10 +84,11 @@ int init(void)
 	log_suppress(LOG_DEBUG, false);
 	log_suppress(LOG_INFO, true);
 
-	if (serial_open() != SUCCESS)
+	if (mouse_init() != SUCCESS ||
+		serial_open() != SUCCESS)
 	{
 		log_print(LOG_ERROR, "Initialization failed\n");
-		return ERROR;
+		end(ERROR);
 	}
 
 	log_print(LOG_SUCCESS, "Initialized Dexterity\n");
@@ -116,6 +102,7 @@ void end(int code)
 		printf("\n");
 	}
 
+	mouse_cleanup();
 	serial_purge();
 	serial_close();
 	log_print(LOG_SUCCESS, "Terminated Dexterity\n");

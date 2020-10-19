@@ -5,21 +5,21 @@
 #include "dexterity.h"
 #include "log.h"
 
-#include "ui.h"
+#include "mouse.h"
 
 enum Event
 {
 	MOVE_CURSOR,
-	LEFT_CLICK,
-	RIGHT_CLICK,
+	// LEFT_CLICK,
+	// RIGHT_CLICK,
 
 	NUM_EVENTS
 };
 
 static char * EVENT_NAMES [NUM_EVENTS] = {
     "MOVE_CURSOR",
-	"LEFT_CLICK",
-	"RIGHT_CLICK",
+	// "LEFT_CLICK",
+	// "RIGHT_CLICK",
 };
 
 static CGEventRef EVENTS [NUM_EVENTS] = {0};   // set all to NULL
@@ -27,11 +27,9 @@ static CGEventRef EVENTS [NUM_EVENTS] = {0};   // set all to NULL
 static int DEFAULT_X = 0;
 static int DEFAULT_Y = 0;
 
-int ui_init(void)
+int mouse_init(void)
 {
 	EVENTS[MOVE_CURSOR] = CGEventCreateMouseEvent(NULL, kCGEventMouseMoved, CGPointMake(DEFAULT_X, DEFAULT_Y), kCGMouseButtonLeft);
-    EVENTS[LEFT_CLICK] = NULL;
-    EVENTS[RIGHT_CLICK] = NULL;
     // add more events here
 
     for (enum Event event = 0; event < NUM_EVENTS; event++)
@@ -39,15 +37,16 @@ int ui_init(void)
         if (EVENTS[event] == NULL)
         {
             log_print(LOG_ERROR, "%s(): Failed to create UI event '%s'\n", __func__, EVENT_NAMES[event]);
-            ui_cleanup();
+            mouse_cleanup();
 			return ERROR;
         }
     }
 
+    log_print(LOG_SUCCESS, "%s(): Created Quartz Events\n", __func__);
 	return 0;
 }
 
-void ui_cleanup(void)
+void mouse_cleanup(void)
 {
     for (enum Event event = 0; event < NUM_EVENTS; event++)
     {
@@ -57,31 +56,55 @@ void ui_cleanup(void)
             EVENTS[event] = NULL;
         }
     }
+
+    log_print(LOG_SUCCESS, "%s(): Cleaned up Quartz Events\n", __func__);
 }
 
-struct Cursor ui_cursor_locate(void)
+struct Mouse mouse_get(void)
 {
-    struct Cursor cursor = { .x = -1, .y = -1 };
+    struct Mouse mouse = { .x = -1, .y = -1 };
     CGEventRef event = CGEventCreate(NULL);
 
     if (event == NULL)
     {
-        log_print(LOG_ERROR, "%s(): Failed to create event to locate cursor\n", __func__);
-        return cursor;
+        log_print(LOG_ERROR, "%s(): Failed to create event to locate mouse cursor\n", __func__);
+        return mouse;
     }
 
     CGPoint point = CGEventGetLocation(event);
     CFRelease(event);
 
-    cursor.x = (int)point.x;
-    cursor.y = (int)point.x;
+    mouse.x = (int)point.x;
+    mouse.y = (int)point.y;
 
-    return cursor;
+    return mouse;
 }
 
-bool ui_cursor_valid(struct Cursor cursor)
+int mouse_set(struct Mouse mouse)
 {
-    if (cursor.x < 0 || cursor.y < 0)
+    if (!mouse_valid(mouse))
+    {
+        log_print(LOG_ERROR, "%s(): Invalid mouse cursor location '(%d, %d)'\n", __func__, mouse.x, mouse.y);
+        return ERROR;
+    }
+
+    CGEventRef event = EVENTS[MOVE_CURSOR];
+
+    if (event == NULL)
+    {
+        log_print(LOG_ERROR, "%s(): Event '%s' is NULL\n", __func__, EVENT_NAMES[MOVE_CURSOR]);
+        return ERROR;
+    }
+
+    CGEventSetLocation(event, CGPointMake(mouse.x ,mouse.y));
+    CGEventPost(kCGHIDEventTap, event);   // inject event into HID stream
+
+    return SUCCESS;
+}
+
+bool mouse_valid(struct Mouse mouse)
+{
+    if (mouse.x < 0 || mouse.y < 0)
     {
         return false;
     }
@@ -89,7 +112,7 @@ bool ui_cursor_valid(struct Cursor cursor)
     return true;
 }
 
-int ui_test(void)
+int mouse_test(void)
 {
     // CGEventRef mouse = EVENTS[MOVE_CURSOR];
 
@@ -100,16 +123,36 @@ int ui_test(void)
 	// 	usleep(10000);
 	// }
 
-    for (int i = 0; i < 100; i++)
+    while (1)
     {
-        struct Cursor cursor = ui_cursor_locate();
-        if (!ui_cursor_valid(cursor))
+        struct Mouse original = mouse_get();
+
+        if (!mouse_valid(original))
         {
-            printf("Invalid cursor: ");
+            printf("Invalid mouse cursor\n");
+            return ERROR;
         }
 
-        printf("x: %d, y: %d\n", cursor.x, cursor.y);
-        usleep(10000);
+        struct Mouse modified = original;
+
+        for (int j = 0; j < 100; j++)
+        {
+            modified.x += 1;
+            modified.y += 1;
+
+            printf("x: %d -> %d, y: %d -> %d\n", original.x, modified.x, original.y, modified.y);
+
+            if (mouse_set(modified) != SUCCESS)
+            {
+                printf("Failed to set mouse\n");
+                return ERROR;
+            }
+
+            usleep(1000);
+        }
+
+        printf("x: %d -> %d, y: %d -> %d\n", original.x, modified.x, original.y, modified.y);
+        usleep(1000000);
     }
 
     return SUCCESS;

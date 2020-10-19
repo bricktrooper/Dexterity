@@ -10,6 +10,16 @@
 #define DEFAULT_X   0   // default X position of mouse cursor
 #define DEFAULT_Y   0   // default Y position of mouse cursor
 
+bool mouse_valid(struct Mouse mouse)
+{
+    if (mouse.x < 0 || mouse.y < 0)
+    {
+        return false;
+    }
+
+    return true;
+}
+
 struct Mouse mouse_get(void)
 {
     struct Mouse mouse = { .x = -1, .y = -1 };
@@ -54,57 +64,41 @@ int mouse_set(struct Mouse mouse)
     return SUCCESS;
 }
 
-bool mouse_valid(struct Mouse mouse)
+int mouse_move(int x_offset, int y_offset)
 {
-    if (mouse.x < 0 || mouse.y < 0)
+    struct Mouse mouse = mouse_get();
+
+    if (!mouse_valid(mouse))
     {
-        return false;
+        log_print(LOG_ERROR, "%s(): Invalid mouse cursor location '(%d, %d)'\n", __func__, mouse.x, mouse.y);
+        return ERROR;
     }
 
-    return true;
+    mouse.x += x_offset;
+    mouse.y += y_offset;
+
+    if (mouse_set(mouse) != SUCCESS)
+    {
+        log_print(LOG_ERROR, "%s(): Failed to move mouse cursor to '(%d, %d)'\n", __func__, mouse.x, mouse.y);
+        return ERROR;
+    }
+
+    return SUCCESS;
 }
 
 int mouse_test(void)
 {
-    // CGEventRef mouse = EVENTS[MOVE_CURSOR];
-
-	// for (int i = 0; i < 100; i++)
-	// {
-	// 	CGEventSetLocation(mouse, CGPointMake(DEFAULT_X, DEFAULT_Y + i));
-	// 	CGEventPost(kCGHIDEventTap, mouse);   // inject event into HID stream
-	// 	usleep(10000);
-	// }
-
     while (1)
     {
-        struct Mouse original = mouse_get();
-
-        if (!mouse_valid(original))
+        if (mouse_move(1, 2) != SUCCESS)
         {
-            printf("Invalid mouse cursor\n");
+            printf("ERROR\n");
             return ERROR;
         }
 
-        struct Mouse modified = original;
+        usleep(10000);
 
-        for (int j = 0; j < 100; j++)
-        {
-            modified.x += 1;
-            modified.y += 1;
-
-            printf("x: %d -> %d, y: %d -> %d\n", original.x, modified.x, original.y, modified.y);
-
-            if (mouse_set(modified) != SUCCESS)
-            {
-                printf("Failed to set mouse\n");
-                return ERROR;
-            }
-
-            usleep(1000);
-        }
-
-        printf("x: %d -> %d, y: %d -> %d\n", original.x, modified.x, original.y, modified.y);
-        usleep(1000000);
+        // printf("x: %d -> %d, y: %d -> %d\n", original.x, modified.x, original.y, modified.y);
     }
 
     return SUCCESS;

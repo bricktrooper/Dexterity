@@ -27,10 +27,9 @@ void print_usage(void);
 
 int main(int argc, char ** argv)
 {
-	mouse_init();
-	signal(SIGINT, end);   // register signal handler for CTRL+C
+	// init();
 	mouse_test();
-	end(SUCCESS);
+	// end(SUCCESS);
 	return 0;
 	char * program = basename(argv[ARGV_PROGRAM]);
 
@@ -84,8 +83,7 @@ int init(void)
 	log_suppress(LOG_DEBUG, false);
 	log_suppress(LOG_INFO, true);
 
-	if (mouse_init() != SUCCESS ||
-		serial_open() != SUCCESS)
+	if (serial_open() != SUCCESS)
 	{
 		log_print(LOG_ERROR, "Initialization failed\n");
 		end(ERROR);
@@ -102,7 +100,6 @@ void end(int code)
 		printf("\n");
 	}
 
-	mouse_cleanup();
 	serial_purge();
 	serial_close();
 	log_print(LOG_SUCCESS, "Terminated Dexterity\n");

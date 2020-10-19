@@ -9,8 +9,6 @@ struct Mouse
 	int y;
 };
 
-int mouse_init(void);
-void mouse_cleanup(void);
 struct Mouse mouse_get(void);
 int mouse_set(struct Mouse mouse);
 bool mouse_valid(struct Mouse mouse);

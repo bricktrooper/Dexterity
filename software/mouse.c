@@ -7,58 +7,8 @@
 
 #include "mouse.h"
 
-enum Event
-{
-	MOVE_CURSOR,
-	// LEFT_CLICK,
-	// RIGHT_CLICK,
-
-	NUM_EVENTS
-};
-
-static char * EVENT_NAMES [NUM_EVENTS] = {
-    "MOVE_CURSOR",
-	// "LEFT_CLICK",
-	// "RIGHT_CLICK",
-};
-
-static CGEventRef EVENTS [NUM_EVENTS] = {0};   // set all to NULL
-
-static int DEFAULT_X = 0;
-static int DEFAULT_Y = 0;
-
-int mouse_init(void)
-{
-	EVENTS[MOVE_CURSOR] = CGEventCreateMouseEvent(NULL, kCGEventMouseMoved, CGPointMake(DEFAULT_X, DEFAULT_Y), kCGMouseButtonLeft);
-    // add more events here
-
-    for (enum Event event = 0; event < NUM_EVENTS; event++)
-    {
-        if (EVENTS[event] == NULL)
-        {
-            log_print(LOG_ERROR, "%s(): Failed to create UI event '%s'\n", __func__, EVENT_NAMES[event]);
-            mouse_cleanup();
-			return ERROR;
-        }
-    }
-
-    log_print(LOG_SUCCESS, "%s(): Created Quartz Events\n", __func__);
-	return 0;
-}
-
-void mouse_cleanup(void)
-{
-    for (enum Event event = 0; event < NUM_EVENTS; event++)
-    {
-        if (EVENTS[event] != NULL)
-        {
-            CFRelease(EVENTS[event]);
-            EVENTS[event] = NULL;
-        }
-    }
-
-    log_print(LOG_SUCCESS, "%s(): Cleaned up Quartz Events\n", __func__);
-}
+#define DEFAULT_X   0   // default X position of mouse cursor
+#define DEFAULT_Y   0   // default Y position of mouse cursor
 
 struct Mouse mouse_get(void)
 {
@@ -67,7 +17,7 @@ struct Mouse mouse_get(void)
 
     if (event == NULL)
     {
-        log_print(LOG_ERROR, "%s(): Failed to create event to locate mouse cursor\n", __func__);
+        log_print(LOG_ERROR, "%s(): Failed to create event\n", __func__);
         return mouse;
     }
 
@@ -88,16 +38,18 @@ int mouse_set(struct Mouse mouse)
         return ERROR;
     }
 
-    CGEventRef event = EVENTS[MOVE_CURSOR];
+    // create an event
+    CGEventRef event = CGEventCreateMouseEvent(NULL, kCGEventMouseMoved, CGPointMake(DEFAULT_X, DEFAULT_Y), kCGMouseButtonLeft);
 
     if (event == NULL)
     {
-        log_print(LOG_ERROR, "%s(): Event '%s' is NULL\n", __func__, EVENT_NAMES[MOVE_CURSOR]);
+        log_print(LOG_ERROR, "%s(): Failed to create event\n", __func__);
         return ERROR;
     }
 
     CGEventSetLocation(event, CGPointMake(mouse.x ,mouse.y));
     CGEventPost(kCGHIDEventTap, event);   // inject event into HID stream
+    CFRelease(event);                     // destroy the event
 
     return SUCCESS;
 }

@@ -197,7 +197,7 @@ void button_test(void)
 
 	while (1)
 	{
-		button_wait_push();
+		button_wait_click();
 		led_blink(1, 100);
 	}
 }

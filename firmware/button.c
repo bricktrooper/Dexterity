@@ -31,7 +31,7 @@ void button_wait_release(void)
 	while (button_pressed());
 }
 
-void button_wait_push(void)
+void button_wait_click(void)
 {
 	button_wait_press();
 	button_wait_release();

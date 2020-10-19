@@ -10,6 +10,38 @@
 #define DEFAULT_X   0   // default X position of mouse cursor
 #define DEFAULT_Y   0   // default Y position of mouse cursor
 
+static CGEventRef mouse_create_event(CGEventType type)
+{
+    struct Mouse mouse = mouse_get();   // get current cursor location
+
+    if (!mouse_valid(mouse))
+    {
+        log_print(LOG_ERROR, "%s(): Invalid mouse cursor location '(%d, %d)'\n", __func__, mouse.x, mouse.y);
+        return NULL;
+    }
+
+    // create an event
+    CGEventRef event = CGEventCreateMouseEvent(
+                            NULL,                            // source of the event
+                            type,                            // type of mouse event
+                            CGPointMake(mouse.x, mouse.y),   // location of mouse event (use current location)
+                            kCGMouseButtonLeft               // ignored
+                            );
+
+    if (event == NULL)
+    {
+        log_print(LOG_ERROR, "%s(): Failed to create event\n", __func__);
+        return NULL;
+    }
+
+    return event;
+}
+
+static void mouse_destroy_event(CGEventRef event)
+{
+    CFRelease(event);   // destroy the event
+}
+
 bool mouse_valid(struct Mouse mouse)
 {
     if (mouse.x < 0 || mouse.y < 0)
@@ -23,11 +55,16 @@ bool mouse_valid(struct Mouse mouse)
 struct Mouse mouse_get(void)
 {
     struct Mouse mouse = { .x = -1, .y = -1 };
+
+    // Do not use mouse_create_event() here because
+    // it calls this function to get the cursor location.
+    // Calling mouse_create_event() here will cause infinite recursion
+
     CGEventRef event = CGEventCreate(NULL);
 
     if (event == NULL)
     {
-        log_print(LOG_ERROR, "%s(): Failed to create event\n", __func__);
+        log_print(LOG_ERROR, "%s(): Failed to create event to get cursor position\n", __func__);
         return mouse;
     }
 
@@ -48,19 +85,18 @@ int mouse_set(struct Mouse mouse)
         return ERROR;
     }
 
-    // create an event
-    CGEventRef event = CGEventCreateMouseEvent(NULL, kCGEventMouseMoved, CGPointMake(DEFAULT_X, DEFAULT_Y), kCGMouseButtonLeft);
+    CGEventRef event = mouse_create_event(kCGEventMouseMoved);
 
     if (event == NULL)
     {
-        log_print(LOG_ERROR, "%s(): Failed to create event\n", __func__);
+        log_print(LOG_ERROR, "%s(): Failed to create event to move cursor\n", __func__);
         return ERROR;
     }
 
-    CGEventSetLocation(event, CGPointMake(mouse.x ,mouse.y));
-    CGEventPost(kCGHIDEventTap, event);   // inject event into HID stream
-    CFRelease(event);                     // destroy the event
+    CGEventSetLocation(event, CGPointMake(mouse.x ,mouse.y));   // update the location of the cursor
+    CGEventPost(kCGHIDEventTap, event);                         // inject event into HID stream
 
+    mouse_destroy_event(event);
     return SUCCESS;
 }
 

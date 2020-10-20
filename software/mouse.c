@@ -7,9 +7,6 @@
 
 #include "mouse.h"
 
-#define DEFAULT_X   0   // default X position of mouse cursor
-#define DEFAULT_Y   0   // default Y position of mouse cursor
-
 static CGEventRef mouse_create_event(CGEventType type)
 {
     struct Mouse mouse = mouse_get();   // get current cursor location
@@ -95,8 +92,8 @@ int mouse_set(struct Mouse mouse)
 
     CGEventSetLocation(event, CGPointMake(mouse.x ,mouse.y));   // update the location of the cursor
     CGEventPost(kCGHIDEventTap, event);                         // inject event into HID stream
-
     mouse_destroy_event(event);
+
     return SUCCESS;
 }
 
@@ -122,61 +119,137 @@ int mouse_move(int x_offset, int y_offset)
     return SUCCESS;
 }
 
-int mouse_test(void)
+int mouse_press(enum MouseButton button)
 {
-    while (1)
+    if (button != MOUSE_BUTTON_LEFT && button != MOUSE_BUTTON_RIGHT)
     {
-        if (mouse_move(1, 2) != SUCCESS)
-        {
-            printf("ERROR\n");
-            return ERROR;
-        }
-
-        usleep(10000);
-
-        // printf("x: %d -> %d, y: %d -> %d\n", original.x, modified.x, original.y, modified.y);
+        log_print(LOG_ERROR, "%s(): Invalid mouse button\n", __func__);
+        return ERROR;
     }
 
+    CGEventRef event = mouse_create_event((button == MOUSE_BUTTON_LEFT) ? kCGEventLeftMouseDown : kCGEventRightMouseDown);
+
+    if (event == NULL)
+    {
+        log_print(LOG_ERROR, "%s(): Failed to create event to press mouse button\n", __func__);
+        return ERROR;
+    }
+
+    CGEventPost(kCGHIDEventTap, event);
+    mouse_destroy_event(event);
+
     return SUCCESS;
+}
 
-    // // Move to 200x200
-    // CGEventRef move1 = CGEventCreateMouseEvent(
-    //     NULL, kCGEventMouseMoved,
-    //     CGPointMake(200, 200),
-    //     kCGMouseButtonLeft // ignored
-    // );
-    // // Move to 250x250
-    // CGEventRef move2 = CGEventCreateMouseEvent(
-    //     NULL, kCGEventMouseMoved,
-    //     CGPointMake(250, 250),
-    //     kCGMouseButtonLeft // ignored
-    // );
-    // // Left button down at 250x250
-    // CGEventRef click1_down = CGEventCreateMouseEvent(
-    //     NULL, kCGEventLeftMouseDown,
-    //     CGPointMake(250, 250),
-    //     kCGMouseButtonLeft
-    // );
-    // // Left button up at 250x250
-    // CGEventRef click1_up = CGEventCreateMouseEvent(
-    //     NULL, kCGEventLeftMouseUp,
-    //     CGPointMake(250, 250),
-    //     kCGMouseButtonLeft
-    // );
+int mouse_release(enum MouseButton button)
+{
+    if (button != MOUSE_BUTTON_LEFT && button != MOUSE_BUTTON_RIGHT)
+    {
+        log_print(LOG_ERROR, "%s(): Invalid mouse button\n", __func__);
+        return ERROR;
+    }
 
-    // // Now, execute these events with an interval to make them noticeable
-    // CGEventPost(kCGHIDEventTap, move1);
-    // sleep(1);
-    // CGEventPost(kCGHIDEventTap, move2);
-    // sleep(1);
-    // CGEventPost(kCGHIDEventTap, click1_down);
-    // CGEventPost(kCGHIDEventTap, click1_up);
+    CGEventRef event = mouse_create_event((button == MOUSE_BUTTON_LEFT) ? kCGEventLeftMouseUp : kCGEventRightMouseUp);
 
-    // // Release the events
-    // CFRelease(click1_up);
-    // CFRelease(click1_down);
-    // CFRelease(move2);
-    // CFRelease(move1);
+    if (event == NULL)
+    {
+        log_print(LOG_ERROR, "%s(): Failed to create event to release mouse button\n", __func__);
+        return ERROR;
+    }
 
-    // return 0;
+    CGEventPost(kCGHIDEventTap, event);
+    mouse_destroy_event(event);
+
+    return SUCCESS;
+}
+
+int mouse_single_click(enum MouseButton button)
+{
+    if (button != MOUSE_BUTTON_LEFT && button != MOUSE_BUTTON_RIGHT)
+    {
+        log_print(LOG_ERROR, "%s(): Invalid mouse button\n", __func__);
+        return ERROR;
+    }
+
+    CGEventType press = (button == MOUSE_BUTTON_LEFT) ? kCGEventLeftMouseDown : kCGEventRightMouseDown;
+    CGEventType release = (button == MOUSE_BUTTON_LEFT) ? kCGEventLeftMouseUp : kCGEventRightMouseUp;
+
+    CGEventRef event = mouse_create_event(press);
+
+    if (event == NULL)
+    {
+        log_print(LOG_ERROR, "%s(): Failed to create event to single click mouse button\n", __func__);
+        return ERROR;
+    }
+
+    CGEventSetIntegerValueField(event, kCGMouseEventClickState, 1);   // single click
+    CGEventPost(kCGHIDEventTap, event);
+    CGEventSetType(event, release);
+    CGEventPost(kCGHIDEventTap, event);
+
+    mouse_destroy_event(event);
+    return SUCCESS;
+}
+
+int mouse_double_click(enum MouseButton button)
+{
+    if (button != MOUSE_BUTTON_LEFT && button != MOUSE_BUTTON_RIGHT)
+    {
+        log_print(LOG_ERROR, "%s(): Invalid mouse button\n", __func__);
+        return ERROR;
+    }
+
+    CGEventType press = (button == MOUSE_BUTTON_LEFT) ? kCGEventLeftMouseDown : kCGEventRightMouseDown;
+    CGEventType release = (button == MOUSE_BUTTON_LEFT) ? kCGEventLeftMouseUp : kCGEventRightMouseUp;
+
+    CGEventRef event = mouse_create_event(press);
+
+    if (event == NULL)
+    {
+        log_print(LOG_ERROR, "%s(): Failed to create event to single click mouse button\n", __func__);
+        return ERROR;
+    }
+
+    CGEventSetIntegerValueField(event, kCGMouseEventClickState, 2);   // double click (for triple click use 3)
+
+    // first click
+    CGEventPost(kCGHIDEventTap, event);
+    CGEventSetType(event, release);
+    CGEventPost(kCGHIDEventTap, event);
+
+    // second click
+    CGEventSetType(event, press);
+    CGEventPost(kCGHIDEventTap, event);
+    CGEventSetType(event, release);
+    CGEventPost(kCGHIDEventTap, event);
+
+    mouse_destroy_event(event);
+    return SUCCESS;
+}
+
+int mouse_drag(enum MouseButton button, int x_offset, int y_offset);
+
+int mouse_test(void)
+{
+    if (mouse_single_click(MOUSE_BUTTON_LEFT) != SUCCESS)
+    {
+        printf("ERROR\n");
+        return ERROR;
+    }
+
+
+    // for (int i = 0; i < 50; i++)
+    // {
+    //     if (mouse_move(0, 2) != SUCCESS)
+    //     {
+    //         printf("ERROR\n");
+    //         return ERROR;
+    //     }
+
+    //     usleep(10000);
+
+    //     // printf("x: %d -> %d, y: %d -> %d\n", original.x, modified.x, original.y, modified.y);
+    // }
+
+    return SUCCESS;
 }

@@ -206,7 +206,7 @@ int mouse_double_click(enum MouseButton button)
 
     if (event == NULL)
     {
-        log_print(LOG_ERROR, "%s(): Failed to create event to single click mouse button\n", __func__);
+        log_print(LOG_ERROR, "%s(): Failed to create event to double click mouse button\n", __func__);
         return ERROR;
     }
 
@@ -227,29 +227,57 @@ int mouse_double_click(enum MouseButton button)
     return SUCCESS;
 }
 
-int mouse_drag(enum MouseButton button, int x_offset, int y_offset);
-
-int mouse_test(void)
+int mouse_drag(enum MouseButton button, int x_offset, int y_offset)
 {
-    if (mouse_single_click(MOUSE_BUTTON_LEFT) != SUCCESS)
+    struct Mouse mouse = mouse_get();
+
+    if (!mouse_valid(mouse))
     {
-        printf("ERROR\n");
+        log_print(LOG_ERROR, "%s(): Invalid mouse cursor location '(%d, %d)'\n", __func__, mouse.x, mouse.y);
         return ERROR;
     }
 
+    mouse.x += x_offset;
+    mouse.y += y_offset;
 
-    // for (int i = 0; i < 50; i++)
-    // {
-    //     if (mouse_move(0, 2) != SUCCESS)
-    //     {
-    //         printf("ERROR\n");
-    //         return ERROR;
-    //     }
+    // check updated coordinates
+    // We might have to remove these checks because Quartz will not send the cursor to invalid coordinates
+    // It will just stay at the edge of the screen
+    if (!mouse_valid(mouse))
+    {
+        log_print(LOG_ERROR, "%s(): Invalid mouse cursor location '(%d, %d)'\n", __func__, mouse.x, mouse.y);
+        return ERROR;
+    }
 
-    //     usleep(10000);
+    CGEventRef event = mouse_create_event((button == MOUSE_BUTTON_LEFT) ? kCGEventLeftMouseDragged : kCGEventRightMouseDragged);
 
-    //     // printf("x: %d -> %d, y: %d -> %d\n", original.x, modified.x, original.y, modified.y);
-    // }
+    if (event == NULL)
+    {
+        log_print(LOG_ERROR, "%s(): Failed to create event to drag cursor\n", __func__);
+        return ERROR;
+    }
+
+    CGEventSetLocation(event, CGPointMake(mouse.x ,mouse.y));   // update the location of the cursor
+    CGEventPost(kCGHIDEventTap, event);                         // inject event into HID stream
+    mouse_destroy_event(event);
+
+    return SUCCESS;
+}
+
+int mouse_test(void)
+{
+    mouse_press(MOUSE_BUTTON_LEFT);
+    for (int i = 0; i < 50; i++)
+    {
+        if (mouse_drag(MOUSE_BUTTON_LEFT, 1, 2) != SUCCESS)
+        {
+        printf("ERROR\n");
+        return ERROR;
+        }
+
+        usleep(10000);
+    }
+    mouse_release(MOUSE_BUTTON_LEFT);
 
     return SUCCESS;
 }

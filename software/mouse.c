@@ -1,5 +1,3 @@
-#include <stdio.h>
-#include <unistd.h>
 #include <ApplicationServices/ApplicationServices.h>
 
 #include "dexterity.h"
@@ -27,7 +25,7 @@ static CGEventRef mouse_create_event(CGEventType type)
 
     if (event == NULL)
     {
-        log_print(LOG_ERROR, "%s(): Failed to create event\n", __func__);
+        log_print(LOG_ERROR, "%s(): Failed to create mouse event\n", __func__);
         return NULL;
     }
 
@@ -293,28 +291,6 @@ int mouse_scroll(enum ScrollDirection direction, S32 speed)
 
     CGEventPost(kCGHIDEventTap, event);
     mouse_destroy_event(event);
-
-    return SUCCESS;
-}
-
-int mouse_test(void)
-{
-    mouse_scroll(MOUSE_SCROLL_DOWN, 10);
-    usleep(250000);
-    mouse_scroll(MOUSE_SCROLL_UP, 10);
-
-    // mouse_press(MOUSE_BUTTON_LEFT);
-    // for (int i = 0; i < 50; i++)
-    // {
-    //     if (mouse_drag(MOUSE_BUTTON_LEFT, 1, 2) != SUCCESS)
-    //     {
-    //     printf("ERROR\n");
-    //     return ERROR;
-    //     }
-
-    //     usleep(10000);
-    // }
-    // mouse_release(MOUSE_BUTTON_LEFT);
 
     return SUCCESS;
 }

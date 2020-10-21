@@ -31,6 +31,5 @@ int mouse_single_click(enum MouseButton button);
 int mouse_double_click(enum MouseButton button);
 int mouse_drag(enum MouseButton button, int x_offset, int y_offset);
 int mouse_scroll(enum ScrollDirection direction, S32 speed);
-int mouse_test(void);
 
 #endif /* MOUSE_H */

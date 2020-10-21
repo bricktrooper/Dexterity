@@ -27,9 +27,23 @@ void print_usage(void);
 
 int main(int argc, char ** argv)
 {
-	// init();
-	mouse_test();
-	// end(SUCCESS);
+	mouse_scroll(MOUSE_SCROLL_DOWN, 10);
+    usleep(250000);
+    mouse_scroll(MOUSE_SCROLL_UP, 10);
+
+    // mouse_press(MOUSE_BUTTON_LEFT);
+    // for (int i = 0; i < 50; i++)
+    // {
+    //     if (mouse_drag(MOUSE_BUTTON_LEFT, 1, 2) != SUCCESS)
+    //     {
+    //     printf("ERROR\n");
+    //     return ERROR;
+    //     }
+
+    //     usleep(10000);
+    // }
+    // mouse_release(MOUSE_BUTTON_LEFT);
+
 	return 0;
 	char * program = basename(argv[ARGV_PROGRAM]);
 

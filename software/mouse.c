@@ -264,20 +264,57 @@ int mouse_drag(enum MouseButton button, int x_offset, int y_offset)
     return SUCCESS;
 }
 
+int mouse_scroll(enum ScrollDirection direction, S32 speed)
+{
+    if (direction != MOUSE_SCROLL_UP && direction != MOUSE_SCROLL_DOWN)
+    {
+        log_print(LOG_ERROR, "%s(): Invalid scroll direction\n", __func__);
+        return ERROR;
+    }
+
+    if (speed < 0)
+    {
+        log_print(LOG_ERROR, "%s(): Scroll speed '%d' cannot be negative\n", __func__, speed);
+        return ERROR;
+    }
+
+    CGEventRef event = CGEventCreateScrollWheelEvent(
+                            NULL,                      // source of the event
+                            kCGScrollEventUnitLine,    // scroll lines instead of pixels (smooth scrolling)
+                            1,                         // only one scroll wheel
+                            (speed * direction)        // scroll magnitude (+ == UP, - == DOWN)
+                            );
+
+    if (event == NULL)
+    {
+        log_print(LOG_ERROR, "%s(): Failed to create mouse scroll event\n", __func__);
+        return ERROR;
+    }
+
+    CGEventPost(kCGHIDEventTap, event);
+    mouse_destroy_event(event);
+
+    return SUCCESS;
+}
+
 int mouse_test(void)
 {
-    mouse_press(MOUSE_BUTTON_LEFT);
-    for (int i = 0; i < 50; i++)
-    {
-        if (mouse_drag(MOUSE_BUTTON_LEFT, 1, 2) != SUCCESS)
-        {
-        printf("ERROR\n");
-        return ERROR;
-        }
+    mouse_scroll(MOUSE_SCROLL_DOWN, 10);
+    usleep(250000);
+    mouse_scroll(MOUSE_SCROLL_UP, 10);
 
-        usleep(10000);
-    }
-    mouse_release(MOUSE_BUTTON_LEFT);
+    // mouse_press(MOUSE_BUTTON_LEFT);
+    // for (int i = 0; i < 50; i++)
+    // {
+    //     if (mouse_drag(MOUSE_BUTTON_LEFT, 1, 2) != SUCCESS)
+    //     {
+    //     printf("ERROR\n");
+    //     return ERROR;
+    //     }
+
+    //     usleep(10000);
+    // }
+    // mouse_release(MOUSE_BUTTON_LEFT);
 
     return SUCCESS;
 }

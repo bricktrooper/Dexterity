@@ -41,6 +41,7 @@ SRC += serial.c
 SRC += calibration.c
 SRC += command.c
 SRC += mouse.c
+SRC += keyboard.c
 
 OBJ = $(SRC:.c=.o)
 DEP = $(SRC:.c=.d)

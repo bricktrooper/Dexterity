@@ -9,7 +9,7 @@
 #include "calibration.h"
 #include "command.h"
 #include "serial.h"
-#include "mouse.h"
+#include "keyboard.h"
 
 #define ARGV_MIN          1   // no subcommand
 #define ARGV_MAX          3   // subcommand + argument
@@ -27,9 +27,14 @@ void print_usage(void);
 
 int main(int argc, char ** argv)
 {
-	mouse_scroll(MOUSE_SCROLL_DOWN, 10);
-    usleep(250000);
-    mouse_scroll(MOUSE_SCROLL_UP, 10);
+	log_suppress(LOG_DEBUG, false);
+
+	enum Key stroke [] = {KEY_SHIFT, KEY_F, KEY_H, KEY_F, KEY_H, KEY_F, KEY_H, KEY_F, KEY_H, KEY_F, KEY_H, KEY_H, KEY_F, KEY_H, KEY_F, KEY_H, KEY_H, KEY_F, KEY_H, KEY_F, KEY_H, KEY_H, KEY_F, KEY_H, KEY_F, KEY_H};
+	keyboard_type(stroke, sizeof(stroke) / sizeof(enum Key));
+	// keyboard_combo((enum Key [3]){KEY_SHIFT, KEY_F, KEY_H}, 3);
+	// mouse_scroll(MOUSE_SCROLL_DOWN, 10);
+    // usleep(250000);
+    // mouse_scroll(MOUSE_SCROLL_UP, 10);
 
     // mouse_press(MOUSE_BUTTON_LEFT);
     // for (int i = 0; i < 50; i++)

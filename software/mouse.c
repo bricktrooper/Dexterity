@@ -2,8 +2,14 @@
 
 #include "dexterity.h"
 #include "log.h"
+#include "utils.h"
 
 #include "mouse.h"
+
+#define X_MIN   0
+#define Y_MIN   0
+#define X_MAX   1920
+#define Y_MAX   1080
 
 static CGEventRef mouse_create_event(CGEventType type)
 {
@@ -39,7 +45,7 @@ static void mouse_destroy_event(CGEventRef event)
 
 bool mouse_valid(struct Mouse mouse)
 {
-    if (mouse.x < 0 || mouse.y < 0)
+    if (mouse.x < X_MIN || mouse.x > X_MAX || mouse.y < Y_MIN || mouse.y > Y_MAX)
     {
         return false;
     }
@@ -88,7 +94,7 @@ int mouse_set(struct Mouse mouse)
         return ERROR;
     }
 
-    CGEventSetLocation(event, CGPointMake(mouse.x ,mouse.y));   // update the location of the cursor
+    CGEventSetLocation(event, CGPointMake(mouse.x, mouse.y));   // update the location of the cursor
     CGEventPost(kCGHIDEventTap, event);                         // inject event into HID stream
     mouse_destroy_event(event);
 
@@ -238,9 +244,6 @@ int mouse_drag(enum MouseButton button, int x_offset, int y_offset)
     mouse.x += x_offset;
     mouse.y += y_offset;
 
-    // check updated coordinates
-    // We might have to remove these checks because Quartz will not send the cursor to invalid coordinates
-    // It will just stay at the edge of the screen
     if (!mouse_valid(mouse))
     {
         log_print(LOG_ERROR, "%s(): Invalid mouse cursor location '(%d, %d)'\n", __func__, mouse.x, mouse.y);

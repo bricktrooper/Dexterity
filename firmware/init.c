@@ -6,12 +6,6 @@
 
 #include "init.h"
 
-#ifdef PIC_TEST_BOARD
-#define OSC_TUNE    0b00000   // factory-calibrated frequency (original PIC)
-#else
-#define OSC_TUNE    0b10000   // minimum frequency (new PICs)
-#endif
-
 #define LED_DELAY     75000
 
 void init_hardware(void)
@@ -35,9 +29,9 @@ void init_hardware(void)
 
 	// OSCILLATOR FREQUENCY //
 
-	OSCCONbits.IRCF = 0b110;      // Fosc = 4MHz (~3.6864MHz)
+	OSCCONbits.IRCF = 0b111;      // Fosc = 8MHz
 	OSCCONbits.SCS = 1;           // use internal oscillator as system clock
-	OSCTUNEbits.TUN = OSC_TUNE;   // tune internal oscillator frequency
+	OSCTUNEbits.TUN = 0b00000;    // tune internal oscillator to factory-calibrated frequency
 
 #ifdef PIC_TEST_BOARD
 	TRISAbits.TRISA4 = 1;   // RA4 button input

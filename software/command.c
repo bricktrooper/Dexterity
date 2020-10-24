@@ -9,6 +9,9 @@
 #include "serial.h"
 #include "calibration.h"
 
+#include "mouse.h"
+#include "keyboard.h"
+
 #include "command.h"
 
 #define MAX_COMMAND_SIZE   15
@@ -27,7 +30,46 @@ char * COMMANDS [NUM_COMMANDS] = {
 
 static int command_run(void)
 {
-	printf("%s\n", __func__);
+	log_suppress(LOG_DEBUG, false);
+	struct Hand hand;
+	// mouse_glide(234, 345);
+	// return SUCCESS;
+
+	while (1)
+	{
+		if (sample(&hand) != SUCCESS)
+		{
+			printf(":(\n");
+			return ERROR;
+		}
+
+		mouse_move(-hand.accel[Z], -hand.accel[X]);
+
+		// if (hand.flex[F1] > 0 && hand.flex[F2] > 0 && hand.flex[F3] <= 0 && hand.flex[F4] <= 0 && hand.flex[F5] <= 0)
+		// {
+		// 	mouse_single_click(MOUSE_BUTTON_LEFT);
+		// }
+
+		// if (hand.accel[X] == 0)
+		// {
+		// 	printf("STOP\n");
+		// 	// mouse_move(0, 0);
+		// 	// mouse_scroll(MOUSE_SCROLL_UP, 0);
+		// }
+		// else if (hand.accel[X] > 0)
+		// {
+		// 	printf("UP\n");
+		// 	mouse_move(0, -2);
+		// 	// mouse_scroll(MOUSE_SCROLL_UP, 1);
+		// }
+		// if (hand.accel[X] < 0)
+		// {
+		// 	printf("DOWN\n");
+		// 	mouse_move(0, 2);
+		// 	// mouse_scroll(MOUSE_SCROLL_DOWN, 1);
+		// }
+	}
+
 	return SUCCESS;
 }
 

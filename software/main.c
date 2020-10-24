@@ -9,7 +9,6 @@
 #include "calibration.h"
 #include "command.h"
 #include "serial.h"
-#include "keyboard.h"
 
 #define ARGV_MIN          1   // no subcommand
 #define ARGV_MAX          3   // subcommand + argument
@@ -27,29 +26,6 @@ void print_usage(void);
 
 int main(int argc, char ** argv)
 {
-	log_suppress(LOG_DEBUG, false);
-
-	enum Key stroke [] = {KEY_SHIFT, KEY_F, KEY_H, KEY_F, KEY_H, KEY_F, KEY_H, KEY_F, KEY_H, KEY_F, KEY_H, KEY_H, KEY_F, KEY_H, KEY_F, KEY_H, KEY_H, KEY_F, KEY_H, KEY_F, KEY_H, KEY_H, KEY_F, KEY_H, KEY_F, KEY_H};
-	keyboard_type(stroke, sizeof(stroke) / sizeof(enum Key));
-	// keyboard_combo((enum Key [3]){KEY_SHIFT, KEY_F, KEY_H}, 3);
-	// mouse_scroll(MOUSE_SCROLL_DOWN, 10);
-    // usleep(250000);
-    // mouse_scroll(MOUSE_SCROLL_UP, 10);
-
-    // mouse_press(MOUSE_BUTTON_LEFT);
-    // for (int i = 0; i < 50; i++)
-    // {
-    //     if (mouse_drag(MOUSE_BUTTON_LEFT, 1, 2) != SUCCESS)
-    //     {
-    //     printf("ERROR\n");
-    //     return ERROR;
-    //     }
-
-    //     usleep(10000);
-    // }
-    // mouse_release(MOUSE_BUTTON_LEFT);
-
-	return 0;
 	char * program = basename(argv[ARGV_PROGRAM]);
 
 	if (argc < ARGV_MIN || argc > ARGV_MAX || argv == NULL)

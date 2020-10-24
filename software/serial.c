@@ -10,10 +10,11 @@
 #include "serial.h"
 #include "log.h"
 
-#define SERIAL_PORT        "/dev/cu.usbserial-AQ00PEW7"   // Use 'cu' instead of 'tty' to prevent DCD (data-carrier-detect)
+#define SERIAL_PORT       "/dev/cu.usbserial-AQ00PEW7"    // Use 'cu' instead of 'tty' to prevent DCD (data-carrier-detect)
 #define SERIAL_CLOSED     -1                              // Invalid fie descriptor for closed serial port
 #define RX_READ_TIMEOUT    1                              // timeout in deciseconds (10^-1 s)
 #define TX_WRITE_DELAY     1500                           // delay in us between 1B writes to TX (used to avoid RX buffer overrun on PIC)
+#define BAUD_RATE          B115200                        // transfer rate of the serial port
 
 extern int errno;
 
@@ -100,15 +101,15 @@ int serial_open(void)
 
 	// BAUD RATE //
 
-	if (cfsetispeed(&settings, B9600) < 0)   // Set input baud rate to 9600
+	if (cfsetispeed(&settings, BAUD_RATE) < 0)   // Set input baud rate to 115200
 	{
-		log_print(LOG_ERROR, "%s(): Failed to set input baud rate to %d: %s (%d)\n", __func__, B9600, strerror(errno), errno);
+		log_print(LOG_ERROR, "%s(): Failed to set input baud rate to %d: %s (%d)\n", __func__, BAUD_RATE, strerror(errno), errno);
 		goto EXIT;
 	}
 
-	if (cfsetospeed(&settings, B9600) < 0)   // Set output baud rate to 9600
+	if (cfsetospeed(&settings, BAUD_RATE) < 0)   // Set output baud rate to 115200
 	{
-		log_print(LOG_ERROR, "%s(): Failed to set output baud rate to %d: %s (%d)\n", __func__, B9600, strerror(errno), errno);
+		log_print(LOG_ERROR, "%s(): Failed to set output baud rate to %d: %s (%d)\n", __func__, BAUD_RATE, strerror(errno), errno);
 		goto EXIT;
 	}
 

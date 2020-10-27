@@ -22,6 +22,7 @@ struct Mouse
 };
 
 bool mouse_valid(struct Mouse mouse);
+int mouse_correct(struct Mouse * mouse);
 struct Mouse mouse_get(void);
 int mouse_set(struct Mouse mouse);
 int mouse_move(int x_offset, int y_offset);

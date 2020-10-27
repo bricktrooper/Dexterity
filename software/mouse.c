@@ -17,8 +17,8 @@ static CGEventRef mouse_create_event(CGEventType type)
 
     if (!mouse_valid(mouse))
     {
-        log_print(LOG_ERROR, "%s(): Invalid mouse cursor location '(%d, %d)'\n", __func__, mouse.x, mouse.y);
-        return NULL;
+        log_print(LOG_WARNING, "%s(): Invalid mouse cursor location '(%d, %d)'\n", __func__, mouse.x, mouse.y);
+        mouse_correct(&mouse);
     }
 
     // create an event
@@ -53,6 +53,35 @@ bool mouse_valid(struct Mouse mouse)
     return true;
 }
 
+int mouse_correct(struct Mouse * mouse)
+{
+    if (mouse == NULL)
+    {
+        log_print(LOG_ERROR, "%s(): Mouse is NULL\n", __func__);
+        return ERROR;
+    }
+
+    if (mouse->x < X_MIN)
+    {
+        mouse->x = X_MIN;
+    }
+    else if (mouse->x > X_MAX)
+    {
+        mouse->x = X_MAX;
+    }
+
+    if (mouse->y < Y_MIN)
+    {
+        mouse->y = Y_MIN;
+    }
+    else if (mouse->y > Y_MAX)
+    {
+        mouse->y = Y_MAX;
+    }
+
+     return SUCCESS;
+}
+
 struct Mouse mouse_get(void)
 {
     struct Mouse mouse = { .x = -1, .y = -1 };
@@ -80,10 +109,13 @@ struct Mouse mouse_get(void)
 
 int mouse_set(struct Mouse mouse)
 {
+    int rc = SUCCESS;
+
     if (!mouse_valid(mouse))
     {
-        log_print(LOG_ERROR, "%s(): Invalid mouse cursor location '(%d, %d)'\n", __func__, mouse.x, mouse.y);
-        return ERROR;
+        log_print(LOG_WARNING, "%s(): Invalid mouse cursor location '(%d, %d)'\n", __func__, mouse.x, mouse.y);
+        mouse_correct(&mouse);
+        rc = WARNING;
     }
 
     CGEventRef event = mouse_create_event(kCGEventMouseMoved);
@@ -98,17 +130,19 @@ int mouse_set(struct Mouse mouse)
     CGEventPost(kCGHIDEventTap, event);                         // inject event into HID stream
     mouse_destroy_event(event);
 
-    return SUCCESS;
+    return rc;
 }
 
 int mouse_move(int x_offset, int y_offset)
 {
+    int rc = SUCCESS;
     struct Mouse mouse = mouse_get();
 
     if (!mouse_valid(mouse))
     {
-        log_print(LOG_ERROR, "%s(): Invalid mouse cursor location '(%d, %d)'\n", __func__, mouse.x, mouse.y);
-        return ERROR;
+        log_print(LOG_WARNING, "%s(): Invalid mouse cursor location '(%d, %d)'\n", __func__, mouse.x, mouse.y);
+        mouse_correct(&mouse);
+        rc = WARNING;
     }
 
     mouse.x += x_offset;
@@ -120,7 +154,7 @@ int mouse_move(int x_offset, int y_offset)
         return ERROR;
     }
 
-    return SUCCESS;
+    return rc;
 }
 
 int mouse_press(enum MouseButton button)
@@ -233,12 +267,14 @@ int mouse_double_click(enum MouseButton button)
 
 int mouse_drag(enum MouseButton button, int x_offset, int y_offset)
 {
+    int rc = SUCCESS;
     struct Mouse mouse = mouse_get();
 
     if (!mouse_valid(mouse))
     {
-        log_print(LOG_ERROR, "%s(): Invalid mouse cursor location '(%d, %d)'\n", __func__, mouse.x, mouse.y);
-        return ERROR;
+        log_print(LOG_WARNING, "%s(): Invalid mouse cursor location '(%d, %d)'\n", __func__, mouse.x, mouse.y);
+        mouse_correct(&mouse);
+        rc = WARNING;
     }
 
     mouse.x += x_offset;
@@ -246,8 +282,9 @@ int mouse_drag(enum MouseButton button, int x_offset, int y_offset)
 
     if (!mouse_valid(mouse))
     {
-        log_print(LOG_ERROR, "%s(): Invalid mouse cursor location '(%d, %d)'\n", __func__, mouse.x, mouse.y);
-        return ERROR;
+        log_print(LOG_WARNING, "%s(): Invalid mouse cursor location '(%d, %d)'\n", __func__, mouse.x, mouse.y);
+        mouse_correct(&mouse);
+        rc = WARNING;
     }
 
     CGEventRef event = mouse_create_event((button == MOUSE_BUTTON_LEFT) ? kCGEventLeftMouseDragged : kCGEventRightMouseDragged);
@@ -262,7 +299,7 @@ int mouse_drag(enum MouseButton button, int x_offset, int y_offset)
     CGEventPost(kCGHIDEventTap, event);                         // inject event into HID stream
     mouse_destroy_event(event);
 
-    return SUCCESS;
+    return rc;
 }
 
 int mouse_scroll(enum ScrollDirection direction, S32 speed)

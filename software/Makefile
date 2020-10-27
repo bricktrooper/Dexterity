@@ -1,6 +1,6 @@
 CC = clang
 LD = clang
-MM = clang
+MM = gcc
 
 INCLUDE += ../common
 

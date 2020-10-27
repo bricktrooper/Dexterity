@@ -43,7 +43,37 @@ static int command_run(void)
 			return ERROR;
 		}
 
-		mouse_move(-hand.accel[Z], -hand.accel[X]);
+		int deadzone = 10;
+		int x = -hand.accel[Z];
+		int y = -hand.accel[X];
+
+		if (abs(x) < deadzone)
+		{
+			x = 0;
+		}
+		else if (x > 0)
+		{
+			x -= deadzone;
+		}
+		else if (x < 0)
+		{
+			x += deadzone;
+		}
+
+		if (abs(y) < deadzone)
+		{
+			y = 0;
+		}
+		else if (x > 0)
+		{
+			y -= deadzone;
+		}
+		else if (x < 0)
+		{
+			y += deadzone;
+		}
+
+		mouse_move(x, y);
 
 		// if (hand.flex[F1] > 0 && hand.flex[F2] > 0 && hand.flex[F3] <= 0 && hand.flex[F4] <= 0 && hand.flex[F5] <= 0)
 		// {

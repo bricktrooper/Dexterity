@@ -17,7 +17,7 @@ static CGEventRef mouse_create_event(CGEventType type)
 
 	if (!mouse_valid(mouse))
 	{
-		log_print(LOG_WARNING, "%s(): Invalid mouse cursor location '(%d, %d)'\n", __func__, mouse.x, mouse.y);
+		log_print(LOG_WARNING, "%s(): Invalid mouse cursor location (%d,%d)\n", __func__, mouse.x, mouse.y);
 		mouse_correct(&mouse);
 	}
 
@@ -79,6 +79,7 @@ int mouse_correct(struct Mouse * mouse)
 		mouse->y = Y_MAX;
 	}
 
+	log_print(LOG_INFO, "%s(): Corrected cursor position to edge (%d,%d)\n", __func__, mouse->x, mouse->y);
 	return SUCCESS;
 }
 
@@ -113,7 +114,7 @@ int mouse_set(struct Mouse mouse)
 
 	if (!mouse_valid(mouse))
 	{
-		log_print(LOG_WARNING, "%s(): Invalid mouse cursor location '(%d, %d)'\n", __func__, mouse.x, mouse.y);
+		log_print(LOG_WARNING, "%s(): Invalid mouse cursor location (%d,%d)\n", __func__, mouse.x, mouse.y);
 		mouse_correct(&mouse);
 		rc = WARNING;
 	}
@@ -140,7 +141,7 @@ int mouse_move(int x_offset, int y_offset)
 
 	if (!mouse_valid(mouse))
 	{
-		log_print(LOG_WARNING, "%s(): Invalid mouse cursor location '(%d, %d)'\n", __func__, mouse.x, mouse.y);
+		log_print(LOG_WARNING, "%s(): Invalid mouse cursor location (%d,%d)\n", __func__, mouse.x, mouse.y);
 		mouse_correct(&mouse);
 		rc = WARNING;
 	}
@@ -148,9 +149,9 @@ int mouse_move(int x_offset, int y_offset)
 	mouse.x += x_offset;
 	mouse.y += y_offset;
 
-	if (mouse_set(mouse) != SUCCESS)
+	if (mouse_set(mouse) == ERROR)
 	{
-		log_print(LOG_ERROR, "%s(): Failed to move mouse cursor to '(%d, %d)'\n", __func__, mouse.x, mouse.y);
+		log_print(LOG_ERROR, "%s(): Failed to move mouse cursor to (%d,%d)\n", __func__, mouse.x, mouse.y);
 		return ERROR;
 	}
 
@@ -272,7 +273,7 @@ int mouse_drag(enum MouseButton button, int x_offset, int y_offset)
 
 	if (!mouse_valid(mouse))
 	{
-		log_print(LOG_WARNING, "%s(): Invalid mouse cursor location '(%d, %d)'\n", __func__, mouse.x, mouse.y);
+		log_print(LOG_WARNING, "%s(): Invalid mouse cursor location (%d,%d)\n", __func__, mouse.x, mouse.y);
 		mouse_correct(&mouse);
 		rc = WARNING;
 	}
@@ -282,7 +283,7 @@ int mouse_drag(enum MouseButton button, int x_offset, int y_offset)
 
 	if (!mouse_valid(mouse))
 	{
-		log_print(LOG_WARNING, "%s(): Invalid mouse cursor location '(%d, %d)'\n", __func__, mouse.x, mouse.y);
+		log_print(LOG_WARNING, "%s(): Invalid mouse cursor location (%d,%d)\n", __func__, mouse.x, mouse.y);
 		mouse_correct(&mouse);
 		rc = WARNING;
 	}

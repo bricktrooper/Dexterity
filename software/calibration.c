@@ -119,8 +119,8 @@ int calibration_download(struct Calibration * calibration)
 		return ERROR;
 	}
 
-	if (serial_purge() != SUCCESS ||
-		serial_write_message(MESSAGE_SETTINGS) != SUCCESS)
+	if (serial_purge() == ERROR ||
+		serial_write_message(MESSAGE_SETTINGS) == ERROR)
 	{
 		log_print(LOG_ERROR, "%s(): Failed to request calibration settings from device\n", __func__);
 		return ERROR;
@@ -150,8 +150,8 @@ int calibration_upload(struct Calibration * calibration)
 		return ERROR;
 	}
 
-	if (serial_purge() != SUCCESS ||
-		serial_write_message(MESSAGE_CALIBRATE) != SUCCESS)
+	if (serial_purge() == ERROR ||
+		serial_write_message(MESSAGE_CALIBRATE) == ERROR)
 	{
 		log_print(LOG_ERROR, "%s(): Failed to send calibration request to device\n", __func__);
 		return ERROR;
@@ -165,7 +165,7 @@ int calibration_upload(struct Calibration * calibration)
 		return ERROR;
 	}
 
-	if (serial_purge() != SUCCESS ||
+	if (serial_purge() == ERROR ||
 		serial_write((char *)calibration, sizeof(struct Calibration)) != sizeof(struct Calibration))
 	{
 		log_print(LOG_ERROR, "%s(): Failed to send calibration data to device\n", __func__);
@@ -184,8 +184,8 @@ int calibration_interactive(struct Calibration * calibration)
 		return ERROR;
 	}
 
-	if (serial_purge() != SUCCESS ||
-	    serial_write_message(MESSAGE_RAW) != SUCCESS)
+	if (serial_purge() == ERROR ||
+	    serial_write_message(MESSAGE_RAW) == ERROR)
 	{
 		log_print(LOG_ERROR, "%s(): Failed to set device to raw sampling mode\n");
 		return ERROR;
@@ -206,7 +206,7 @@ int calibration_interactive(struct Calibration * calibration)
 			// press button to calibrate
 			do
 			{
-				if (sample(&hand) != SUCCESS)
+				if (sample(&hand) == ERROR)
 				{
 					log_print(LOG_ERROR, "%s(): Sample failed while calibrating '%s %s'\n",
 										__func__, DIRECTIONS[direction], PARAMETERS[parameter]);
@@ -231,7 +231,7 @@ int calibration_interactive(struct Calibration * calibration)
 			// wait for user to release button
 			do
 			{
-				if (sample(&hand) != SUCCESS)
+				if (sample(&hand) == ERROR)
 				{
 					log_print(LOG_ERROR, "%s(): Sample failed while waiting for button release after calibrating '%s %s'\n",
 										__func__, DIRECTIONS[direction], PARAMETERS[parameter]);
@@ -246,7 +246,7 @@ int calibration_interactive(struct Calibration * calibration)
 			// press button to calibrate
 			do
 			{
-				if (sample(&hand) != SUCCESS)
+				if (sample(&hand) == ERROR)
 				{
 					log_print(LOG_ERROR, "%s(): Sample failed while calibrating '%s %s'\n", __func__, FINGERS[finger], PARAMETERS[parameter]);
 					return ERROR;
@@ -275,7 +275,7 @@ int calibration_interactive(struct Calibration * calibration)
 			// wait for user to release button
 			do
 			{
-				if (sample(&hand) != SUCCESS)
+				if (sample(&hand) == ERROR)
 				{
 					log_print(LOG_ERROR, "%s(): Sample failed while waiting for button release after calibrating '%s %s'\n",
 										__func__, FINGERS[finger], PARAMETERS[parameter]);

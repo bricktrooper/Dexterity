@@ -30,14 +30,13 @@ char * COMMANDS [NUM_COMMANDS] = {
 
 static int command_run(void)
 {
-	log_suppress(LOG_DEBUG, false);
 	struct Hand hand;
 	// mouse_glide(234, 345);
 	// return SUCCESS;
 
 	while (1)
 	{
-		if (sample(&hand) != SUCCESS)
+		if (sample(&hand) == ERROR)
 		{
 			printf(":(\n");
 			return ERROR;
@@ -119,7 +118,7 @@ static int command_sample(void)
 		result = sample(&hand);
 		end = clock();
 
-		if (result != SUCCESS)
+		if (result == ERROR)
 		{
 			log_print(LOG_ERROR, "%s: Failed to sample sensors\n", PROGRAM);
 			return result;
@@ -148,7 +147,7 @@ static int command_calibrate(char * file_name)
 	struct Calibration calibration;
 	int result = calibration_interactive(&calibration);
 
-	if (result != SUCCESS)
+	if (result == ERROR)
 	{
 		log_print(LOG_ERROR, "%s: Interactive calibration failed\n", PROGRAM);
 		return result;
@@ -157,7 +156,7 @@ static int command_calibrate(char * file_name)
 	calibration_print(&calibration);
 	result = calibration_export(file_name, &calibration);
 
-	if (result != SUCCESS)
+	if (result == ERROR)
 	{
 		log_print(LOG_ERROR, "%s: Failed to export calibration to '%s'\n", PROGRAM, file_name);
 		return result;
@@ -177,7 +176,7 @@ static int command_upload(char * file_name)
 	struct Calibration calibration;
 	int result = calibration_import(file_name, &calibration);
 
-	if (result != SUCCESS)
+	if (result == ERROR)
 	{
 		log_print(LOG_ERROR, "%s: Failed to import calibration from '%s'\n", PROGRAM, file_name);
 		return result;
@@ -186,7 +185,7 @@ static int command_upload(char * file_name)
 	calibration_print(&calibration);
 	result = calibration_upload(&calibration);
 
-	if (result != SUCCESS)
+	if (result == ERROR)
 	{
 		log_print(LOG_ERROR, "%s: Failed to upload calibration to device\n", PROGRAM);
 		return result;
@@ -200,7 +199,7 @@ static int command_download(char * file_name)
 	struct Calibration calibration;
 	int result = calibration_download(&calibration);
 
-	if (result != SUCCESS)
+	if (result == ERROR)
 	{
 		log_print(LOG_ERROR, "%s: Failed to download calibration from device\n", PROGRAM);
 		return result;
@@ -215,7 +214,7 @@ static int command_download(char * file_name)
 
 	result = calibration_export(file_name, &calibration);
 
-	if (result != SUCCESS)
+	if (result == ERROR)
 	{
 		log_print(LOG_ERROR, "%s: Failed to export calibration to '%s'\n", PROGRAM, file_name);
 		return result;
@@ -226,8 +225,8 @@ static int command_download(char * file_name)
 
 static int command_raw(void)
 {
-	if (serial_purge() != SUCCESS ||
-		serial_write_message(MESSAGE_RAW) != SUCCESS)
+	if (serial_purge() == ERROR ||
+		serial_write_message(MESSAGE_RAW) == ERROR)
 	{
 		log_print(LOG_ERROR, "%s: Failed to disable scaling\n", PROGRAM);
 		return ERROR;
@@ -239,8 +238,8 @@ static int command_raw(void)
 
 static int command_scaled(void)
 {
-	if (serial_purge() != SUCCESS ||
-		serial_write_message(MESSAGE_SCALED) != SUCCESS)
+	if (serial_purge() == ERROR ||
+		serial_write_message(MESSAGE_SCALED) == ERROR)
 	{
 		log_print(LOG_ERROR, "%s: Failed to enable scaling\n", PROGRAM);
 		return ERROR;

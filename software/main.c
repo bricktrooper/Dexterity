@@ -57,7 +57,7 @@ int main(int argc, char ** argv)
 
 	int result = init();
 
-	if (result != SUCCESS)
+	if (result == ERROR)
 	{
 		return result;
 	}
@@ -76,9 +76,9 @@ int init(void)
 	log_suppress(LOG_WARNING, false);
 	log_suppress(LOG_SUCCESS, false);
 	log_suppress(LOG_DEBUG, false);
-	log_suppress(LOG_INFO, true);
+	log_suppress(LOG_INFO, false);
 
-	if (serial_open() != SUCCESS)
+	if (serial_open() == ERROR)
 	{
 		log_print(LOG_ERROR, "Initialization failed\n");
 		end(ERROR);

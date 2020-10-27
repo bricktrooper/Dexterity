@@ -301,7 +301,7 @@ int keyboard_tap(enum Key key)
         return ERROR;
     }
 
-    if (keyboard_press(key) != SUCCESS || keyboard_release(key) != SUCCESS)
+    if (keyboard_press(key) == ERROR || keyboard_release(key) == ERROR)
     {
         log_print(LOG_ERROR, "%s(): Failed to tap key\n", __func__);
         return ERROR;
@@ -329,7 +329,7 @@ int keyboard_type(enum Key * keys, int length)
             return ERROR;
         }
 
-        if (keyboard_tap(key) != SUCCESS)
+        if (keyboard_tap(key) == ERROR)
         {
             log_print(LOG_ERROR, "%s(): Failed to tap key '%s'\n", __func__, KEY_NAMES[key]);
             return ERROR;
@@ -357,7 +357,7 @@ int keyboard_combo(enum Key * keys, int length)
             return ERROR;
         }
 
-        if (keyboard_press(key) != SUCCESS)
+        if (keyboard_press(key) == ERROR)
         {
             log_print(LOG_ERROR, "%s(): Failed to press key '%s'\n", __func__, KEY_NAMES[key]);
             return ERROR;
@@ -366,7 +366,7 @@ int keyboard_combo(enum Key * keys, int length)
 
     for (int i = 0; i < length; i++)
     {
-        if (keyboard_release(keys[i]) != SUCCESS)
+        if (keyboard_release(keys[i]) == ERROR)
         {
             log_print(LOG_ERROR, "%s(): Failed to release key '%s'\n", __func__, KEY_NAMES[keys[i]]);
             return ERROR;

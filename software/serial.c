@@ -12,8 +12,8 @@
 
 #define SERIAL_PORT       "/dev/cu.usbserial-AQ00PEW7"    // Use 'cu' instead of 'tty' to prevent DCD (data-carrier-detect)
 #define SERIAL_CLOSED     -1                              // Invalid fie descriptor for closed serial port
-#define RX_READ_TIMEOUT    1                              // timeout in deciseconds (10^-1 s)
-#define TX_WRITE_DELAY     1500                           // delay in us between 1B writes to TX (used to avoid RX buffer overrun on PIC)
+#define RX_READ_TIMEOUT    10                             // timeout in deciseconds (10^-1 s)
+#define TX_WRITE_DELAY     100                            // delay in us between 1B writes to TX (used to avoid RX buffer overrun on PIC)
 #define BAUD_RATE          B115200                        // transfer rate of the serial port
 
 extern int errno;

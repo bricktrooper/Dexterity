@@ -8,6 +8,7 @@
 #include "utils.h"
 #include "serial.h"
 #include "calibration.h"
+#include "colours.h"
 
 #include "mouse.h"
 #include "keyboard.h"
@@ -42,7 +43,7 @@ static int command_run(void)
 			return ERROR;
 		}
 
-		int deadzone = 10;
+		int deadzone = 5;
 		int x = -hand.accel[Z];
 		int y = -hand.accel[X];
 
@@ -126,11 +127,24 @@ static int command_sample(void)
 
 		latency = ((double)(end - begin) / CLOCKS_PER_SEC) * 1000;   // calculate sampling latency in milliseconds
 
-		printf("[%0.3fms] X: %hd Y: %hd Z: %hd F1: %hd F2: %hd F3: %hd F4: %hd F5: %hd BUTTON: %hhd LED: %hhd\n",
+		printf("[%0.3fms] "
+				BLUE   "X"  WHITE ": %hd "
+				YELLOW "Y"  WHITE ": %hd "
+				GREEN  "Z"  WHITE ": %hd "
+				RED    "F1" WHITE ": %hd "
+				ORANGE "F2" WHITE ": %hd "
+				CYAN   "F3" WHITE ": %hd "
+				PINK   "F4" WHITE ": %hd "
+				PURPLE "F5" WHITE ": %hd "
+				"BUTTON: %hhd "
+				"LED: %hhd\n",
 				latency,
 				hand.accel[X], hand.accel[Y], hand.accel[Z],
 				hand.flex[F1], hand.flex[F2], hand.flex[F3], hand.flex[F4], hand.flex[F5],
-				hand.button, hand.led);
+				hand.button, hand.led
+				);
+
+		fflush(stdout);
 	}
 
 	return SUCCESS;

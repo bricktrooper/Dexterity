@@ -125,22 +125,9 @@ int calibration_download(struct Calibration * calibration)
 		return ERROR;
 	}
 
-	if (!serial_is_open())
+	if (download(calibration) == ERROR)
 	{
-		log_print(LOG_ERROR, "%s(): The serial port is not open\n", __func__);
-		return ERROR;
-	}
-
-	if (serial_purge() == ERROR ||
-		serial_write_message(MESSAGE_SETTINGS) == ERROR)
-	{
-		log_print(LOG_ERROR, "%s(): Failed to request calibration settings from device\n", __func__);
-		return ERROR;
-	}
-
-	if (serial_read(calibration, sizeof(struct Calibration)) != sizeof(struct Calibration))
-	{
-		log_print(LOG_ERROR, "%s(): Failed to receive calibration settings from device\n", __func__);
+		log_print(LOG_ERROR, "%s(): Failed to download calibration settings from device\n", __func__);
 		return ERROR;
 	}
 
@@ -156,31 +143,9 @@ int calibration_upload(struct Calibration * calibration)
 		return ERROR;
 	}
 
-	if (!serial_is_open())
+	if (upload(calibration) == ERROR)
 	{
-		log_print(LOG_ERROR, "%s(): The serial port is not open\n", __func__);
-		return ERROR;
-	}
-
-	if (serial_purge() == ERROR ||
-		serial_write_message(MESSAGE_CALIBRATE) == ERROR)
-	{
-		log_print(LOG_ERROR, "%s(): Failed to send calibration request to device\n", __func__);
-		return ERROR;
-	}
-
-	enum Message response = serial_read_message();
-
-	if (response != MESSAGE_SUCCESS)
-	{
-		log_print(LOG_ERROR, "%s(): Device refused calibration request\n", __func__);
-		return ERROR;
-	}
-
-	if (serial_purge() == ERROR ||
-		serial_write(calibration, sizeof(struct Calibration)) != sizeof(struct Calibration))
-	{
-		log_print(LOG_ERROR, "%s(): Failed to send calibration data to device\n", __func__);
+		log_print(LOG_ERROR, "%s(): Failed to upload calibration settings to device\n", __func__);
 		return ERROR;
 	}
 
@@ -196,8 +161,7 @@ int calibration_interactive(struct Calibration * calibration)
 		return ERROR;
 	}
 
-	if (serial_purge() == ERROR ||
-	    serial_write_message(MESSAGE_RAW) == ERROR)
+	if (raw() == ERROR)
 	{
 		log_print(LOG_ERROR, "%s(): Failed to set device to raw sampling mode\n");
 		return ERROR;
@@ -318,8 +282,8 @@ int calibration_print(struct Calibration * calibration)
 	}
 
 	printf("============ CALIBRATION ============\n");
-	printf("Accelerometer range: %14hd |\n", calibration->accel.range);
-	printf("Flex sensor range:   %14hd |\n", calibration->flex.range);
+	printf("| Accelerometer range: %12hd |\n", calibration->accel.range);
+	printf("| Flex sensor range:   %12hd |\n", calibration->flex.range);
 	printf("-------------------------------------\n");
 	printf("| %-2s  %-8s |  MIN |  MAX | ZERO |\n", "", "");
 	printf("-------------------------------------\n");

@@ -30,6 +30,8 @@ void main(void)
 
 	while (1)
 	{
+		// operations that change the device state will require an ACK
+		// operations that simply request data do not require a separate ACK
 		message = uart_receive_message();
 
 		switch (message)
@@ -38,58 +40,46 @@ void main(void)
 
 				sample(&hand);
 				uart_transmit(&hand, sizeof(struct Hand));
-				// uart_print("X: %d Y: %d Z: %d F1: %d F2: %d F3: %d F4: %d F5: %d BUTTON: %d LED: %d" NEWLINE,
-				// 			hand.accel[X],
-				// 			hand.accel[Y],
-				// 			hand.accel[Z],
-				// 			hand.flex[F1],
-				// 			hand.flex[F2],
-				// 			hand.flex[F3],
-				// 			hand.flex[F4],
-				// 			hand.flex[F5],
-				// 			hand.button,
-				// 			hand.led
-				// 			);
 				break;
 
 			case MESSAGE_RAW:   // use raw ADC readings
 
 				accel_enable_scaling(false);
 				flex_enable_scaling(false);
+				uart_transmit_message(MESSAGE_SUCCESS);
 				break;
 
 			case MESSAGE_SCALED:   // scale ADC readings using the calibration
 
 				accel_enable_scaling(true);
 				flex_enable_scaling(true);
+				uart_transmit_message(MESSAGE_SUCCESS);
 				break;
 
-			case MESSAGE_CALIBRATE:   // receive the calibration settings and apply them
+			case MESSAGE_UPLOAD:   // receive the calibration settings and apply them
 
-				uart_transmit_message(MESSAGE_SUCCESS);
+				uart_transmit_message(MESSAGE_SUCCESS);   // handshake with PC
 
 				if (uart_receive(&calibration, sizeof(struct Calibration)) != sizeof(struct Calibration))
 				{
 					uart_transmit_message(MESSAGE_ERROR);
-				}
-				else
-				{
-					calibrate(&calibration);
-					// uart_send_message(MESSAGE_SUCCESS);
+					break;
 				}
 
+				// apply the calibration and send an ACK when finished
+				calibrate(&calibration);
+				uart_transmit_message(MESSAGE_SUCCESS);
 				break;
 
-			case MESSAGE_SETTINGS:   // transmit the current calibration settings
+			case MESSAGE_DOWNLOAD:   // transmit the current calibration settings
 
 				settings(&calibration);
 				uart_transmit(&calibration, sizeof(struct Calibration));
 				break;
 
 			default:
-
-				// We don't really care about the receiving the other messages
-				// just continue with the loop here
+				// We don't really care about receiving the other messages
+				// just continue with the state machine here
 				break;
 
 		}

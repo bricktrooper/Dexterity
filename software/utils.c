@@ -30,6 +30,103 @@ int sample(struct Hand * hand)
 	return SUCCESS;
 }
 
+int raw(void)
+{
+	if (serial_purge() == ERROR ||
+		serial_write_message(MESSAGE_RAW) == ERROR)
+	{
+		log_print(LOG_ERROR, "%s(): Failed to send raw mode request to device\n");
+		return ERROR;
+	}
+
+	if (serial_read_message() != MESSAGE_SUCCESS)
+	{
+		log_print(LOG_ERROR, "%s(): Device did not acknowledge raw mode request\n");
+		return ERROR;
+	}
+
+	return SUCCESS;
+}
+
+int scaled(void)
+{
+	if (serial_purge() == ERROR ||
+		serial_write_message(MESSAGE_SCALED) == ERROR)
+	{
+		log_print(LOG_ERROR, "%s(): Failed to send scaled mode request to device\n");
+		return ERROR;
+	}
+
+	if (serial_read_message() != MESSAGE_SUCCESS)
+	{
+		log_print(LOG_ERROR, "%s(): Device did not acknowledge scaled mode request\n");
+		return ERROR;
+	}
+
+	return SUCCESS;
+}
+
+int upload(struct Calibration * calibration)
+{
+	if (calibration == NULL)
+	{
+		log_print(LOG_ERROR, "%s(): Invalid arguments\n", __func__);
+		return ERROR;
+	}
+
+	if (serial_purge() == ERROR ||
+		serial_write_message(MESSAGE_UPLOAD) == ERROR)
+	{
+		log_print(LOG_ERROR, "%s(): Failed to send calibration upload request to device\n", __func__);
+		return ERROR;
+	}
+
+	if (serial_read_message() != MESSAGE_SUCCESS)
+	{
+		log_print(LOG_ERROR, "%s(): Device did not acknowledge calibration upload request\n", __func__);
+		return ERROR;
+	}
+
+	if (serial_purge() == ERROR ||
+		serial_write(calibration, sizeof(struct Calibration)) != sizeof(struct Calibration))
+	{
+		log_print(LOG_ERROR, "%s(): Failed to send calibration data to device\n", __func__);
+		return ERROR;
+	}
+
+	if (serial_read_message() != MESSAGE_SUCCESS)
+	{
+		log_print(LOG_ERROR, "%s(): Device did not acknowledge the result of calibration upload\n", __func__);
+		return ERROR;
+	}
+
+	return SUCCESS;
+}
+
+int download(struct Calibration * calibration)
+{
+	if (calibration == NULL)
+	{
+		log_print(LOG_ERROR, "%s(): Invalid arguments\n", __func__);
+		return ERROR;
+	}
+
+	if (serial_purge() == ERROR ||
+		serial_write_message(MESSAGE_DOWNLOAD) == ERROR)
+	{
+		log_print(LOG_ERROR, "%s(): Failed to send calibration download request to device\n", __func__);
+		return ERROR;
+	}
+
+	if (serial_read(calibration, sizeof(struct Calibration)) != sizeof(struct Calibration))
+	{
+		log_print(LOG_ERROR, "%s(): Failed to receive calibration data from device\n", __func__);
+		return ERROR;
+	}
+
+	return SUCCESS;
+}
+
 int read_file(char * file_name, char ** data, int * size)
 {
 	if (file_name == NULL || data == NULL || size == NULL)

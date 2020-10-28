@@ -239,8 +239,7 @@ static int command_download(char * file_name)
 
 static int command_raw(void)
 {
-	if (serial_purge() == ERROR ||
-		serial_write_message(MESSAGE_RAW) == ERROR)
+	if (raw() == ERROR)
 	{
 		log_print(LOG_ERROR, "%s: Failed to disable scaling\n", PROGRAM);
 		return ERROR;
@@ -252,8 +251,7 @@ static int command_raw(void)
 
 static int command_scaled(void)
 {
-	if (serial_purge() == ERROR ||
-		serial_write_message(MESSAGE_SCALED) == ERROR)
+	if (scaled() == ERROR)
 	{
 		log_print(LOG_ERROR, "%s: Failed to enable scaling\n", PROGRAM);
 		return ERROR;

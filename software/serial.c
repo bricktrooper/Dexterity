@@ -169,9 +169,9 @@ int serial_purge(void)
 	return SUCCESS;
 }
 
-int serial_read(char * data, int size)
+int serial_read(void * buffer, int size)
 {
-	if (data == NULL || size < 0)
+	if (buffer == NULL || size < 0)
 	{
 		log_print(LOG_ERROR, "%s(): Invalid arguments\n", __func__);
 		return ERROR;
@@ -183,6 +183,7 @@ int serial_read(char * data, int size)
 		return ERROR;
 	}
 
+	char * data = (char *)buffer;
 	int received = 0;
 
 	do
@@ -220,9 +221,9 @@ int serial_read(char * data, int size)
 	return received;
 }
 
-int serial_write(char * data, int size)
+int serial_write(void * buffer, int size)
 {
-	if (data == NULL || size < 0)
+	if (buffer == NULL || size < 0)
 	{
 		log_print(LOG_ERROR, "%s(): Invalid arguments\n", __func__);
 		return ERROR;
@@ -234,6 +235,7 @@ int serial_write(char * data, int size)
 		return ERROR;
 	}
 
+	char * data = (char *)buffer;
 	int transmitted = 0;
 
 	for (int i = 0; i < size; i++)

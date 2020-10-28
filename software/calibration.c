@@ -138,7 +138,7 @@ int calibration_download(struct Calibration * calibration)
 		return ERROR;
 	}
 
-	if (serial_read((char *)calibration, sizeof(struct Calibration)) != sizeof(struct Calibration))
+	if (serial_read(calibration, sizeof(struct Calibration)) != sizeof(struct Calibration))
 	{
 		log_print(LOG_ERROR, "%s(): Failed to receive calibration settings from device\n", __func__);
 		return ERROR;
@@ -178,7 +178,7 @@ int calibration_upload(struct Calibration * calibration)
 	}
 
 	if (serial_purge() == ERROR ||
-		serial_write((char *)calibration, sizeof(struct Calibration)) != sizeof(struct Calibration))
+		serial_write(calibration, sizeof(struct Calibration)) != sizeof(struct Calibration))
 	{
 		log_print(LOG_ERROR, "%s(): Failed to send calibration data to device\n", __func__);
 		return ERROR;

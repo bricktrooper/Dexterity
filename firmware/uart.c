@@ -56,13 +56,14 @@ char uart_receive_byte(void)
 	return RCREG;                 // read new byte from RX buffer
 }
 
-int uart_transmit(char * data, int size)
+int uart_transmit(void * buffer, int size)
 {
-	if (data == NULL || size < 0)
+	if (buffer == NULL || size < 0)
 	{
 		return ERROR;
 	}
 
+	char * data = (char *)buffer;
 	int count = 0;
 
 	for (int i = 0; i < size; i++)
@@ -74,13 +75,14 @@ int uart_transmit(char * data, int size)
 	return count;
 }
 
-int uart_receive(char * data, int size)
+int uart_receive(void * buffer, int size)
 {
-	if (data == NULL || size < 0)
+	if (buffer == NULL || size < 0)
 	{
 		return ERROR;
 	}
 
+	char * data = (char *)buffer;
 	int count = 0;
 
 	for (int i = 0; i < size; i++)

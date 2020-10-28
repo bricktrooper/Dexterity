@@ -21,7 +21,7 @@ int sample(struct Hand * hand)
 
 	if (serial_purge() == ERROR ||
 		serial_write_message(MESSAGE_SAMPLE) == ERROR ||
-		serial_read((char *)hand, sizeof(struct Hand)) != sizeof(struct Hand))
+		serial_read(hand, sizeof(struct Hand)) != sizeof(struct Hand))
 	{
 		log_print(LOG_ERROR, "%s(): Failed to sample sensor data\n", __func__);
 		return ERROR;

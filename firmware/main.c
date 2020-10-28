@@ -37,7 +37,7 @@ void main(void)
 			case MESSAGE_SAMPLE:   // read the analogue sensors and transmit the results
 
 				sample(&hand);
-				uart_transmit((char *)&hand, sizeof(struct Hand));
+				uart_transmit(&hand, sizeof(struct Hand));
 				// uart_print("X: %d Y: %d Z: %d F1: %d F2: %d F3: %d F4: %d F5: %d BUTTON: %d LED: %d" NEWLINE,
 				// 			hand.accel[X],
 				// 			hand.accel[Y],
@@ -68,7 +68,7 @@ void main(void)
 
 				uart_transmit_message(MESSAGE_SUCCESS);
 
-				if (uart_receive((char *)&calibration, sizeof(struct Calibration)) != sizeof(struct Calibration))
+				if (uart_receive(&calibration, sizeof(struct Calibration)) != sizeof(struct Calibration))
 				{
 					uart_transmit_message(MESSAGE_ERROR);
 				}
@@ -83,7 +83,7 @@ void main(void)
 			case MESSAGE_SETTINGS:   // transmit the current calibration settings
 
 				settings(&calibration);
-				uart_transmit((char *)&calibration, sizeof(struct Calibration));
+				uart_transmit(&calibration, sizeof(struct Calibration));
 				break;
 
 			default:

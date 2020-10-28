@@ -19,11 +19,15 @@ int sample(struct Hand * hand)
 		return ERROR;
 	}
 
-	if (serial_purge() == ERROR ||
-		serial_write_message(MESSAGE_SAMPLE) == ERROR ||
-		serial_read(hand, sizeof(struct Hand)) != sizeof(struct Hand))
+	if (serial_write_message(MESSAGE_SAMPLE) == ERROR)
 	{
-		log_print(LOG_ERROR, "%s(): Failed to sample sensor data\n", __func__);
+		log_print(LOG_ERROR, "%s(): Failed to send sample request to device\n", __func__);
+		return ERROR;
+	}
+
+	if (serial_read(hand, sizeof(struct Hand)) != sizeof(struct Hand))
+	{
+		log_print(LOG_ERROR, "%s(): Failed to receive sensor data\n", __func__);
 		return ERROR;
 	}
 
@@ -32,8 +36,7 @@ int sample(struct Hand * hand)
 
 int raw(void)
 {
-	if (serial_purge() == ERROR ||
-		serial_write_message(MESSAGE_RAW) == ERROR)
+	if (serial_write_message(MESSAGE_RAW) == ERROR)
 	{
 		log_print(LOG_ERROR, "%s(): Failed to send raw mode request to device\n");
 		return ERROR;
@@ -50,8 +53,7 @@ int raw(void)
 
 int scaled(void)
 {
-	if (serial_purge() == ERROR ||
-		serial_write_message(MESSAGE_SCALED) == ERROR)
+	if (serial_write_message(MESSAGE_SCALED) == ERROR)
 	{
 		log_print(LOG_ERROR, "%s(): Failed to send scaled mode request to device\n");
 		return ERROR;
@@ -74,8 +76,7 @@ int upload(struct Calibration * calibration)
 		return ERROR;
 	}
 
-	if (serial_purge() == ERROR ||
-		serial_write_message(MESSAGE_UPLOAD) == ERROR)
+	if (serial_write_message(MESSAGE_UPLOAD) == ERROR)
 	{
 		log_print(LOG_ERROR, "%s(): Failed to send calibration upload request to device\n", __func__);
 		return ERROR;
@@ -87,8 +88,7 @@ int upload(struct Calibration * calibration)
 		return ERROR;
 	}
 
-	if (serial_purge() == ERROR ||
-		serial_write(calibration, sizeof(struct Calibration)) != sizeof(struct Calibration))
+	if (serial_write(calibration, sizeof(struct Calibration)) != sizeof(struct Calibration))
 	{
 		log_print(LOG_ERROR, "%s(): Failed to send calibration data to device\n", __func__);
 		return ERROR;
@@ -111,8 +111,7 @@ int download(struct Calibration * calibration)
 		return ERROR;
 	}
 
-	if (serial_purge() == ERROR ||
-		serial_write_message(MESSAGE_DOWNLOAD) == ERROR)
+	if (serial_write_message(MESSAGE_DOWNLOAD) == ERROR)
 	{
 		log_print(LOG_ERROR, "%s(): Failed to send calibration download request to device\n", __func__);
 		return ERROR;

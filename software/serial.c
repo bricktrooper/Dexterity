@@ -235,6 +235,12 @@ int serial_write(void * buffer, int size)
 		return ERROR;
 	}
 
+	if (serial_purge() == ERROR)
+	{
+		log_print(LOG_ERROR, "%s(): Failed to purge the serial port before writing new data\n", __func__);
+		return ERROR;
+	}
+
 	char * data = (char *)buffer;
 	int transmitted = 0;
 
@@ -306,18 +312,16 @@ enum Message serial_read_message(void)
 
 int serial_write_message(enum Message message)
 {
-	char * data = MESSAGES[message];
-	int length = strlen(data);
+	int length = strlen(MESSAGES[message]);
+	char buffer [MAX_MESSAGE_SIZE] = {0};
 
-	if (serial_write(data, length) != length)   // read 1B at a time
-	{
-		log_print(LOG_ERROR, "%s(): Failed to write message string\n", __func__);
-		return ERROR;
-	}
+	memcpy(buffer, MESSAGES[message], length);   // get message string
+	memcpy(buffer + length, "\r", 1);            // carriage return [Enter] indicates end of transmission
+	length += 1;                                 // length of message including the terminator
 
-	if (serial_write("\r", 1) != 1)   // carriage return [Enter] indicates end of transmission
+	if (serial_write(buffer, length) != length)
 	{
-		log_print(LOG_ERROR, "%s(): Failed to write message terminator\n", __func__);
+		log_print(LOG_ERROR, "%s(): Failed to write message to serial port\n", __func__);
 		return ERROR;
 	}
 

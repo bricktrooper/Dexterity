@@ -12,13 +12,14 @@
 
 #define FLEX_DEFAULT_ZERO   0
 
-static struct Analogue settings [5];
+static struct Flex settings;
 static int channels [] = {F1_CHANNEL, F2_CHANNEL, F3_CHANNEL, F4_CHANNEL, F5_CHANNEL};
 static bool scaling_enabled = true;
 
 void flex_init(void)
 {
-	adc_set_vref(VREF_INTERNAL);   // use VDD as VREF for conversions (5V)
+	adc_set_vref(VREF_INTERNAL);                // use VDD as VREF for conversions (5V)
+	flex_set_range(FLEX_DEFAULT_SCALE_RANGE);   // use default scaling range
 
 	// FINGER 1 //
 
@@ -56,11 +57,21 @@ void flex_enable_scaling(bool enable)
 	scaling_enabled = enable;
 }
 
+S16 flex_get_range(void)
+{
+	return settings.range;
+}
+
+void flex_set_range(S16 range)
+{
+	settings.range = range;
+}
+
 void flex_calibrate(enum Finger finger, S16 min, S16 max, S16 zero)
 {
-	settings[finger].min = min;
-	settings[finger].max = max;
-	settings[finger].zero = zero;
+	settings.params[finger].min = min;
+	settings.params[finger].max = max;
+	settings.params[finger].zero = zero;
 }
 
 void flex_default(enum Finger finger)
@@ -68,16 +79,16 @@ void flex_default(enum Finger finger)
 	flex_calibrate(finger, ADC_MIN, ADC_MAX, FLEX_DEFAULT_ZERO);
 }
 
-int flex_settings(enum Finger finger, struct Analogue * analogue)
+int flex_settings(enum Finger finger, struct Parameters * param)
 {
-	if (analogue == NULL)
+	if (param == NULL)
 	{
 		return ERROR;
 	}
 
-	analogue->min = settings[finger].min;
-	analogue->max = settings[finger].max;
-	analogue->zero = settings[finger].zero;
+	param->min = settings.params[finger].min;
+	param->max = settings.params[finger].max;
+	param->zero = settings.params[finger].zero;
 
 	return SUCCESS;
 }
@@ -85,7 +96,7 @@ int flex_settings(enum Finger finger, struct Analogue * analogue)
 S16 flex_scaled(enum Finger finger)
 {
 	// scale flex reading from 'min' <-> 'max' to 0 <-> 100 centred at 'zero'
-	return scale(flex_raw(finger), FLEX_SCALE_RANGE, settings[finger].min, settings[finger].max, settings[finger].zero);
+	return scale(flex_raw(finger), settings.range, settings.params[finger].min, settings.params[finger].max, settings.params[finger].zero);
 }
 
 S16 flex_raw(enum Finger finger)

@@ -76,7 +76,7 @@ int init(void)
 	log_suppress(LOG_WARNING, false);
 	log_suppress(LOG_SUCCESS, false);
 	log_suppress(LOG_DEBUG, false);
-	log_suppress(LOG_INFO, false);
+	log_suppress(LOG_INFO, true);
 
 	if (serial_open() == ERROR)
 	{

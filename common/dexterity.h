@@ -12,8 +12,8 @@
 
 #define MAX_MESSAGE_SIZE    15
 
-#define ACCEL_SCALE_RANGE   200
-#define FLEX_SCALE_RANGE    100
+#define ACCEL_DEFAULT_SCALE_RANGE   20
+#define FLEX_DEFAULT_SCALE_RANGE    10
 
 typedef uint8_t  U8;
 typedef uint16_t U16;
@@ -27,7 +27,7 @@ enum Direction
 {
 	X,   // X-Axis acceleration
 	Y,   // Y-Axis acceleration
-	Z,    // Z-Axis acceleration
+	Z,   // Z-Axis acceleration
 
 	NUM_DIRECTIONS
 };
@@ -38,7 +38,7 @@ enum Finger
 	F2,   // Index
 	F3,   // Middle
 	F4,   // Ring
-	F5,    // Pinky
+	F5,   // Pinky
 
 	NUM_FINGERS
 };
@@ -59,9 +59,9 @@ enum Message
 
 enum Parameter
 {
-	ANALOGUE_MIN,   // Maximum analogue value for sclaing
-	ANALOGUE_MAX,   // Minimum analogue value for sclaing
-	ANALOGUE_ZERO,  // Centre analogue value for scaling
+	ANALOGUE_MIN,    // Maximum raw analogue value for scaling
+	ANALOGUE_MAX,    // Minimum raw analogue value for scaling
+	ANALOGUE_ZERO,   // Centre scaled analogue value for adjustment
 
 	NUM_PARAMETERS
 };
@@ -74,17 +74,29 @@ struct Hand
 	S8 led;
 };
 
-struct Analogue
+struct Parameters
 {
 	S16 min;
 	S16 max;
 	S16 zero;
 };
 
+struct Accel
+{
+	S16 range;
+	struct Parameters params [NUM_DIRECTIONS];
+};
+
+struct Flex
+{
+	S16 range;
+	struct Parameters params [NUM_FINGERS];
+};
+
 struct Calibration
 {
-	struct Analogue accel [NUM_DIRECTIONS];
-	struct Analogue flex [NUM_FINGERS];
+	struct Accel accel;
+	struct Flex flex;
 };
 
 extern char * DIRECTIONS [NUM_DIRECTIONS];

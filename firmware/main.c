@@ -150,14 +150,18 @@ int calibrate(struct Calibration * calibration)
 		return ERROR;
 	}
 
+	accel_set_range(calibration->accel.range);
+
 	for (enum Direction direction = 0; direction < NUM_DIRECTIONS; direction++)
 	{
-		accel_calibrate(direction, calibration->accel[direction].min, calibration->accel[direction].max, calibration->accel[direction].zero);
+		accel_calibrate(direction, calibration->accel.params[direction].min, calibration->accel.params[direction].max, calibration->accel.params[direction].zero);
 	}
+
+	flex_set_range(calibration->flex.range);
 
 	for (enum Finger finger = 0; finger < NUM_FINGERS; finger++)
 	{
-		flex_calibrate(finger, calibration->flex[finger].min, calibration->flex[finger].max, calibration->flex[finger].zero);
+		flex_calibrate(finger, calibration->flex.params[finger].min, calibration->flex.params[finger].max, calibration->flex.params[finger].zero);
 	}
 
 	return SUCCESS;
@@ -170,14 +174,18 @@ int settings(struct Calibration * calibration)
 		return ERROR;
 	}
 
+	calibration->accel.range = accel_get_range();
+
 	for (enum Direction direction = 0; direction < NUM_DIRECTIONS; direction++)
 	{
-		accel_settings(direction, &(calibration->accel[direction]));
+		accel_settings(direction, &(calibration->accel.params[direction]));
 	}
+
+	calibration->flex.range = flex_get_range();
 
 	for (enum Finger finger = 0; finger < NUM_FINGERS; finger++)
 	{
-		flex_settings(finger, &(calibration->flex[finger]));
+		flex_settings(finger, &(calibration->flex.params[finger]));
 	}
 
 	return SUCCESS;

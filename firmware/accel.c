@@ -12,13 +12,14 @@
 
 #define ACCEL_DEFAULT_ZERO   100
 
-static struct Analogue settings [3];
+static struct Accel settings;
 static int channels [] = {X_CHANNEL, Y_CHANNEL, Z_CHANNEL};
 static bool scaling_enabled = true;
 
 void accel_init(void)
 {
-	adc_set_vref(VREF_EXTERNAL);   // use external VREF for conversions (3.3V)
+	adc_set_vref(VREF_EXTERNAL);                  // use external VREF for conversions (3.3V)
+	accel_set_range(ACCEL_DEFAULT_SCALE_RANGE);   // use default scaling range
 
 	// X Axis //
 
@@ -44,11 +45,21 @@ void accel_enable_scaling(bool enable)
 	scaling_enabled = enable;
 }
 
+S16 accel_get_range(void)
+{
+	return settings.range;
+}
+
+void accel_set_range(S16 range)
+{
+	settings.range = range;
+}
+
 void accel_calibrate(enum Direction direction, S16 min, S16 max, S16 zero)
 {
-	settings[direction].min = min;
-	settings[direction].max = max;
-	settings[direction].zero = zero;
+	settings.params[direction].min = min;
+	settings.params[direction].max = max;
+	settings.params[direction].zero = zero;
 }
 
 void accel_default(enum Direction direction)
@@ -56,16 +67,16 @@ void accel_default(enum Direction direction)
 	accel_calibrate(direction, ADC_MIN, ADC_MAX, ACCEL_DEFAULT_ZERO);
 }
 
-int accel_settings(enum Direction direction, struct Analogue * analogue)
+int accel_settings(enum Direction direction, struct Parameters * param)
 {
-	if (analogue == NULL)
+	if (param == NULL)
 	{
 		return ERROR;
 	}
 
-	analogue->min = settings[direction].min;
-	analogue->max = settings[direction].max;
-	analogue->zero = settings[direction].zero;
+	param->min = settings.params[direction].min;
+	param->max = settings.params[direction].max;
+	param->zero = settings.params[direction].zero;
 
 	return SUCCESS;
 }
@@ -73,7 +84,7 @@ int accel_settings(enum Direction direction, struct Analogue * analogue)
 S16 accel_scaled(enum Direction direction)
 {
 	// scale acceleration reading from 'min' <-> '1023' to -100 <-> +100 centered at 'zero'
-	return scale(accel_raw(direction), ACCEL_SCALE_RANGE, settings[direction].min, settings[direction].max, settings[direction].zero);
+	return scale(accel_raw(direction), settings.range, settings.params[direction].min, settings.params[direction].max, settings.params[direction].zero);
 }
 
 S16 accel_raw(enum Direction direction)

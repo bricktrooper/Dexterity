@@ -30,14 +30,24 @@ int calibration_import(char * file_name, struct Calibration * calibration)
 		return ERROR;
 	}
 
+	int tokens = fscanf(file, "accel_range=%hd flex_range=%hd\n",
+						&(calibration->accel.range),
+						&(calibration->flex.range));
+
+	if (tokens != 2)
+	{
+		log_print(LOG_ERROR, "%s(): Calibration file was incorrectly parsed\n", __func__, file_name);
+		return ERROR;
+	}
+
 	for (enum Direction direction = 0; direction < NUM_DIRECTIONS; direction++)
 	{
-		int tokens = fscanf(file, "%*s %*s min=%hd max=%hd zero=%hd\n",
-							&(calibration->accel[direction].min),
-							&(calibration->accel[direction].max),
-							&(calibration->accel[direction].zero));
+		tokens = fscanf(file, "%*s %*s min=%hd max=%hd zero=%hd\n",
+						&(calibration->accel.params[direction].min),
+						&(calibration->accel.params[direction].max),
+						&(calibration->accel.params[direction].zero));
 
-		if (tokens != 3)
+		if (tokens != NUM_PARAMETERS)
 		{
 			log_print(LOG_ERROR, "%s(): Calibration file was incorrectly parsed\n", __func__, file_name);
 			return ERROR;
@@ -46,12 +56,12 @@ int calibration_import(char * file_name, struct Calibration * calibration)
 
 	for (enum Finger finger = 0; finger < NUM_FINGERS; finger++)
 	{
-		int tokens = fscanf(file, "%*s %*s min=%hd max=%hd zero=%hd\n",
-							&(calibration->flex[finger].min),
-							&(calibration->flex[finger].max),
-							&(calibration->flex[finger].zero));
+		tokens = fscanf(file, "%*s %*s min=%hd max=%hd zero=%hd\n",
+						&(calibration->flex.params[finger].min),
+						&(calibration->flex.params[finger].max),
+						&(calibration->flex.params[finger].zero));
 
-		if (tokens != 3)
+		if (tokens != NUM_PARAMETERS)
 		{
 			log_print(LOG_ERROR, "%s(): Calibration file was incorrectly parsed\n", __func__, file_name);
 			return ERROR;
@@ -80,14 +90,16 @@ int calibration_export(char * file_name, struct Calibration * calibration)
 		return ERROR;
 	}
 
+	fprintf(file, "accel_range=%hd flex_range=%hd\n", calibration->accel.range, calibration->flex.range);
+
 	for (enum Direction direction = 0; direction < NUM_DIRECTIONS; direction++)
 	{
 		fprintf(file, "%-2s %-8s min=%hd max=%hd zero=%hd\n",
 				DIRECTIONS[direction],
 				DIRECTION_NAMES[direction],
-				calibration->accel[direction].min,
-				calibration->accel[direction].max,
-				calibration->accel[direction].zero);
+				calibration->accel.params[direction].min,
+				calibration->accel.params[direction].max,
+				calibration->accel.params[direction].zero);
 	}
 
 	for (enum Finger finger = 0; finger < NUM_FINGERS; finger++)
@@ -95,9 +107,9 @@ int calibration_export(char * file_name, struct Calibration * calibration)
 		fprintf(file, "%-2s %-8s min=%hd max=%hd zero=%hd\n",
 				FINGERS[finger],
 				FINGER_NAMES[finger],
-				calibration->flex[finger].min,
-				calibration->flex[finger].max,
-				calibration->flex[finger].zero);
+				calibration->flex.params[finger].min,
+				calibration->flex.params[finger].max,
+				calibration->flex.params[finger].zero);
 	}
 
 	fclose(file);
@@ -191,6 +203,11 @@ int calibration_interactive(struct Calibration * calibration)
 		return ERROR;
 	}
 
+	// Use the default analogue ranges
+	// This can be changed from the calibration file
+	calibration->accel.range = ACCEL_DEFAULT_SCALE_RANGE;
+	calibration->flex.range = FLEX_DEFAULT_SCALE_RANGE;
+
 	printf("Press the button to confirm a measurement\n\n");
 
 	struct Hand hand;
@@ -215,7 +232,7 @@ int calibration_interactive(struct Calibration * calibration)
 
 				if (parameter == ANALOGUE_ZERO)
 				{
-					hand.accel[direction] = scale(hand.accel[direction], ACCEL_SCALE_RANGE, calibration->accel[direction].min, calibration->accel[direction].max, 0);
+					hand.accel[direction] = scale(hand.accel[direction], calibration->accel.range, calibration->accel.params[direction].min, calibration->accel.params[direction].max, 0);
 				}
 
 				printf("\r%-2s  %-8s : %-12hd", DIRECTIONS[direction], DIRECTION_NAMES[direction], hand.accel[direction]);
@@ -224,8 +241,8 @@ int calibration_interactive(struct Calibration * calibration)
 			while (hand.button == BUTTON_RELEASED);
 
 			// save parameter to Calibration struct
-			S16 * param = (S16 *)(&calibration->accel[direction]);
-			param[parameter] = hand.accel[direction];
+			S16 * params = (S16 *)(&calibration->accel.params[direction]);
+			params[parameter] = hand.accel[direction];
 			printf("\r%-2s  %-8s : %-12hd ~\n", DIRECTIONS[direction], DIRECTION_NAMES[direction], hand.accel[direction]);
 
 			// wait for user to release button
@@ -254,7 +271,7 @@ int calibration_interactive(struct Calibration * calibration)
 
 				if (parameter == ANALOGUE_ZERO)
 				{
-					hand.flex[finger] = scale(hand.flex[finger], FLEX_SCALE_RANGE, calibration->flex[finger].min, calibration->flex[finger].max, 0);
+					hand.flex[finger] = scale(hand.flex[finger], calibration->flex.range, calibration->flex.params[finger].min, calibration->flex.params[finger].max, 0);
 				}
 
 				printf("\r%-2s  %-8s : %-12hd", FINGERS[finger], FINGER_NAMES[finger], hand.flex[finger]);
@@ -263,11 +280,11 @@ int calibration_interactive(struct Calibration * calibration)
 			while (hand.button == BUTTON_RELEASED);
 
 			// save parameter to Calibration struct
-			S16 * param = (S16 *)(&calibration->flex[finger]);
-			param[parameter] = hand.flex[finger];
+			S16 * params = (S16 *)(&calibration->flex.params[finger]);
+			params[parameter] = hand.flex[finger];
 			printf("\r%-2s  %-8s : %-12hd ~\n", FINGERS[finger], FINGER_NAMES[finger], hand.flex[finger]);
 
-			if (calibration->flex[finger].min == calibration->flex[finger].max)
+			if (calibration->flex.params[finger].min == calibration->flex.params[finger].max)
 			{
 				log_print(LOG_WARNING, "%s(): MIN and MAX are the same for '%s'\n", __func__, FINGERS[finger]);
 			}
@@ -301,6 +318,9 @@ int calibration_print(struct Calibration * calibration)
 	}
 
 	printf("============ CALIBRATION ============\n");
+	printf("Accelerometer range: %14hd |\n", calibration->accel.range);
+	printf("Flex sensor range:   %14hd |\n", calibration->flex.range);
+	printf("-------------------------------------\n");
 	printf("| %-2s  %-8s |  MIN |  MAX | ZERO |\n", "", "");
 	printf("-------------------------------------\n");
 
@@ -309,9 +329,9 @@ int calibration_print(struct Calibration * calibration)
 		printf("| %-2s  %-8s | %4hd | %4hd | %4hd |\n",
 				DIRECTIONS[direction],
 				DIRECTION_NAMES[direction],
-				calibration->accel[direction].min,
-				calibration->accel[direction].max,
-				calibration->accel[direction].zero);
+				calibration->accel.params[direction].min,
+				calibration->accel.params[direction].max,
+				calibration->accel.params[direction].zero);
 	}
 
 	for (enum Finger finger = 0; finger < NUM_FINGERS; finger++)
@@ -319,9 +339,9 @@ int calibration_print(struct Calibration * calibration)
 		printf("| %-2s  %-8s | %4hd | %4hd | %4hd |\n",
 				FINGERS[finger],
 				FINGER_NAMES[finger],
-				calibration->flex[finger].min,
-				calibration->flex[finger].max,
-				calibration->flex[finger].zero);
+				calibration->flex.params[finger].min,
+				calibration->flex.params[finger].max,
+				calibration->flex.params[finger].zero);
 	}
 
 	printf("=====================================\n");

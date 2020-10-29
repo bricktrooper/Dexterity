@@ -42,6 +42,7 @@ SRC += calibration.c
 SRC += command.c
 SRC += mouse.c
 SRC += keyboard.c
+SRC += gesture.c
 
 OBJ = $(SRC:.c=.o)
 DEP = $(SRC:.c=.d)

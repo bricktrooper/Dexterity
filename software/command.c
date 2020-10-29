@@ -12,6 +12,7 @@
 
 #include "mouse.h"
 #include "keyboard.h"
+#include "gesture.h"
 
 #include "command.h"
 
@@ -41,6 +42,13 @@ static int command_run(void)
 		{
 			printf(":(\n");
 			return ERROR;
+		}
+
+		// you should apply any deadzone before doing any inference
+		// apply the deadzones to the entire hand here before doing anything else
+		if (!gesture_compare(GESTURE_MOVE, &hand))
+		{
+			continue;
 		}
 
 		int deadzone = 5;

@@ -287,7 +287,7 @@ enum Message serial_read_message(void)
 	{
 		if (serial_read(&next, 1) != 1)  // read 1B at a time
 		{
-			log_print(LOG_ERROR, "%s(): Failed to read message character #%d\n", __func__, i);
+			log_print(LOG_ERROR, "%s(): Failed to read message character #%d\n", __func__, i + 1);
 			return MESSAGE_UNKNOWN;
 		}
 

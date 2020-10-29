@@ -1,2 +1,2 @@
 # Dexterity
-N/A
+Dexterity is a wearable hand gesture recognition device.  More information to follow.....

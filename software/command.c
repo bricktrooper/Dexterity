@@ -127,22 +127,18 @@ static int command_sample(void)
 
 		latency = ((double)(end - begin) / CLOCKS_PER_SEC) * 1000;   // calculate sampling latency in milliseconds
 
-		printf("[%0.3fms] "
-				BLUE   "X"  WHITE ": %hd "
-				YELLOW "Y"  WHITE ": %hd "
-				GREEN  "Z"  WHITE ": %hd "
-				RED    "F1" WHITE ": %hd "
-				ORANGE "F2" WHITE ": %hd "
-				CYAN   "F3" WHITE ": %hd "
-				PINK   "F4" WHITE ": %hd "
-				PURPLE "F5" WHITE ": %hd "
-				"BUTTON: %hhd "
-				"LED: %hhd\n",
-				latency,
-				hand.accel[X], hand.accel[Y], hand.accel[Z],
-				hand.flex[F1], hand.flex[F2], hand.flex[F3], hand.flex[F4], hand.flex[F5],
-				hand.button, hand.led
-				);
+		printf("[" BLUE "%0.3f ms" WHITE "] |", latency);
+		printf(RED    " X"      WHITE ": % 5hd |", hand.accel[X]);
+		printf(RED    " Y"      WHITE ": % 5hd |", hand.accel[Y]);
+		printf(RED    " Z"      WHITE ": % 5hd |", hand.accel[Z]);
+		printf(YELLOW  " F1"     WHITE ": % 5hd |", hand.flex[F1]);
+		printf(YELLOW  " F2"     WHITE ": % 5hd |", hand.flex[F2]);
+		printf(YELLOW  " F3"     WHITE ": % 5hd |", hand.flex[F3]);
+		printf(YELLOW  " F4"     WHITE ": % 5hd |", hand.flex[F4]);
+		printf(YELLOW  " F5"     WHITE ": % 5hd |", hand.flex[F5]);
+		printf(GREEN " BUTTON" WHITE ": %2hhd |", hand.button);
+		printf(GREEN " LED"    WHITE ": %2hhd |", hand.led);
+		printf("\n");
 
 		fflush(stdout);
 	}

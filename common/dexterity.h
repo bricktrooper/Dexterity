@@ -7,13 +7,14 @@
 #define WARNING    1
 #define SUCCESS    0
 
-#define BUTTON_PRESSED      1
-#define BUTTON_RELEASED     0
+#define BUTTON_PRESSED    1
+#define BUTTON_RELEASED   0
 
-#define MAX_MESSAGE_SIZE    15
+#define MAX_MESSAGE_SIZE      15
+#define MAX_LABEL_LENGTH      6
 
-#define ACCEL_DEFAULT_SCALE_RANGE   20
-#define FLEX_DEFAULT_SCALE_RANGE    10
+#define ACCEL_DEFAULT_RANGE   100
+#define FLEX_DEFAULT_RANGE    20
 
 typedef uint8_t  U8;
 typedef uint16_t U16;
@@ -34,11 +35,11 @@ enum Direction
 
 enum Finger
 {
-	F1,   // Thumb
-	F2,   // Index
-	F3,   // Middle
-	F4,   // Ring
-	F5,   // Pinky
+	THUMB,    // 1st flex sensor
+	INDEX,    // 2nd flex sensor
+	MIDDLE,   // 3rd flex sensor
+	RING,     // 4th flex sensor
+	PINKY,    // 5th flex sensor
 
 	NUM_FINGERS
 };
@@ -59,9 +60,9 @@ enum Message
 
 enum Parameter
 {
-	ANALOGUE_MIN,    // Maximum raw analogue value for scaling
-	ANALOGUE_MAX,    // Minimum raw analogue value for scaling
-	ANALOGUE_ZERO,   // Centre scaled analogue value for adjustment
+	MIN,    // Maximum raw analogue value for scaling
+	MAX,    // Minimum raw analogue value for scaling
+	CENTRE,   // Centre scaled analogue value for adjustment
 
 	NUM_PARAMETERS
 };
@@ -74,38 +75,29 @@ struct Hand
 	S8 led;
 };
 
-struct Parameters
-{
-	S16 min;
-	S16 max;
-	S16 zero;
-};
-
-struct Accel
+struct AccelCalibration
 {
 	S16 range;
-	struct Parameters params [NUM_DIRECTIONS];
+	S16 params [NUM_DIRECTIONS][NUM_PARAMETERS];
 };
 
-struct Flex
+struct FlexCalibration
 {
 	S16 range;
-	struct Parameters params [NUM_FINGERS];
+	S16 params [NUM_FINGERS][NUM_PARAMETERS];
 };
 
 struct Calibration
 {
-	struct Accel accel;
-	struct Flex flex;
+	struct AccelCalibration accel;
+	struct FlexCalibration flex;
 };
 
 extern char * DIRECTIONS [NUM_DIRECTIONS];
 extern char * FINGERS [NUM_FINGERS];
-extern char * DIRECTION_NAMES [NUM_DIRECTIONS];
-extern char * FINGER_NAMES [NUM_FINGERS];
 extern char * MESSAGES [NUM_MESSAGES];
 extern char * PARAMETERS [NUM_PARAMETERS];
 
-S16 scale(S16 reading, S16 range, S16 min, S16 max, S16 zero);
+S16 scale(S16 reading, S16 range, S16 min, S16 max, S16 centre);
 
 #endif /* DEXTERITY_H */

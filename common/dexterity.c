@@ -7,20 +7,6 @@ char * DIRECTIONS [NUM_DIRECTIONS] = {
 };
 
 char * FINGERS [NUM_FINGERS] = {
-	"F1",
-	"F2",
-	"F3",
-	"F4",
-	"F5"
-};
-
-char * DIRECTION_NAMES [NUM_DIRECTIONS] = {
-	"ACCEL",
-	"ACCEL",
-	"ACCEL"
-};
-
-char * FINGER_NAMES [NUM_FINGERS] = {
 	"THUMB",
 	"INDEX",
 	"MIDDLE",
@@ -42,15 +28,15 @@ char * MESSAGES [NUM_MESSAGES] = {
 char * PARAMETERS [NUM_PARAMETERS] = {
 	"MIN",
 	"MAX",
-	"ZERO"
+	"CENTRE"
 };
 
-S16 scale(S16 reading, S16 range, S16 min, S16 max, S16 zero)
+S16 scale(S16 reading, S16 range, S16 min, S16 max, S16 centre)
 {
 	if (max == min)  // avoid divide by 0
 	{
 		return reading;
 	}
 
-	return ((range * ((S32)reading - min)) / (max - min)) - zero;
+	return ((range * ((S32)reading - min)) / (max - min)) - centre;
 }

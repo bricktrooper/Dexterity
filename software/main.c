@@ -17,7 +17,7 @@
 #define ARGV_ARGUMENT     2
 
 int init(void);
-void end(int signal);
+void end(int code);
 void print_usage(void);
 
 // when we calibrate we should 1. have the devie send an ack to affim that it is ready,

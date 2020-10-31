@@ -60,7 +60,7 @@ bool gesture_compare(enum Gesture gesture, struct Hand * hand)
 		return false;
 	}
 
-	printf("%d %d %d %d %d -> %f\n", deviation[F1], deviation[F2], deviation[F3], deviation[F4], deviation[F5], confidence);
+	printf("%d %d %d %d %d -> %f\n", deviation[THUMB], deviation[INDEX], deviation[MIDDLE], deviation[RING], deviation[PINKY], confidence);
 
 	if (fabs(confidence) < TOLERANCE)
 	{

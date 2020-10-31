@@ -7,6 +7,7 @@
 #include <string.h>
 
 #include "dexterity.h"
+#include "led.h"
 
 #include "uart.h"
 
@@ -40,8 +41,10 @@ void uart_init(void)
 
 void uart_transmit_byte(char byte)
 {
+	led_on();
 	while (TXSTAbits.TRMT == 0);   // wait for TX register to empty
 	TXREG = byte;                  // load new byte into TX register
+	led_off();
 }
 
 char uart_receive_byte(void)

@@ -7,13 +7,13 @@
 
 void adc_init(void)
 {
-	adc_set_vref(VREF_INTERNAL);   // use VDD as VREF for conversions
+	adc_vref(VREF_INTERNAL);   // use VDD as VREF for conversions
 
-	ADCON0bits.ADFM = 1;           // right justify result
-	ADCON0bits.CHS = 11;           // set default channel to AN11
-	ADCON0bits.GO_DONE = 0;        // set ADC to idle
-	ADCON0bits.ADON = 1;           // enable ADC hardware
-	ADCON1bits.ADCS = 0b111;       // use internal oscillator for ADC conversion clock
+	ADCON0bits.ADFM = 1;       // right justify result
+	ADCON0bits.CHS = 11;       // set default channel to AN11
+	ADCON0bits.GO_DONE = 0;    // set ADC to idle
+	ADCON0bits.ADON = 1;       // enable ADC hardware
+	ADCON1bits.ADCS = 0b111;   // use internal oscillator for ADC conversion clock
 }
 
 void adc_run(void)
@@ -24,7 +24,7 @@ void adc_run(void)
 
 S16 adc_read(int channel)
 {
-	if (adc_set_channel(channel))
+	if (adc_channel(channel))
 	{
 		return ERROR;
 	}
@@ -33,7 +33,7 @@ S16 adc_read(int channel)
 	return (ADRESH << 8) + ADRESL;   // calculate result of conversion
 }
 
-int adc_set_channel(int channel)
+int adc_channel(int channel)
 {
 	if (channel < 0 || channel > 11)
 	{
@@ -44,7 +44,7 @@ int adc_set_channel(int channel)
 	return SUCCESS;
 }
 
-void adc_set_vref(enum VREF vref)
+void adc_vref(enum VREF vref)
 {
 	ADCON0bits.VCFG = vref;
 }

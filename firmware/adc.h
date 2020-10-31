@@ -13,7 +13,7 @@ enum VREF
 void adc_init(void);
 void adc_run(void);
 S16 adc_read(int channel);
-int adc_set_channel(int channel);
-void adc_set_vref(enum VREF vref);
+int adc_channel(int channel);
+void adc_vref(enum VREF vref);
 
 #endif /* ADC_H */

@@ -17,6 +17,8 @@
 
 void init(void);
 int sample(struct Hand * hand);
+void raw(void);
+void scaled(void);
 int calibrate(struct Calibration * calibration);
 int settings(struct Calibration * calibration);
 
@@ -44,15 +46,13 @@ void main(void)
 
 			case MESSAGE_RAW:   // use raw ADC readings
 
-				accel_enable_scaling(false);
-				flex_enable_scaling(false);
+				raw();
 				uart_transmit_message(MESSAGE_SUCCESS);
 				break;
 
 			case MESSAGE_SCALED:   // scale ADC readings using the calibration
 
-				accel_enable_scaling(true);
-				flex_enable_scaling(true);
+				scaled();
 				uart_transmit_message(MESSAGE_SUCCESS);
 				break;
 
@@ -106,7 +106,7 @@ int sample(struct Hand * hand)
 
 	// ACCELEROMETER //
 
-	adc_set_vref(VREF_EXTERNAL);
+	adc_vref(VREF_EXTERNAL);
 
 	hand->accel[X] = accel_read(X);
 	hand->accel[Y] = accel_read(Y);
@@ -114,13 +114,13 @@ int sample(struct Hand * hand)
 
 	// FLEX SENSORS //
 
-	adc_set_vref(VREF_INTERNAL);
+	adc_vref(VREF_INTERNAL);
 
-	hand->flex[F1] = flex_read(F1);
-	hand->flex[F2] = flex_read(F2);
-	hand->flex[F3] = flex_read(F3);
-	hand->flex[F4] = flex_read(F4);
-	hand->flex[F5] = flex_read(F5);
+	hand->flex[THUMB] = flex_read(THUMB);
+	hand->flex[INDEX] = flex_read(INDEX);
+	hand->flex[MIDDLE] = flex_read(MIDDLE);
+	hand->flex[RING] = flex_read(RING);
+	hand->flex[PINKY] = flex_read(PINKY);
 
 	// BUTTON STATE //
 
@@ -133,6 +133,19 @@ int sample(struct Hand * hand)
 	return SUCCESS;
 }
 
+void raw(void)
+{
+	accel_mode(RAW);
+	flex_mode(RAW);
+}
+
+void scaled(void)
+{
+	accel_mode(SCALED);
+	flex_mode(SCALED);
+}
+
+
 int calibrate(struct Calibration * calibration)
 {
 	if (calibration == NULL)
@@ -140,18 +153,10 @@ int calibrate(struct Calibration * calibration)
 		return ERROR;
 	}
 
-	accel_set_range(calibration->accel.range);
-
-	for (enum Direction direction = 0; direction < NUM_DIRECTIONS; direction++)
+	if (accel_calibrate(&calibration->accel) == ERROR ||
+		flex_calibrate(&calibration->flex) == ERROR)
 	{
-		accel_calibrate(direction, calibration->accel.params[direction].min, calibration->accel.params[direction].max, calibration->accel.params[direction].zero);
-	}
-
-	flex_set_range(calibration->flex.range);
-
-	for (enum Finger finger = 0; finger < NUM_FINGERS; finger++)
-	{
-		flex_calibrate(finger, calibration->flex.params[finger].min, calibration->flex.params[finger].max, calibration->flex.params[finger].zero);
+		return ERROR;
 	}
 
 	return SUCCESS;
@@ -164,18 +169,10 @@ int settings(struct Calibration * calibration)
 		return ERROR;
 	}
 
-	calibration->accel.range = accel_get_range();
-
-	for (enum Direction direction = 0; direction < NUM_DIRECTIONS; direction++)
+	if (accel_settings(&calibration->accel) == ERROR ||
+		flex_settings(&calibration->flex) == ERROR)
 	{
-		accel_settings(direction, &(calibration->accel.params[direction]));
-	}
-
-	calibration->flex.range = flex_get_range();
-
-	for (enum Finger finger = 0; finger < NUM_FINGERS; finger++)
-	{
-		flex_settings(finger, &(calibration->flex.params[finger]));
+		return ERROR;
 	}
 
 	return SUCCESS;

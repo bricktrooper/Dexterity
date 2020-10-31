@@ -13,6 +13,9 @@
 #define MAX_MESSAGE_SIZE      15
 #define MAX_LABEL_LENGTH      6
 
+#define ACCEL_DEFAULT_ZERO    100
+#define FLEX_DEFAULT_ZERO     0
+
 #define ACCEL_DEFAULT_RANGE   100
 #define FLEX_DEFAULT_RANGE    20
 
@@ -60,11 +63,19 @@ enum Message
 
 enum Parameter
 {
-	MIN,    // Maximum raw analogue value for scaling
-	MAX,    // Minimum raw analogue value for scaling
+	MIN,      // Maximum raw analogue value for scaling
+	MAX,      // Minimum raw analogue value for scaling
 	CENTRE,   // Centre scaled analogue value for adjustment
 
 	NUM_PARAMETERS
+};
+
+enum Mode
+{
+	RAW,      // use raw adc readings
+	SCALED,   // scale adc readings using calibration
+
+	NUM_MODES
 };
 
 struct Hand

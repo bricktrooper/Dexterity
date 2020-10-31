@@ -156,21 +156,21 @@ void flex_test(void)
 
 	uart_print(NEWLINE NEWLINE "======= FLEX Test =======" NEWLINE NEWLINE);
 
-	int f1 = 0;
-	int f2 = 0;
-	int f3 = 0;
-	int f4 = 0;
-	int f5 = 0;
+	int thumb = 0;
+	int index = 0;
+	int middle = 0;
+	int ring = 0;
+	int pinky = 0;
 
 	while (1)
 	{
-		f1 = flex_read(F1);
-		f2 = flex_read(F2);
-		f3 = flex_read(F3);
-		f4 = flex_read(F4);
-		f5 = flex_read(F5);
+		thumb = flex_read(THUMB);
+		index = flex_read(INDEX);
+		middle = flex_read(MIDDLE);
+		ring = flex_read(RING);
+		pinky = flex_read(PINKY);
 
-		uart_print("1: %d, 2: %d, 3: %d, 4: %d, 5: %d" NEWLINE, f1, f2, f3, f4, f5);
+		uart_print("1: %d, 2: %d, 3: %d, 4: %d, 5: %d" NEWLINE, thumb, index, middle, ring, pinky);
 		_delay(10);
 	}
 }

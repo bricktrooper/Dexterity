@@ -135,18 +135,19 @@ static int command_sample(void)
 
 		latency = ((double)(end - begin) / CLOCKS_PER_SEC) * 1000;   // calculate sampling latency in milliseconds
 
+		printf("\r");
+
 		printf("[" BLUE "%0.3f ms" WHITE "] |", latency);
-		printf(RED    " X"      WHITE ": % 5hd |", hand.accel[X]);
-		printf(RED    " Y"      WHITE ": % 5hd |", hand.accel[Y]);
-		printf(RED    " Z"      WHITE ": % 5hd |", hand.accel[Z]);
-		printf(YELLOW  " F1"     WHITE ": % 5hd |", hand.flex[F1]);
-		printf(YELLOW  " F2"     WHITE ": % 5hd |", hand.flex[F2]);
-		printf(YELLOW  " F3"     WHITE ": % 5hd |", hand.flex[F3]);
-		printf(YELLOW  " F4"     WHITE ": % 5hd |", hand.flex[F4]);
-		printf(YELLOW  " F5"     WHITE ": % 5hd |", hand.flex[F5]);
-		printf(GREEN " BUTTON" WHITE ": %2hhd |", hand.button);
-		printf(GREEN " LED"    WHITE ": %2hhd |", hand.led);
-		printf("\n");
+		printf(RED    " %s" WHITE " : % 5hd |", DIRECTIONS[X],   hand.accel[X]);
+		printf(RED    " %s" WHITE " : % 5hd |", DIRECTIONS[Y],   hand.accel[Y]);
+		printf(RED    " %s" WHITE " : % 5hd |", DIRECTIONS[Z],   hand.accel[Z]);
+		printf(YELLOW " %s" WHITE " : % 5hd |", FINGERS[THUMB],  hand.flex[THUMB]);
+		printf(YELLOW " %s" WHITE " : % 5hd |", FINGERS[INDEX],  hand.flex[INDEX]);
+		printf(YELLOW " %s" WHITE " : % 5hd |", FINGERS[MIDDLE], hand.flex[MIDDLE]);
+		printf(YELLOW " %s" WHITE " : % 5hd |", FINGERS[RING],   hand.flex[RING]);
+		printf(YELLOW " %s" WHITE " : % 5hd |", FINGERS[PINKY],  hand.flex[PINKY]);
+		printf(GREEN  " %s" WHITE " : % hhd |", "BUTTON",        hand.button);
+		printf(GREEN  " %s" WHITE " : % hhd |", "LED",           hand.led);
 
 		fflush(stdout);
 	}

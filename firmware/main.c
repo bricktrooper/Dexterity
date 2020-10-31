@@ -25,6 +25,7 @@ int settings(struct Calibration * calibration);
 void main(void)
 {
 	init();
+	led_off();
 
 	struct Hand hand;
 	struct Calibration calibration;
@@ -77,11 +78,11 @@ void main(void)
 				uart_transmit(&calibration, sizeof(struct Calibration));
 				break;
 
+			case MESSAGE_UNKNOWN:   // respond with error if an unexpected or unknown message is received
 			default:
-				// We don't really care about receiving the other messages
-				// just continue with the state machine here
-				break;
 
+				uart_transmit_message(MESSAGE_ERROR);
+				break;
 		}
 	}
 }

@@ -8,8 +8,7 @@ enum Command
 	COMMAND_CALIBRATE,   // start an interactive calibration (requires an output file)
 	COMMAND_UPLOAD,      // upload a calibration file to the device (requires a calibration file)
 	COMMAND_DOWNLOAD,    // download a calibration from the device (optionally save to an output file, otherwise print the calibration)
-	COMMAND_RAW,         // disable scaling of ADC readings
-	COMMAND_SCALED,      // enable scaling of ADC readings
+	COMMAND_MODE,         // set the scaling mode of ADC readings
 
 	// Future commands
 	// COMMAND_RECORD    // record a new gesture

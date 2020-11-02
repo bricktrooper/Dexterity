@@ -108,6 +108,7 @@ extern char * DIRECTIONS [NUM_DIRECTIONS];
 extern char * FINGERS [NUM_FINGERS];
 extern char * MESSAGES [NUM_MESSAGES];
 extern char * PARAMETERS [NUM_PARAMETERS];
+extern char * MODES [NUM_MODES];
 
 S16 scale(S16 reading, S16 range, S16 min, S16 max, S16 centre);
 

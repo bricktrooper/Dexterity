@@ -16,7 +16,9 @@
 
 #include "command.h"
 
-#define MAX_COMMAND_SIZE   15
+#define MAX_COMMAND_SIZE      15
+#define MODE_COMMAND_RAW      "raw"
+#define MODE_COMMAND_SCALED   "scaled"
 
 static char * PROGRAM = "";
 
@@ -26,8 +28,7 @@ char * COMMANDS [NUM_COMMANDS] = {
 	"calibrate",
 	"upload",
 	"download",
-	"raw",
-	"scaled"
+	"mode"
 };
 
 static int command_run(void)
@@ -40,16 +41,16 @@ static int command_run(void)
 	{
 		if (sample(&hand) == ERROR)
 		{
-			printf(":(\n");
+			log_print(LOG_ERROR, "%s(): Failed to sample sensors\n", __func__);
 			return ERROR;
 		}
 
 		// you should apply any deadzone before doing any inference
 		// apply the deadzones to the entire hand here before doing anything else
-		if (!gesture_compare(GESTURE_MOVE, &hand))
-		{
-			continue;
-		}
+		//if (!gesture_compare(GESTURE_MOVE, &hand))
+		//{
+		//	continue;
+		//}
 
 		int deadzone = 5;
 		int x = -hand.accel[Z];
@@ -242,27 +243,37 @@ static int command_download(char * file_name)
 	return SUCCESS;
 }
 
-static int command_raw(void)
+static int command_mode(char * mode)
 {
-	if (raw() == ERROR)
+	if (mode == NULL)
 	{
-		log_print(LOG_ERROR, "%s: Failed to disable scaling\n", PROGRAM);
+		log_print(LOG_ERROR, "%s: No argument provided for scaling mode\n", PROGRAM, mode);
 		return ERROR;
 	}
 
-	log_print(LOG_SUCCESS, "%s: Disabled scaling\n", PROGRAM);
-	return SUCCESS;
-}
-
-static int command_scaled(void)
-{
-	if (scaled() == ERROR)
+	if (strncasecmp(mode, MODES[RAW], strlen(MODES[RAW])) == 0)
 	{
-		log_print(LOG_ERROR, "%s: Failed to enable scaling\n", PROGRAM);
+		if (raw() == ERROR)
+		{
+			log_print(LOG_SUCCESS, "%s: Failed to set device to %s mode\n", PROGRAM, mode);
+			return ERROR;
+		}
+	}
+	else if (strncasecmp(mode, MODES[SCALED], strlen(MODES[SCALED])) == 0)
+	{
+		if (scaled() == ERROR)
+		{
+			log_print(LOG_SUCCESS, "%s: Failed to set device to %s mode\n", PROGRAM, mode);
+			return ERROR;
+		}
+	}
+	else
+	{
+		log_print(LOG_ERROR, "%s: Unknown scaling mode '%s'\n", PROGRAM, mode);
 		return ERROR;
 	}
 
-	log_print(LOG_SUCCESS, "%s: Enabled scaling\n", PROGRAM);
+	log_print(LOG_SUCCESS, "%s: Set device to %s mode\n", PROGRAM, mode);
 	return SUCCESS;
 }
 
@@ -317,12 +328,8 @@ int command_execute(char * program, enum Command command, char * argument)
 			return command_download(argument);
 			break;
 
-		case COMMAND_RAW:
-			return command_raw();
-			break;
-
-		case COMMAND_SCALED:
-			return command_scaled();
+		case COMMAND_MODE:
+			return command_mode(argument);
 			break;
 
 		default:

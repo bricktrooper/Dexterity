@@ -31,6 +31,11 @@ char * PARAMETERS [NUM_PARAMETERS] = {
 	"CENTRE"
 };
 
+char * MODES [NUM_MODES] = {
+	"RAW",
+	"SCALED",
+};
+
 S16 scale(S16 reading, S16 range, S16 min, S16 max, S16 centre)
 {
 	if (max == min)  // avoid divide by 0

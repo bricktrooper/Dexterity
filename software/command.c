@@ -33,6 +33,39 @@ char * COMMANDS [NUM_COMMANDS] = {
 
 static int command_run(void)
 {
+	struct Criteria criteria;
+	struct Binding binding;
+	binding.gesture = GESTURE_MOVE;
+	binding.phases = 1;
+	binding.criteria = &criteria;
+	//gesture_export("binding.txt", &binding);
+	gesture_import("binding.txt", &binding);
+
+	printf("%d %d %d %d %d %d %d %d\n",
+				binding.ignore.accel[X],
+				binding.ignore.accel[Y],
+				binding.ignore.accel[Z],
+				binding.ignore.flex[THUMB],
+				binding.ignore.flex[INDEX],
+				binding.ignore.flex[MIDDLE],
+				binding.ignore.flex[RING],
+				binding.ignore.flex[PINKY]);
+
+	for (int i = 0; i < binding.phases; i++)
+	{
+		printf("%hu %hu %hu %hu %hu %hu %hu %hu\n",
+				binding.criteria[i].accel[X],
+				binding.criteria[i].accel[Y],
+				binding.criteria[i].accel[Z],
+				binding.criteria[i].flex[THUMB],
+				binding.criteria[i].flex[INDEX],
+				binding.criteria[i].flex[MIDDLE],
+				binding.criteria[i].flex[RING],
+				binding.criteria[i].flex[PINKY]);
+	}
+
+
+	return 0;
 	struct Hand hand;
 	// mouse_glide(234, 345);
 	// return SUCCESS;

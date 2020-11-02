@@ -110,10 +110,10 @@ S16 flex_scaled(enum Finger finger)
 {
 	// scale flex reading from 'min' <-> 'max' to 0 <-> 100 centred at 'centre'
 	return scale(flex_raw(finger),
-				 scaling_calibration.range,
-				 scaling_calibration.params[finger][MIN],
-				 scaling_calibration.params[finger][MAX],
-				 scaling_calibration.params[finger][CENTRE]);
+	             scaling_calibration.range,
+	             scaling_calibration.params[finger][MIN],
+	             scaling_calibration.params[finger][MAX],
+	             scaling_calibration.params[finger][CENTRE]);
 }
 
 S16 flex_raw(enum Finger finger)

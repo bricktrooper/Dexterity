@@ -125,14 +125,14 @@ int gesture_import(char * file_name, struct Binding * binding)
 	}
 
 	int tokens = fscanf(file, "IGNORE X=%hhd Y=%hhd Z=%hhd THUMB=%hhd INDEX=%hhd MIDDLE=%hhd RING=%hhd PINKY=%hhd\n",
-							(S8 *)&(binding->ignore.accel[X]),
-							(S8 *)&(binding->ignore.accel[Y]),
-							(S8 *)&(binding->ignore.accel[Z]),
-							(S8 *)&(binding->ignore.flex[THUMB]),
-							(S8 *)&(binding->ignore.flex[INDEX]),
-							(S8 *)&(binding->ignore.flex[MIDDLE]),
-							(S8 *)&(binding->ignore.flex[RING]),
-							(S8 *)&(binding->ignore.flex[PINKY]));
+	                    (S8 *)&(binding->ignore.accel[X]),
+	                    (S8 *)&(binding->ignore.accel[Y]),
+	                    (S8 *)&(binding->ignore.accel[Z]),
+	                    (S8 *)&(binding->ignore.flex[THUMB]),
+	                    (S8 *)&(binding->ignore.flex[INDEX]),
+	                    (S8 *)&(binding->ignore.flex[MIDDLE]),
+	                    (S8 *)&(binding->ignore.flex[RING]),
+	                    (S8 *)&(binding->ignore.flex[PINKY]));
 
 	if (tokens != NUM_DIRECTIONS + NUM_FINGERS)
 	{
@@ -144,15 +144,15 @@ int gesture_import(char * file_name, struct Binding * binding)
 	{
 		int phase_label = 0;
 		int tokens = fscanf(file, "%d X=%hd Y=%hd Z=%hd THUMB=%hd INDEX=%hd MIDDLE=%hd RING=%hd PINKY=%hd\n",
-							&phase_label,
-							&(binding->criteria[phase].accel[X]),
-							&(binding->criteria[phase].accel[Y]),
-							&(binding->criteria[phase].accel[Z]),
-							&(binding->criteria[phase].flex[THUMB]),
-							&(binding->criteria[phase].flex[INDEX]),
-							&(binding->criteria[phase].flex[MIDDLE]),
-							&(binding->criteria[phase].flex[RING]),
-							&(binding->criteria[phase].flex[PINKY]));
+		                    &phase_label,
+		                    &(binding->criteria[phase].accel[X]),
+		                    &(binding->criteria[phase].accel[Y]),
+		                    &(binding->criteria[phase].accel[Z]),
+		                    &(binding->criteria[phase].flex[THUMB]),
+		                    &(binding->criteria[phase].flex[INDEX]),
+		                    &(binding->criteria[phase].flex[MIDDLE]),
+		                    &(binding->criteria[phase].flex[RING]),
+		                    &(binding->criteria[phase].flex[PINKY]));
 
 		if (tokens != 1 + NUM_DIRECTIONS + NUM_FINGERS)
 		{

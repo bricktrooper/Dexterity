@@ -23,11 +23,11 @@ static CGEventRef mouse_create_event(CGEventType type)
 
 	// create an event
 	CGEventRef event = CGEventCreateMouseEvent(
-							NULL,                            // source of the event
-							type,                            // type of mouse event
-							CGPointMake(mouse.x, mouse.y),   // location of mouse event (use current location)
-							kCGMouseButtonLeft               // ignored
-							);
+		                    NULL,                            // source of the event
+		                    type,                            // type of mouse event
+		                    CGPointMake(mouse.x, mouse.y),   // location of mouse event (use current location)
+		                    kCGMouseButtonLeft               // ignored
+		                    );
 
 	if (event == NULL)
 	{
@@ -318,11 +318,11 @@ int mouse_scroll(enum ScrollDirection direction, S32 speed)
 	}
 
 	CGEventRef event = CGEventCreateScrollWheelEvent(
-							NULL,                      // source of the event
-							kCGScrollEventUnitLine,    // scroll lines instead of pixels (smooth scrolling)
-							1,                         // only one scroll wheel
-							(speed * direction)        // scroll magnitude (+ == UP, - == DOWN)
-							);
+		                    NULL,                      // source of the event
+		                    kCGScrollEventUnitLine,    // scroll lines instead of pixels (smooth scrolling)
+		                    1,                         // only one scroll wheel
+		                    (speed * direction)        // scroll magnitude (+ == UP, - == DOWN)
+		                    );
 
 	if (event == NULL)
 	{

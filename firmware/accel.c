@@ -100,10 +100,10 @@ S16 accel_scaled(enum Direction direction)
 {
 	// scale acceleration reading from 'min' <-> '1023' to -100 <-> +100 centered at 'centre'
 	return scale(accel_raw(direction),
-				 scaling_calibration.range,
-				 scaling_calibration.params[direction][MIN],
-				 scaling_calibration.params[direction][MAX],
-				 scaling_calibration.params[direction][CENTRE]);
+	             scaling_calibration.range,
+	             scaling_calibration.params[direction][MIN],
+	             scaling_calibration.params[direction][MAX],
+	             scaling_calibration.params[direction][CENTRE]);
 }
 
 S16 accel_raw(enum Direction direction)

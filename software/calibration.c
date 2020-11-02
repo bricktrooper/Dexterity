@@ -30,16 +30,18 @@ int calibration_import(char * file_name, struct Calibration * calibration)
 		return ERROR;
 	}
 
+	int rc = ERROR;
+
 	int tokens = fscanf(file, "accel-range=%hd\n", &(calibration->accel.range))
 			   + fscanf(file, "flex-range=%hd\n", &(calibration->flex.range));
 
 	if (tokens != 2)
 	{
 		log_print(LOG_ERROR, "%s(): Calibration file was incorrectly parsed\n", __func__, file_name);
-		return ERROR;
+		goto EXIT;
 	}
 
-	char label [MAX_LABEL_LENGTH + 1];
+	char label [MAX_SENSOR_NAME_LENGTH + 1];
 
 	for (enum Direction direction = 0; direction < NUM_DIRECTIONS; direction++)
 	{
@@ -48,14 +50,14 @@ int calibration_import(char * file_name, struct Calibration * calibration)
 		if (fscanf(file, "%s", label) != 1)
 		{
 			log_print(LOG_ERROR, "%s(): Calibration file label was incorrectly parsed\n", __func__, file_name);
-			return ERROR;
+			goto EXIT;
 		}
 
-		if (strncmp(label, DIRECTIONS[direction], MAX_LABEL_LENGTH) != 0)
+		if (strncmp(label, DIRECTIONS[direction], MAX_SENSOR_NAME_LENGTH) != 0)
 		{
 			log_print(LOG_ERROR, "%s(): Incorrect calibration file label: Expected '%s' but parsed '%s'\n",
 								__func__, DIRECTIONS[direction], label);
-			return ERROR;
+			goto EXIT;
 		}
 
 		tokens = fscanf(file, " MIN=%hd MAX=%hd CENTRE=%hd\n",
@@ -66,7 +68,7 @@ int calibration_import(char * file_name, struct Calibration * calibration)
 		if (tokens != NUM_PARAMETERS)
 		{
 			log_print(LOG_ERROR, "%s(): Calibration file parameters were incorrectly parsed\n", __func__, file_name);
-			return ERROR;
+			goto EXIT;
 		}
 	}
 
@@ -77,14 +79,14 @@ int calibration_import(char * file_name, struct Calibration * calibration)
 		if (fscanf(file, "%s", label) != 1)
 		{
 			log_print(LOG_ERROR, "%s(): Calibration file label was incorrectly parsed\n", __func__, file_name);
-			return ERROR;
+			goto EXIT;
 		}
 
-		if (strncmp(label, FINGERS[finger], MAX_LABEL_LENGTH) != 0)
+		if (strncmp(label, FINGERS[finger], MAX_SENSOR_NAME_LENGTH) != 0)
 		{
 			log_print(LOG_ERROR, "%s(): Incorrect calibration file label: Expected '%s' but parsed '%s'\n",
 								__func__, FINGERS[finger], label);
-			return ERROR;
+			goto EXIT;
 		}
 
 		tokens = fscanf(file, " MIN=%hd MAX=%hd CENTRE=%hd\n",
@@ -95,14 +97,16 @@ int calibration_import(char * file_name, struct Calibration * calibration)
 		if (tokens != NUM_PARAMETERS)
 		{
 			log_print(LOG_ERROR, "%s(): Calibration file parameters were incorrectly parsed\n", __func__, file_name);
-			return ERROR;
+			goto EXIT;
 		}
 	}
 
-	fclose(file);
 	log_print(LOG_SUCCESS, "%s(): Imported calibration from file '%s'\n", __func__, file_name);
+	rc = SUCCESS;
 
-	return SUCCESS;
+EXIT:
+	fclose(file);
+	return rc;
 }
 
 int calibration_export(char * file_name, struct Calibration * calibration)
@@ -121,30 +125,56 @@ int calibration_export(char * file_name, struct Calibration * calibration)
 		return ERROR;
 	}
 
-	fprintf(file, "accel-range=%hd\n", calibration->accel.range);
-	fprintf(file, "flex-range=%hd\n", calibration->flex.range);
+	int rc = ERROR;
+
+	if (fprintf(file, "accel-range=%hd\n", calibration->accel.range) < 0)
+	{
+		log_print(LOG_ERROR, "%s(): Failed to write to file '%s': %s (%d)\n", __func__, file_name, strerror(errno), errno);
+		goto EXIT;
+	}
+
+	if (fprintf(file, "flex-range=%hd\n", calibration->flex.range) < 0)
+	{
+		log_print(LOG_ERROR, "%s(): Failed to write to file '%s': %s (%d)\n", __func__, file_name, strerror(errno), errno);
+		goto EXIT;
+	}
 
 	for (enum Direction direction = 0; direction < NUM_DIRECTIONS; direction++)
 	{
-		fprintf(file, "%-*s MIN=%hd MAX=%hd CENTRE=%hd\n",
-				MAX_LABEL_LENGTH, DIRECTIONS[direction],
-				calibration->accel.params[direction][MIN],
-				calibration->accel.params[direction][MAX],
-				calibration->accel.params[direction][CENTRE]);
+		int written = fprintf(file, "%-*s MIN=%hd MAX=%hd CENTRE=%hd\n",
+									MAX_SENSOR_NAME_LENGTH, DIRECTIONS[direction],
+									calibration->accel.params[direction][MIN],
+									calibration->accel.params[direction][MAX],
+									calibration->accel.params[direction][CENTRE]);
+
+		if (written < 0)
+		{
+			log_print(LOG_ERROR, "%s(): Failed to write to file '%s': %s (%d)\n", __func__, file_name, strerror(errno), errno);
+			goto EXIT;
+		}
 	}
 
 	for (enum Finger finger = 0; finger < NUM_FINGERS; finger++)
 	{
-		fprintf(file, "%-*s MIN=%hd MAX=%hd CENTRE=%hd\n",
-				MAX_LABEL_LENGTH, FINGERS[finger],
-				calibration->flex.params[finger][MIN],
-				calibration->flex.params[finger][MAX],
-				calibration->flex.params[finger][CENTRE]);
+		int written = fprintf(file, "%-*s MIN=%hd MAX=%hd CENTRE=%hd\n",
+									MAX_SENSOR_NAME_LENGTH, FINGERS[finger],
+									calibration->flex.params[finger][MIN],
+									calibration->flex.params[finger][MAX],
+									calibration->flex.params[finger][CENTRE]);
+
+		if (written < 0)
+		{
+			log_print(LOG_ERROR, "%s(): Failed to write to file '%s': %s (%d)\n", __func__, file_name, strerror(errno), errno);
+			goto EXIT;
+		}
 	}
 
+	log_print(LOG_SUCCESS, "%s(): Imported calibration from file '%s'\n", __func__, file_name);
+	rc = SUCCESS;
+
+EXIT:
 	fclose(file);
-	log_print(LOG_SUCCESS, "%s(): Exported calibration to file '%s'\n", __func__, file_name);
-	return SUCCESS;
+	return rc;
 }
 
 int calibration_download(struct Calibration * calibration)
@@ -323,28 +353,28 @@ int calibration_print(struct Calibration * calibration)
 	printf("| Flex sensor range:   %12hd |\n", calibration->flex.range);
 	printf("-------------------------------------\n");
 	printf("| %-*s | %*s | %*s | %*s |\n",
-			MAX_LABEL_LENGTH, "",
-			MAX_LABEL_LENGTH, PARAMETERS[MIN],
-			MAX_LABEL_LENGTH, PARAMETERS[MAX],
-			MAX_LABEL_LENGTH, PARAMETERS[CENTRE]);
+			MAX_SENSOR_NAME_LENGTH, "",
+			MAX_SENSOR_NAME_LENGTH, PARAMETERS[MIN],
+			MAX_SENSOR_NAME_LENGTH, PARAMETERS[MAX],
+			MAX_SENSOR_NAME_LENGTH, PARAMETERS[CENTRE]);
 	printf("-------------------------------------\n");
 
 	for (enum Direction direction = 0; direction < NUM_DIRECTIONS; direction++)
 	{
 		printf("| %-*s | %*hd | %*hd | %*hd |\n",
-				MAX_LABEL_LENGTH, DIRECTIONS[direction],
-				MAX_LABEL_LENGTH, calibration->accel.params[direction][MIN],
-				MAX_LABEL_LENGTH, calibration->accel.params[direction][MAX],
-				MAX_LABEL_LENGTH, calibration->accel.params[direction][CENTRE]);
+				MAX_SENSOR_NAME_LENGTH, DIRECTIONS[direction],
+				MAX_SENSOR_NAME_LENGTH, calibration->accel.params[direction][MIN],
+				MAX_SENSOR_NAME_LENGTH, calibration->accel.params[direction][MAX],
+				MAX_SENSOR_NAME_LENGTH, calibration->accel.params[direction][CENTRE]);
 	}
 
 	for (enum Finger finger = 0; finger < NUM_FINGERS; finger++)
 	{
 		printf("| %-*s | %*hd | %*hd | %*hd |\n",
-				MAX_LABEL_LENGTH, FINGERS[finger],
-				MAX_LABEL_LENGTH, calibration->flex.params[finger][MIN],
-				MAX_LABEL_LENGTH, calibration->flex.params[finger][MAX],
-				MAX_LABEL_LENGTH, calibration->flex.params[finger][CENTRE]);
+				MAX_SENSOR_NAME_LENGTH, FINGERS[finger],
+				MAX_SENSOR_NAME_LENGTH, calibration->flex.params[finger][MIN],
+				MAX_SENSOR_NAME_LENGTH, calibration->flex.params[finger][MAX],
+				MAX_SENSOR_NAME_LENGTH, calibration->flex.params[finger][CENTRE]);
 	}
 
 	printf("=====================================\n");

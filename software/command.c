@@ -64,6 +64,8 @@ static int command_run(void)
 				binding.criteria[i].flex[PINKY]);
 	}
 
+	//gesture_binding_destroy(&binding);
+
 
 	return 0;
 	struct Hand hand;

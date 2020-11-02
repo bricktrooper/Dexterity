@@ -142,8 +142,8 @@ int gesture_import(char * file_name, struct Binding * binding)
 
 	for (int phase = 0; phase < binding->phases; phase++)
 	{
-		int phase_label;
-		int tokens = fscanf(file, "%d: X=%hd Y=%hd Z=%hd THUMB=%hd INDEX=%hd MIDDLE=%hd RING=%hd PINKY=%hd\n",
+		int phase_label = 0;
+		int tokens = fscanf(file, "%d X=%hd Y=%hd Z=%hd THUMB=%hd INDEX=%hd MIDDLE=%hd RING=%hd PINKY=%hd\n",
 							&phase_label,
 							&(binding->criteria[phase].accel[X]),
 							&(binding->criteria[phase].accel[Y]),
@@ -162,7 +162,7 @@ int gesture_import(char * file_name, struct Binding * binding)
 
 		if (phase_label != phase)
 		{
-			log_print(LOG_ERROR, "%s(): Incorrect phase label: Expected '%s' but parsed '%s'\n", __func__, phase, phase_label);
+			log_print(LOG_ERROR, "%s(): Incorrect phase label: Expected '%d' but parsed '%d'\n", __func__, phase, phase_label);
 			goto EXIT;
 		}
 	}
@@ -216,7 +216,7 @@ int gesture_export(char * file_name, struct Binding * binding)
 
 	for (int phase = 0; phase < binding->phases; phase++)
 	{
-		fprintf(file, "%d:", phase);
+		fprintf(file, "%-7d", phase);
 
 		for (enum Direction direction = 0; direction < NUM_DIRECTIONS; direction++)
 		{

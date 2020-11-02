@@ -169,7 +169,7 @@ int calibration_export(char * file_name, struct Calibration * calibration)
 		}
 	}
 
-	log_print(LOG_SUCCESS, "%s(): Imported calibration from file '%s'\n", __func__, file_name);
+	log_print(LOG_SUCCESS, "%s(): Export calibration to file '%s'\n", __func__, file_name);
 	rc = SUCCESS;
 
 EXIT:

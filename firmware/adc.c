@@ -18,8 +18,8 @@ void adc_init(void)
 
 void adc_run(void)
 {
-	GO_DONE = 1;            // start the ADC conversion
-	while (GO_DONE == 1);   // wait for the conversion to finish
+	GO_DONE = 1;       // start the ADC conversion
+	while (GO_DONE);   // wait for the conversion to finish
 }
 
 S16 adc_read(int channel)

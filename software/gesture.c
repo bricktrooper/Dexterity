@@ -7,12 +7,13 @@
 #include "dexterity.h"
 #include "utils.h"
 #include "log.h"
+#include "colours.h"
 
 #include "gesture.h"
 
 #define TOLERANCE   2.0   // how much deviation is tolerated in the confidence (average of the individual deviations)
 
-static char * CONTROLS [NUM_CONTROLS] = {
+char * CONTROLS [NUM_CONTROLS] = {
 	"MOUSE",
 	"ZOOM",
 	"SCROLL",
@@ -20,7 +21,7 @@ static char * CONTROLS [NUM_CONTROLS] = {
 };
 
 
-static char * ACTIONS [NUM_ACTIONS] = {
+char * ACTIONS [NUM_ACTIONS] = {
 	"MOVE",
 	"DRAG",
 	"LEFT_CLICK",
@@ -32,21 +33,57 @@ static char * ACTIONS [NUM_ACTIONS] = {
 	"SCROLL_DOWN",
 	"VOLUME_UP",
 	"VOLUME_DOWN",
-	"CYCLE",
+	"SWITCH_CONTROLS",
 	"DISABLE",
 	"ENABLE",
 	"UNKNOWN"
 };
 
-static struct Gesture * gestures = NULL;
-static int gesture_count = 0;
-static int gesture_phase = 0;
+struct Gesture * gesture_create(int quantity)
+{
+	struct Gesture * gestures = malloc(quantity * sizeof(struct Gesture));
 
-static bool gesture_valid(struct Gesture * gesture)
+	if (gestures == NULL)
+	{
+		log_print(LOG_ERROR, "%s(): Failed to allocate memory for %d gestures\n", __func__, quantity);
+		return NULL;
+	}
+
+	for (int i = 0; i < quantity; i++)
+	{
+		gestures[i].action = ACTION_UNKNOWN;
+		gestures[i].phases = -1;
+		memset(&(gestures[i].ignore), 0, sizeof(struct Ignore));
+		gestures[i].criteria = NULL;
+	}
+
+	return gestures;
+}
+
+int gesture_destroy(struct Gesture * gestures, int quantity)
+{
+	if (quantity < 0)
+	{
+		log_print(LOG_ERROR, "%s(): Invalid arguments\n", __func__);
+		return ERROR;
+	}
+
+	if (gestures != NULL)
+	{
+		for (int i = 0; i < quantity; i++)
+		{
+			free(gestures[i].criteria);
+		}
+	}
+
+	free(gestures);
+	return SUCCESS;
+}
+
+bool gesture_valid(struct Gesture * gesture)
 {
 	if (gesture == NULL ||
 		gesture->action >= NUM_ACTIONS ||
-		gesture->action >= ACTION_UNKNOWN ||
 		gesture->phases <= 0 ||
 		gesture->criteria == NULL)
 	{
@@ -56,19 +93,9 @@ static bool gesture_valid(struct Gesture * gesture)
 	return true;
 }
 
-void gesture_destroy(struct Gesture * gesture)
+int gesture_import(char * file_name, struct Gesture ** gestures, int * quantity)
 {
-	if (gesture == NULL)
-	{
-		return;
-	}
-
-	free(gesture->criteria);
-}
-
-int gesture_import(char * file_name, struct Gesture * gesture)
-{
-	if (file_name == NULL || gesture == NULL)
+	if (file_name == NULL || gestures == NULL || quantity == NULL)
 	{
 		log_print(LOG_ERROR, "%s(): Invalid arguments\n", __func__);
 		return ERROR;
@@ -83,113 +110,147 @@ int gesture_import(char * file_name, struct Gesture * gesture)
 	}
 
 	int rc = ERROR;
-	char name [MAX_ACTION_NAME_LENGTH + 1];
+	struct Gesture * elements = NULL;
+	int count = 0;
 
-	if (fscanf(file, "ACTION=%s\n", name) != 1)
+	if (fscanf(file, "QUANTITY=%d\n\n", &count) != 1)
 	{
-		log_print(LOG_ERROR, "%s(): Gesture action was incorrectly parsed\n", __func__, file_name);
+		log_print(LOG_ERROR, "%s(): Gesture quantity was incorrectly parsed\n", __func__);
 		goto EXIT;
 	}
 
-	gesture->action = ACTION_UNKNOWN;
-
-	for (enum Action action = 0; action < NUM_ACTIONS; action++)
+	if (count < 1)
 	{
-		if (strncmp(name, ACTIONS[action], MAX_ACTION_NAME_LENGTH) == 0)
+		log_print(LOG_ERROR, "%s(): Parsed invalid gesture quantity '%d'\n", __func__, count);
+		goto EXIT;
+	}
+
+	elements = gesture_create(count);
+
+	if (elements == NULL)
+	{
+		log_print(LOG_ERROR, "%s(): Parsed invalid gesture quantity '%d'\n", __func__, count);
+		goto EXIT;
+	}
+
+	for (int i = 0; i < count; i++)
+	{
+		struct Gesture *gesture = (struct Gesture *)&elements[i];
+		char name [MAX_ACTION_NAME_LENGTH + 1];
+
+		if (fscanf(file, "ACTION=%s\n", name) != 1)
 		{
-			gesture->action = action;
-			break;
-		}
-	}
-
-	if (gesture->action == ACTION_UNKNOWN)
-	{
-		log_print(LOG_ERROR, "%s(): Parsed an unknown action '%s'\n", __func__, name);
-		goto EXIT;
-	}
-
-	if (fscanf(file, "PHASES=%d\n", &(gesture->phases)) != 1)
-	{
-		log_print(LOG_ERROR, "%s(): Phase count was incorrectly parsed\n", __func__);
-		goto EXIT;
-	}
-
-	if (gesture->phases < 0)
-	{
-		log_print(LOG_ERROR, "%s(): Parsed an negative phase count '%d'\n", __func__, file_name, gesture->phases);
-		goto EXIT;
-	}
-
-	gesture->criteria = malloc(gesture->phases * sizeof(struct Criteria));
-
-	if (gesture->criteria == NULL)
-	{
-		log_print(LOG_ERROR, "%s(): Failed to allocate memory for %d phases\n", __func__, gesture->phases);
-		goto EXIT;
-	}
-
-	int tokens = fscanf(file, "IGNORE X=%hhd Y=%hhd Z=%hhd THUMB=%hhd INDEX=%hhd MIDDLE=%hhd RING=%hhd PINKY=%hhd\n",
-	                    (S8 *)&(gesture->ignore.accel[X]),
-	                    (S8 *)&(gesture->ignore.accel[Y]),
-	                    (S8 *)&(gesture->ignore.accel[Z]),
-	                    (S8 *)&(gesture->ignore.flex[THUMB]),
-	                    (S8 *)&(gesture->ignore.flex[INDEX]),
-	                    (S8 *)&(gesture->ignore.flex[MIDDLE]),
-	                    (S8 *)&(gesture->ignore.flex[RING]),
-	                    (S8 *)&(gesture->ignore.flex[PINKY]));
-
-	if (tokens != NUM_DIRECTIONS + NUM_FINGERS)
-	{
-		log_print(LOG_ERROR, "%s(): Sensor ignores were incorrectly parsed\n", __func__, file_name);
-		goto EXIT;
-	}
-
-	for (int i = 0; i < gesture->phases; i++)
-	{
-		int phase = 0;
-		int tokens = fscanf(file, "%d X=%hd Y=%hd Z=%hd THUMB=%hd INDEX=%hd MIDDLE=%hd RING=%hd PINKY=%hd\n",
-		                    &phase,
-		                    &(gesture->criteria[i].accel[X]),
-		                    &(gesture->criteria[i].accel[Y]),
-		                    &(gesture->criteria[i].accel[Z]),
-		                    &(gesture->criteria[i].flex[THUMB]),
-		                    &(gesture->criteria[i].flex[INDEX]),
-		                    &(gesture->criteria[i].flex[MIDDLE]),
-		                    &(gesture->criteria[i].flex[RING]),
-		                    &(gesture->criteria[i].flex[PINKY]));
-
-		if (tokens != 1 + NUM_DIRECTIONS + NUM_FINGERS)
-		{
-			log_print(LOG_ERROR, "%s(): Sensor criteria were incorrectly parsed\n", __func__, file_name);
+			log_print(LOG_ERROR, "%s(): Gesture action was incorrectly parsed for gesture #%d\n", __func__, i + 1);
 			goto EXIT;
 		}
 
-		if (phase != i)
+		gesture->action = ACTION_UNKNOWN;
+
+		for (enum Action action = 0; action < NUM_ACTIONS; action++)
 		{
-			log_print(LOG_ERROR, "%s(): Incorrect phase label: Expected '%d' but parsed '%d'\n", __func__, i, phase);
+			if (strncmp(name, ACTIONS[action], MAX_ACTION_NAME_LENGTH) == 0)
+			{
+				gesture->action = action;
+				break;
+			}
+		}
+
+		if (gesture->action == ACTION_UNKNOWN)
+		{
+			log_print(LOG_ERROR, "%s(): Parsed an invalid action '%s'\n", __func__, name);
+			goto EXIT;
+		}
+
+		if (fscanf(file, "PHASES=%d\n", &(gesture->phases)) != 1)
+		{
+			log_print(LOG_ERROR, "%s(): Phase count was incorrectly parsed for gesture #%d\n", __func__, i + 1);
+			goto EXIT;
+		}
+
+		if (gesture->phases < 0)
+		{
+			log_print(LOG_ERROR, "%s(): Parsed an negative phase count '%d'\n", __func__, gesture->phases);
+			goto EXIT;
+		}
+
+		gesture->criteria = malloc(gesture->phases * sizeof(struct Criteria));
+
+		if (gesture->criteria == NULL)
+		{
+			log_print(LOG_ERROR, "%s(): Failed to allocate memory for %d phases\n", __func__, gesture->phases);
+			goto EXIT;
+		}
+
+		int tokens = fscanf(file, "IGNORE X=%hhd Y=%hhd Z=%hhd THUMB=%hhd INDEX=%hhd MIDDLE=%hhd RING=%hhd PINKY=%hhd\n",
+							(S8 *)&(gesture->ignore.accel[X]),
+							(S8 *)&(gesture->ignore.accel[Y]),
+							(S8 *)&(gesture->ignore.accel[Z]),
+							(S8 *)&(gesture->ignore.flex[THUMB]),
+							(S8 *)&(gesture->ignore.flex[INDEX]),
+							(S8 *)&(gesture->ignore.flex[MIDDLE]),
+							(S8 *)&(gesture->ignore.flex[RING]),
+							(S8 *)&(gesture->ignore.flex[PINKY]));
+
+		if (tokens != NUM_DIRECTIONS + NUM_FINGERS)
+		{
+			log_print(LOG_ERROR, "%s(): Sensor ignores were incorrectly parsed for gesture #%d\n", __func__, i + 1);
+			goto EXIT;
+		}
+
+		for (int phase = 0; phase < gesture->phases; phase++)
+		{
+			int phase_label = 0;
+			int tokens = fscanf(file, "%d X=%hd Y=%hd Z=%hd THUMB=%hd INDEX=%hd MIDDLE=%hd RING=%hd PINKY=%hd\n",
+								&phase_label,
+								&(gesture->criteria[phase].accel[X]),
+								&(gesture->criteria[phase].accel[Y]),
+								&(gesture->criteria[phase].accel[Z]),
+								&(gesture->criteria[phase].flex[THUMB]),
+								&(gesture->criteria[phase].flex[INDEX]),
+								&(gesture->criteria[phase].flex[MIDDLE]),
+								&(gesture->criteria[phase].flex[RING]),
+								&(gesture->criteria[phase].flex[PINKY]));
+
+			if (tokens != 1 + NUM_DIRECTIONS + NUM_FINGERS)
+			{
+				log_print(LOG_ERROR, "%s(): Sensor criteria were incorrectly parsed for gesture #%d\n", __func__, i + 1);
+				goto EXIT;
+			}
+
+			if (phase_label != phase)
+			{
+				log_print(LOG_ERROR, "%s(): Incorrect phase label for gesture #%d: Expected '%d' but parsed '%d'\n", __func__, i + 1, phase, phase_label);
+				goto EXIT;
+			}
+		}
+
+		if (fscanf(file, "\n") < 0)
+		{
+			log_print(LOG_ERROR, "%s(): Failed to parse break between gestures\n", __func__);
 			goto EXIT;
 		}
 	}
 
-	log_print(LOG_SUCCESS, "%s(): Imported gesture from file '%s'\n", __func__, file_name);
+	log_print(LOG_SUCCESS, "%s(): Imported %d gestures from file '%s'\n", __func__, count, file_name);
+	*gestures = elements;
+	*quantity = count;
 	rc = SUCCESS;
 
 EXIT:
+	if (rc == ERROR)
+	{
+		gesture_destroy(elements, count);
+	}
+
 	fclose(file);
 	return rc;
 }
 
-int gesture_export(char * file_name, struct Gesture * gesture)
+int gesture_export(char * file_name, struct Gesture * gestures, int quantity)
 {
-	if (file_name == NULL || gesture == NULL)
+	if (file_name == NULL || gestures == NULL || quantity < 1)
 	{
 		log_print(LOG_ERROR, "%s(): Invalid arguments\n", __func__);
-		return ERROR;
-	}
-
-	if (!gesture_valid(gesture))
-	{
-		log_print(LOG_ERROR, "%s(): Invalid gesture\n", __func__, file_name);
 		return ERROR;
 	}
 
@@ -201,42 +262,159 @@ int gesture_export(char * file_name, struct Gesture * gesture)
 		return ERROR;
 	}
 
-	fprintf(file, "ACTION=%s\n", ACTIONS[gesture->action]);
-	fprintf(file, "PHASES=%d\n", gesture->phases);
+	fprintf(file, "QUANTITY=%d\n\n", quantity);
+	struct Gesture * gesture = NULL;
 
-	fprintf(file, "IGNORE");
-
-	for (enum Direction direction = 0; direction < NUM_DIRECTIONS; direction++)
+	for (int i = 0; i < quantity; i++)
 	{
-		fprintf(file, " %s=%hhd", DIRECTIONS[direction], (S8)gesture->ignore.accel[direction]);
-	}
+		gesture = (struct Gesture *)&gestures[i];
 
-	for (enum Finger finger = 0; finger < NUM_FINGERS; finger++)
-	{
-		fprintf(file, " %s=%hhd", FINGERS[finger], (S8)gesture->ignore.flex[finger]);
-	}
+		if (!gesture_valid(gesture))
+		{
+			log_print(LOG_ERROR, "%s(): Invalid gesture\n", __func__);
+			return ERROR;
+		}
 
-	fprintf(file, "\n");
+		fprintf(file, "ACTION=%s\n", ACTIONS[gesture->action]);
+		fprintf(file, "PHASES=%d\n", gesture->phases);
 
-	for (int i = 0; i < gesture->phases; i++)
-	{
-		fprintf(file, "%6d", i);
+		fprintf(file, "IGNORE");
 
 		for (enum Direction direction = 0; direction < NUM_DIRECTIONS; direction++)
 		{
-			fprintf(file, " %s=%hd", DIRECTIONS[direction], gesture->criteria[i].accel[direction]);
+			fprintf(file, " %s=%hhd", DIRECTIONS[direction], (S8)gesture->ignore.accel[direction]);
 		}
 
 		for (enum Finger finger = 0; finger < NUM_FINGERS; finger++)
 		{
-			fprintf(file, " %s=%hd", FINGERS[finger], gesture->criteria[i].flex[finger]);
+			fprintf(file, " %s=%hhd", FINGERS[finger], (S8)gesture->ignore.flex[finger]);
+		}
+
+		fprintf(file, "\n");
+
+		for (int phase = 0; phase < gesture->phases; phase++)
+		{
+			fprintf(file, "%6d", phase);
+
+			for (enum Direction direction = 0; direction < NUM_DIRECTIONS; direction++)
+			{
+				fprintf(file, " %s=%hd", DIRECTIONS[direction], gesture->criteria[phase].accel[direction]);
+			}
+
+			for (enum Finger finger = 0; finger < NUM_FINGERS; finger++)
+			{
+				fprintf(file, " %s=%hd", FINGERS[finger], gesture->criteria[phase].flex[finger]);
+			}
+
+			fprintf(file, "\n");
 		}
 
 		fprintf(file, "\n");
 	}
 
-	log_print(LOG_SUCCESS, "%s(): Exported gesture to file '%s'\n", __func__, file_name);
+	log_print(LOG_SUCCESS, "%s(): Exported %d gestures to file '%s'\n", __func__, quantity, file_name);
 	fclose(file);
+	return SUCCESS;
+}
+
+int gesture_record(struct Gesture * gesture)
+{
+	if (gesture == NULL)
+	{
+		log_print(LOG_ERROR, "%s(): Invalid arguments\n", __func__);
+		return ERROR;
+	}
+
+	if (scaled() == ERROR)
+	{
+		log_print(LOG_ERROR, "%s(): Failed to set device to scaled sampling mode\n", __func__);
+		return ERROR;
+	}
+
+	// The purpose of this function is just to record an N-phase gesture.
+	// The gesture action and ignores must be manually set in the file.
+
+	gesture->action = ACTION_UNKNOWN;
+	memset(&(gesture->ignore), 0, sizeof(struct Ignore));
+
+	printf("Enter the number of phases: ");
+
+	if (scanf("%d", &(gesture->phases)) < 1)
+	{
+		log_print(LOG_ERROR, "%s(): Failed to input phase count\n", __func__);
+		return ERROR;
+	}
+
+	printf("%d\n", gesture->phases);
+
+	if (gesture->phases < 1)
+	{
+		log_print(LOG_ERROR, "%s(): The phase count cannot be less than 1\n", __func__);
+		return ERROR;
+	}
+
+	gesture->criteria = malloc(gesture->phases * sizeof(struct Criteria));
+
+	if (gesture->criteria == NULL)
+	{
+		log_print(LOG_ERROR, "%s(): Failed to allocate memory for %d phases\n", __func__, gesture->phases);
+		return ERROR;
+	}
+
+	printf("Press the button to confirm a measurement\n\n");
+
+	struct Hand hand;
+
+	for (int phase = 0; phase < gesture->phases; phase++)
+	{
+		// press button to calibrate
+		do
+		{
+			if (sample(&hand) == ERROR)
+			{
+				log_print(LOG_ERROR, "%s(): Sample failed while recording phase #%d\n", __func__, phase);
+				return ERROR;
+			}
+
+			printf("\r");
+			printf("[" BLUE "Phase %d" WHITE "] |", phase);
+			printf(RED    " %s" WHITE " : % 5hd |", DIRECTIONS[X],   hand.accel[X]);
+			printf(RED    " %s" WHITE " : % 5hd |", DIRECTIONS[Y],   hand.accel[Y]);
+			printf(RED    " %s" WHITE " : % 5hd |", DIRECTIONS[Z],   hand.accel[Z]);
+			printf(YELLOW " %s" WHITE " : % 5hd |", FINGERS[THUMB],  hand.flex[THUMB]);
+			printf(YELLOW " %s" WHITE " : % 5hd |", FINGERS[INDEX],  hand.flex[INDEX]);
+			printf(YELLOW " %s" WHITE " : % 5hd |", FINGERS[MIDDLE], hand.flex[MIDDLE]);
+			printf(YELLOW " %s" WHITE " : % 5hd |", FINGERS[RING],   hand.flex[RING]);
+			printf(YELLOW " %s" WHITE " : % 5hd |", FINGERS[PINKY],  hand.flex[PINKY]);
+			fflush(stdout);
+		}
+		while (hand.button == BUTTON_RELEASED);
+
+		// save phase readings to criteria array
+		gesture->criteria[phase].accel[X] = hand.accel[X];
+		gesture->criteria[phase].accel[Y] = hand.accel[Y];
+		gesture->criteria[phase].accel[Z] = hand.accel[Z];
+		gesture->criteria[phase].flex[THUMB] = hand.flex[THUMB];
+		gesture->criteria[phase].flex[INDEX] = hand.flex[INDEX];
+		gesture->criteria[phase].flex[MIDDLE] = hand.flex[MIDDLE];
+		gesture->criteria[phase].flex[RING] = hand.flex[RING];
+		gesture->criteria[phase].flex[PINKY] = hand.flex[PINKY];
+
+		printf(" " GREEN "~" WHITE "\n");
+
+		// wait for user to release button
+		do
+		{
+			if (sample(&hand) == ERROR)
+			{
+				log_print(LOG_ERROR, "%s(): Sample failed while waiting for button release after recording phase #%d\n", __func__, phase);
+				return ERROR;
+			}
+		}
+		while (hand.button == BUTTON_PRESSED);
+	}
+
+	log_print(LOG_SUCCESS, "%s(): Recorded %d phase gesture\n", __func__, gesture->phases);
 	return SUCCESS;
 }
 
@@ -337,22 +515,23 @@ int gesture_print(struct Gesture * gesture)
 	printf("\n");
 	printf("-----------------------------------------------------------------------------\n");
 
-	for (int i = 0; i < gesture->phases; i++)
+	for (int phase = 0; phase < gesture->phases; phase++)
 	{
-		printf("%6d:", i);
+		printf("%6d:", phase);
 
 		for (enum Direction direction = 0; direction < NUM_DIRECTIONS; direction++)
 		{
-			printf(" %s=%hd", DIRECTIONS[direction], gesture->criteria[i].accel[direction]);
+			printf(" %s=%hd", DIRECTIONS[direction], gesture->criteria[phase].accel[direction]);
 		}
 
 		for (enum Finger finger = 0; finger < NUM_FINGERS; finger++)
 		{
-			printf(" %s=%hd", FINGERS[finger], gesture->criteria[i].flex[finger]);
+			printf(" %s=%hd", FINGERS[finger], gesture->criteria[phase].flex[finger]);
 		}
 
 		printf("\n");
 	}
 
 	printf("=============================================================================\n");
+	return SUCCESS;
 }

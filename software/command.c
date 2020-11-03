@@ -33,18 +33,38 @@ char * COMMANDS [NUM_COMMANDS] = {
 
 static int command_run(void)
 {
-	struct Criteria criteria;
+	struct Gesture * gestures = NULL;
+	int num_gestures = 0;
+
+	if (gesture_import("gesture.txt", &gestures, &num_gestures) == ERROR)
+	{
+		printf(":(\n");
+		return ERROR;
+	}
+
+	for (int i = 0; i < num_gestures; i++)
+	{
+		gesture_print(&gestures[i]);
+	}
+
+	if (gesture_export("test.txt", gestures, num_gestures) == ERROR)
+	{
+		printf(":(\n");
+		return ERROR;
+	}
+
+	gesture_destroy(gestures, num_gestures);
+	gestures = NULL;
+
 	struct Gesture gesture;
-	gesture.action = ACTION_MOVE;
-	gesture.phases = 1;
-	gesture.criteria = &criteria;
-	//gesture_export("gesture.txt", &gesture);
-	gesture_import("gesture.txt", &gesture);
+	if (gesture_record(&gesture) == ERROR)
+	{
+		printf("ERROR\n");
+		return ERROR;
+	}
 
 	gesture_print(&gesture);
-
-	//gesture_destroy(&gesture);
-
+	gesture_export("record.txt", &gesture, 1);
 
 	return 0;
 	struct Hand hand;
@@ -261,7 +281,7 @@ static int command_mode(char * mode)
 {
 	if (mode == NULL)
 	{
-		log_print(LOG_ERROR, "%s: No argument provided for scaling mode\n", PROGRAM, mode);
+		log_print(LOG_ERROR, "%s: No argument provided for scaling mode\n", PROGRAM);
 		return ERROR;
 	}
 

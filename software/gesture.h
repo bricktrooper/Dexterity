@@ -20,9 +20,9 @@ enum Action
 	ACTION_SCROLL_DOWN,
 	ACTION_VOLUME_UP,
 	ACTION_VOLUME_DOWN,
-	ACTION_CYCLE,        // switch between controls
-	ACTION_DISABLE,      // ignore all input from device until re-enabled
-	ACTION_ENABLE,       // bring the device back from a disabled state
+	ACTION_SWITCH_CONTROLS,   // switch between controls
+	ACTION_DISABLE,           // ignore all input from device until re-enabled
+	ACTION_ENABLE,            // bring the device back from a disabled state
 	ACTION_UNKNOWN,
 
 	NUM_ACTIONS
@@ -79,20 +79,20 @@ struct Criteria
 
 struct Gesture
 {
-	enum Action action;         // the gesture to execute when this binding is activated
+	enum Action action;           // the gesture to execute when this binding is activated
 	int phases;                   // the number of phases in the gesture
 	struct Ignore ignore;         // which sensors to ignore
 	struct Criteria * criteria;   // array of criteria for multiphase gestures
 };
 
-//int gesture_record(char * file_name);
-void gesture_create(struct Gesture * gesture);
-void gesture_destroy(struct Gesture * gesture);
-int gesture_export(char * file_name, struct Gesture * gesture);
-int gesture_import(char * file_name, struct Gesture * gesture);
-bool gesture_compare(enum Action action, struct Hand * hand);
-//enum Action action_identify(struct Hand * hand);
-int gesture_execute(enum Action action, struct Hand * hand);
+struct Gesture * gesture_create(int quantity);
+int gesture_destroy(struct Gesture * gestures, int quantity);
+bool gesture_valid(struct Gesture * gesture);
+int gesture_import(char * file_name, struct Gesture ** gestures, int * quantity);
+int gesture_export(char * file_name, struct Gesture * gestures, int quantity);
+int gesture_record(struct Gesture * gesture);
+bool gesture_compare(struct Gesture gesture, struct Hand * hand);
+int gesture_execute(struct Gesture gesture, struct Hand * hand);
 int gesture_print(struct Gesture * gesture);
 
 #endif /* GESTURE_H */

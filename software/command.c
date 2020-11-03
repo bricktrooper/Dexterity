@@ -28,7 +28,8 @@ char * COMMANDS [NUM_COMMANDS] = {
 	"calibrate",
 	"upload",
 	"download",
-	"mode"
+	"mode",
+	"record",
 };
 
 static int command_run(void)
@@ -55,16 +56,6 @@ static int command_run(void)
 
 	gesture_destroy(gestures, num_gestures);
 	gestures = NULL;
-
-	struct Gesture gesture;
-	if (gesture_record(&gesture) == ERROR)
-	{
-		printf("ERROR\n");
-		return ERROR;
-	}
-
-	gesture_print(&gesture);
-	gesture_export("record.txt", &gesture, 1);
 
 	return 0;
 	struct Hand hand;
@@ -199,21 +190,19 @@ static int command_calibrate(char * file_name)
 	}
 
 	struct Calibration calibration;
-	int result = calibration_interactive(&calibration);
 
-	if (result == ERROR)
+	if (calibration_interactive(&calibration) == ERROR)
 	{
 		log_print(LOG_ERROR, "%s: Interactive calibration failed\n", PROGRAM);
-		return result;
+		return ERROR;
 	}
 
 	calibration_print(&calibration);
-	result = calibration_export(file_name, &calibration);
 
-	if (result == ERROR)
+	if (calibration_export(file_name, &calibration) == ERROR)
 	{
 		log_print(LOG_ERROR, "%s: Failed to export calibration to '%s'\n", PROGRAM, file_name);
-		return result;
+		return ERROR;
 	}
 
 	return SUCCESS;
@@ -228,21 +217,19 @@ static int command_upload(char * file_name)
 	}
 
 	struct Calibration calibration;
-	int result = calibration_import(file_name, &calibration);
 
-	if (result == ERROR)
+	if (calibration_import(file_name, &calibration) == ERROR)
 	{
 		log_print(LOG_ERROR, "%s: Failed to import calibration from '%s'\n", PROGRAM, file_name);
-		return result;
+		return ERROR;
 	}
 
 	calibration_print(&calibration);
-	result = calibration_upload(&calibration);
 
-	if (result == ERROR)
+	if (calibration_upload(&calibration) == ERROR)
 	{
 		log_print(LOG_ERROR, "%s: Failed to upload calibration to device\n", PROGRAM);
-		return result;
+		return ERROR;
 	}
 
 	return SUCCESS;
@@ -251,12 +238,11 @@ static int command_upload(char * file_name)
 static int command_download(char * file_name)
 {
 	struct Calibration calibration;
-	int result = calibration_download(&calibration);
 
-	if (result == ERROR)
+	if (calibration_download(&calibration) == ERROR)
 	{
 		log_print(LOG_ERROR, "%s: Failed to download calibration from device\n", PROGRAM);
-		return result;
+		return ERROR;
 	}
 
 	calibration_print(&calibration);
@@ -266,12 +252,10 @@ static int command_download(char * file_name)
 		return SUCCESS;
 	}
 
-	result = calibration_export(file_name, &calibration);
-
-	if (result == ERROR)
+	if (calibration_export(file_name, &calibration) == ERROR)
 	{
 		log_print(LOG_ERROR, "%s: Failed to export calibration to '%s'\n", PROGRAM, file_name);
-		return result;
+		return ERROR;
 	}
 
 	return SUCCESS;
@@ -308,6 +292,32 @@ static int command_mode(char * mode)
 	}
 
 	log_print(LOG_SUCCESS, "%s: Set device to %s mode\n", PROGRAM, mode);
+	return SUCCESS;
+}
+
+static int command_record(char * file_name)
+{
+	struct Gesture gesture;
+
+	if (gesture_record(&gesture) == ERROR)
+	{
+		log_print(LOG_SUCCESS, "%s: Failed to record gesture\n", __func__);
+		return ERROR;
+	}
+
+	gesture_print(&gesture);
+
+	if (file_name == NULL)
+	{
+		return SUCCESS;
+	}
+
+	if (gesture_export(file_name, &gesture, 1) == ERROR)
+	{
+		log_print(LOG_ERROR, "%s: Failed to gesture to '%s'\n", PROGRAM, file_name);
+	}
+
+	log_print(LOG_SUCCESS, "%s: Recorded gesture\n", PROGRAM);
 	return SUCCESS;
 }
 
@@ -364,6 +374,10 @@ int command_execute(char * program, enum Command command, char * argument)
 
 		case COMMAND_MODE:
 			return command_mode(argument);
+			break;
+
+		case COMMAND_RECORD:
+			return command_record(argument);
 			break;
 
 		default:

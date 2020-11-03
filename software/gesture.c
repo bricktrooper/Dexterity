@@ -53,7 +53,7 @@ struct Gesture * gesture_create(int quantity)
 	{
 		gestures[i].action = ACTION_UNKNOWN;
 		gestures[i].phases = -1;
-		memset(&(gestures[i].ignore), 0, sizeof(struct Ignore));
+		memset(&gestures[i].ignore, 0, sizeof(struct Ignore));
 		gestures[i].criteria = NULL;
 	}
 
@@ -161,7 +161,7 @@ int gesture_import(char * file_name, struct Gesture ** gestures, int * quantity)
 			goto EXIT;
 		}
 
-		if (fscanf(file, "PHASES=%d\n", &(gesture->phases)) != 1)
+		if (fscanf(file, "PHASES=%d\n", &gesture->phases) != 1)
 		{
 			log_print(LOG_ERROR, "%s(): Phase count was incorrectly parsed for gesture #%d\n", __func__, i + 1);
 			goto EXIT;
@@ -182,14 +182,14 @@ int gesture_import(char * file_name, struct Gesture ** gestures, int * quantity)
 		}
 
 		int tokens = fscanf(file, "IGNORE X=%hhd Y=%hhd Z=%hhd THUMB=%hhd INDEX=%hhd MIDDLE=%hhd RING=%hhd PINKY=%hhd\n",
-							(S8 *)&(gesture->ignore.accel[X]),
-							(S8 *)&(gesture->ignore.accel[Y]),
-							(S8 *)&(gesture->ignore.accel[Z]),
-							(S8 *)&(gesture->ignore.flex[THUMB]),
-							(S8 *)&(gesture->ignore.flex[INDEX]),
-							(S8 *)&(gesture->ignore.flex[MIDDLE]),
-							(S8 *)&(gesture->ignore.flex[RING]),
-							(S8 *)&(gesture->ignore.flex[PINKY]));
+							(S8 *)&gesture->ignore.accel[X],
+							(S8 *)&gesture->ignore.accel[Y],
+							(S8 *)&gesture->ignore.accel[Z],
+							(S8 *)&gesture->ignore.flex[THUMB],
+							(S8 *)&gesture->ignore.flex[INDEX],
+							(S8 *)&gesture->ignore.flex[MIDDLE],
+							(S8 *)&gesture->ignore.flex[RING],
+							(S8 *)&gesture->ignore.flex[PINKY]);
 
 		if (tokens != NUM_DIRECTIONS + NUM_FINGERS)
 		{
@@ -202,14 +202,14 @@ int gesture_import(char * file_name, struct Gesture ** gestures, int * quantity)
 			int phase_label = 0;
 			int tokens = fscanf(file, "%d X=%hd Y=%hd Z=%hd THUMB=%hd INDEX=%hd MIDDLE=%hd RING=%hd PINKY=%hd\n",
 								&phase_label,
-								&(gesture->criteria[phase].accel[X]),
-								&(gesture->criteria[phase].accel[Y]),
-								&(gesture->criteria[phase].accel[Z]),
-								&(gesture->criteria[phase].flex[THUMB]),
-								&(gesture->criteria[phase].flex[INDEX]),
-								&(gesture->criteria[phase].flex[MIDDLE]),
-								&(gesture->criteria[phase].flex[RING]),
-								&(gesture->criteria[phase].flex[PINKY]));
+								&gesture->criteria[phase].accel[X],
+								&gesture->criteria[phase].accel[Y],
+								&gesture->criteria[phase].accel[Z],
+								&gesture->criteria[phase].flex[THUMB],
+								&gesture->criteria[phase].flex[INDEX],
+								&gesture->criteria[phase].flex[MIDDLE],
+								&gesture->criteria[phase].flex[RING],
+								&gesture->criteria[phase].flex[PINKY]);
 
 			if (tokens != 1 + NUM_DIRECTIONS + NUM_FINGERS)
 			{
@@ -335,11 +335,11 @@ int gesture_record(struct Gesture * gesture)
 	// The gesture action and ignores must be manually set in the file.
 
 	gesture->action = ACTION_UNKNOWN;
-	memset(&(gesture->ignore), 0, sizeof(struct Ignore));
+	memset(&gesture->ignore, 0, sizeof(struct Ignore));
 
 	printf("Enter the number of phases: ");
 
-	if (scanf("%d", &(gesture->phases)) < 1)
+	if (scanf("%d", &gesture->phases) < 1)
 	{
 		log_print(LOG_ERROR, "%s(): Failed to input phase count\n", __func__);
 		return ERROR;

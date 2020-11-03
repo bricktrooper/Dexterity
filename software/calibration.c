@@ -33,13 +33,13 @@ int calibration_import(char * file_name, struct Calibration * calibration)
 
 	int rc = ERROR;
 
-	if (fscanf(file, "accel-range=%hd\n", &(calibration->accel.range)) != 1)
+	if (fscanf(file, "accel-range=%hd\n", &calibration->accel.range) != 1)
 	{
 		log_print(LOG_ERROR, "%s(): Accel range was incorrectly parsed\n", __func__);
 		goto EXIT;
 	}
 
-	if (fscanf(file, "flex-range=%hd\n", &(calibration->flex.range)) != 1)
+	if (fscanf(file, "flex-range=%hd\n", &calibration->flex.range) != 1)
 	{
 		log_print(LOG_ERROR, "%s(): Flex range was incorrectly parsed\n", __func__);
 		goto EXIT;
@@ -69,9 +69,9 @@ int calibration_import(char * file_name, struct Calibration * calibration)
 		}
 
 		int tokens = fscanf(file, " MIN=%hd MAX=%hd CENTRE=%hd\n",
-		                    &(calibration->accel.params[direction][MIN]),
-		                    &(calibration->accel.params[direction][MAX]),
-		                    &(calibration->accel.params[direction][CENTRE]));
+		                    &calibration->accel.params[direction][MIN],
+		                    &calibration->accel.params[direction][MAX],
+		                    &calibration->accel.params[direction][CENTRE]);
 
 		if (tokens != NUM_PARAMETERS)
 		{
@@ -96,9 +96,9 @@ int calibration_import(char * file_name, struct Calibration * calibration)
 		}
 
 		int tokens = fscanf(file, " MIN=%hd MAX=%hd CENTRE=%hd\n",
-		                    &(calibration->flex.params[finger][MIN]),
-		                    &(calibration->flex.params[finger][MAX]),
-		                    &(calibration->flex.params[finger][CENTRE]));
+		                    &calibration->flex.params[finger][MIN],
+		                    &calibration->flex.params[finger][MAX],
+		                    &calibration->flex.params[finger][CENTRE]);
 
 		if (tokens != NUM_PARAMETERS)
 		{

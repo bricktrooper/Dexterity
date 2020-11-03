@@ -5,27 +5,27 @@
 
 #include "dexterity.h"
 
-#define MAX_GESTURE_NAME_LENGTH   18
+#define MAX_ACTION_NAME_LENGTH   18
 
-enum Gesture
+enum Action
 {
-	GESTURE_MOVE,
-	GESTURE_DRAG,
-	GESTURE_LEFT_CLICK,
-	GESTURE_RIGHT_CLICK,
-	GESTURE_DOUBLE_CLICK,
-	GESTURE_ZOOM_IN,
-	GESTURE_ZOOM_OUT,
-	GESTURE_SCROLL_UP,
-	GESTURE_SCROLL_DOWN,
-	GESTURE_VOLUME_UP,
-	GESTURE_VOLUME_DOWN,
-	GESTURE_CYCLE,        // switch between controls
-	GESTURE_DISABLE,      // ignore all input from device until re-enabled
-	GESTURE_ENABLE,       // bring the device back from a disabled state
-	GESTURE_UNKNOWN,
+	ACTION_MOVE,
+	ACTION_DRAG,
+	ACTION_LEFT_CLICK,
+	ACTION_RIGHT_CLICK,
+	ACTION_DOUBLE_CLICK,
+	ACTION_ZOOM_IN,
+	ACTION_ZOOM_OUT,
+	ACTION_SCROLL_UP,
+	ACTION_SCROLL_DOWN,
+	ACTION_VOLUME_UP,
+	ACTION_VOLUME_DOWN,
+	ACTION_CYCLE,        // switch between controls
+	ACTION_DISABLE,      // ignore all input from device until re-enabled
+	ACTION_ENABLE,       // bring the device back from a disabled state
+	ACTION_UNKNOWN,
 
-	NUM_GESTURES
+	NUM_ACTIONS
 };
 
 enum Control
@@ -77,24 +77,22 @@ struct Criteria
 	S16 flex [NUM_FINGERS];
 };
 
-struct Binding
+struct Gesture
 {
-	enum Gesture gesture;         // the gesture to execute when this binding is activated
+	enum Action action;         // the gesture to execute when this binding is activated
 	int phases;                   // the number of phases in the gesture
 	struct Ignore ignore;         // which sensors to ignore
-	struct Criteria * criteria;   // array of profiles for multiphase gestures
-	////// make a static array of these and call it from there instead using binding->gesture //int (* action)(struct Hand * hand);   // the function to call when this gesture is registered
+	struct Criteria * criteria;   // array of criteria for multiphase gestures
 };
 
-extern char * CONTROLS [NUM_CONTROLS];
-extern char * GESTURES [NUM_GESTURES];
-
 //int gesture_record(char * file_name);
-void gesture_binding_destroy(struct Binding * binding);
-int gesture_export(char * file_name, struct Binding * binding);
-int gesture_import(char * file_name, struct Binding * binding);
-bool gesture_compare(enum Gesture gesture, struct Hand * hand);
-enum Gesture gesture_identify(struct Hand * hand);
-int gesture_execute(enum Gesture gesture, struct Hand * hand);
+void gesture_create(struct Gesture * gesture);
+void gesture_destroy(struct Gesture * gesture);
+int gesture_export(char * file_name, struct Gesture * gesture);
+int gesture_import(char * file_name, struct Gesture * gesture);
+bool gesture_compare(enum Action action, struct Hand * hand);
+//enum Action action_identify(struct Hand * hand);
+int gesture_execute(enum Action action, struct Hand * hand);
+int gesture_print(struct Gesture * gesture);
 
 #endif /* GESTURE_H */

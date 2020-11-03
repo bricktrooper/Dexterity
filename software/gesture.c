@@ -12,7 +12,7 @@
 
 #define TOLERANCE   2.0   // how much deviation is tolerated in the confidence (average of the individual deviations)
 
-char * CONTROLS [NUM_CONTROLS] = {
+static char * CONTROLS [NUM_CONTROLS] = {
 	"MOUSE",
 	"ZOOM",
 	"SCROLL",
@@ -20,7 +20,7 @@ char * CONTROLS [NUM_CONTROLS] = {
 };
 
 
-char * GESTURES [NUM_GESTURES] = {
+static char * ACTIONS [NUM_ACTIONS] = {
 	"MOVE",
 	"DRAG",
 	"LEFT_CLICK",
@@ -38,13 +38,17 @@ char * GESTURES [NUM_GESTURES] = {
 	"UNKNOWN"
 };
 
-static bool binding_valid(struct Binding * binding)
+static struct Gesture * gestures = NULL;
+static int gesture_count = 0;
+static int gesture_phase = 0;
+
+static bool gesture_valid(struct Gesture * gesture)
 {
-	if (binding == NULL ||
-		binding->gesture >= NUM_GESTURES ||
-		binding->gesture >= GESTURE_UNKNOWN ||
-		binding->phases <= 0 ||
-		binding->criteria == NULL)
+	if (gesture == NULL ||
+		gesture->action >= NUM_ACTIONS ||
+		gesture->action >= ACTION_UNKNOWN ||
+		gesture->phases <= 0 ||
+		gesture->criteria == NULL)
 	{
 		return false;
 	}
@@ -52,19 +56,19 @@ static bool binding_valid(struct Binding * binding)
 	return true;
 }
 
-void gesture_binding_destroy(struct Binding * binding)
+void gesture_destroy(struct Gesture * gesture)
 {
-	if (binding == NULL)
+	if (gesture == NULL)
 	{
 		return;
 	}
 
-	free(binding->criteria);
+	free(gesture->criteria);
 }
 
-int gesture_import(char * file_name, struct Binding * binding)
+int gesture_import(char * file_name, struct Gesture * gesture)
 {
-	if (file_name == NULL || binding == NULL)
+	if (file_name == NULL || gesture == NULL)
 	{
 		log_print(LOG_ERROR, "%s(): Invalid arguments\n", __func__);
 		return ERROR;
@@ -79,60 +83,60 @@ int gesture_import(char * file_name, struct Binding * binding)
 	}
 
 	int rc = ERROR;
-	char name [MAX_GESTURE_NAME_LENGTH + 1];
+	char name [MAX_ACTION_NAME_LENGTH + 1];
 
-	if (fscanf(file, "GESTURE=%s\n", name) != 1)
+	if (fscanf(file, "ACTION=%s\n", name) != 1)
 	{
-		log_print(LOG_ERROR, "%s(): Gesture name was incorrectly parsed\n", __func__, file_name);
+		log_print(LOG_ERROR, "%s(): Gesture action was incorrectly parsed\n", __func__, file_name);
 		goto EXIT;
 	}
 
-	binding->gesture = GESTURE_UNKNOWN;
+	gesture->action = ACTION_UNKNOWN;
 
-	for (enum Gesture gesture = 0; gesture < NUM_GESTURES; gesture++)
+	for (enum Action action = 0; action < NUM_ACTIONS; action++)
 	{
-		if (strncmp(name, GESTURES[gesture], MAX_GESTURE_NAME_LENGTH) == 0)
+		if (strncmp(name, ACTIONS[action], MAX_ACTION_NAME_LENGTH) == 0)
 		{
-			binding->gesture = gesture;
+			gesture->action = action;
 			break;
 		}
 	}
 
-	if (binding->gesture == GESTURE_UNKNOWN)
+	if (gesture->action == ACTION_UNKNOWN)
 	{
-		log_print(LOG_ERROR, "%s(): An unknown gesture was parsed\n", __func__);
+		log_print(LOG_ERROR, "%s(): Parsed an unknown action '%s'\n", __func__, name);
 		goto EXIT;
 	}
 
-	if (fscanf(file, "PHASES=%d\n", &(binding->phases)) != 1)
+	if (fscanf(file, "PHASES=%d\n", &(gesture->phases)) != 1)
 	{
 		log_print(LOG_ERROR, "%s(): Phase count was incorrectly parsed\n", __func__);
 		goto EXIT;
 	}
 
-	if (binding->phases < 0)
+	if (gesture->phases < 0)
 	{
-		log_print(LOG_ERROR, "%s(): Phase count cannot be negative\n", __func__, file_name);
+		log_print(LOG_ERROR, "%s(): Parsed an negative phase count '%d'\n", __func__, file_name, gesture->phases);
 		goto EXIT;
 	}
 
-	binding->criteria = malloc(binding->phases * sizeof(struct Criteria));
+	gesture->criteria = malloc(gesture->phases * sizeof(struct Criteria));
 
-	if (binding->criteria == NULL)
+	if (gesture->criteria == NULL)
 	{
-		log_print(LOG_ERROR, "%s(): Failed to allocate memory for %d bindings\n", __func__, binding->criteria);
+		log_print(LOG_ERROR, "%s(): Failed to allocate memory for %d phases\n", __func__, gesture->phases);
 		goto EXIT;
 	}
 
 	int tokens = fscanf(file, "IGNORE X=%hhd Y=%hhd Z=%hhd THUMB=%hhd INDEX=%hhd MIDDLE=%hhd RING=%hhd PINKY=%hhd\n",
-	                    (S8 *)&(binding->ignore.accel[X]),
-	                    (S8 *)&(binding->ignore.accel[Y]),
-	                    (S8 *)&(binding->ignore.accel[Z]),
-	                    (S8 *)&(binding->ignore.flex[THUMB]),
-	                    (S8 *)&(binding->ignore.flex[INDEX]),
-	                    (S8 *)&(binding->ignore.flex[MIDDLE]),
-	                    (S8 *)&(binding->ignore.flex[RING]),
-	                    (S8 *)&(binding->ignore.flex[PINKY]));
+	                    (S8 *)&(gesture->ignore.accel[X]),
+	                    (S8 *)&(gesture->ignore.accel[Y]),
+	                    (S8 *)&(gesture->ignore.accel[Z]),
+	                    (S8 *)&(gesture->ignore.flex[THUMB]),
+	                    (S8 *)&(gesture->ignore.flex[INDEX]),
+	                    (S8 *)&(gesture->ignore.flex[MIDDLE]),
+	                    (S8 *)&(gesture->ignore.flex[RING]),
+	                    (S8 *)&(gesture->ignore.flex[PINKY]));
 
 	if (tokens != NUM_DIRECTIONS + NUM_FINGERS)
 	{
@@ -140,19 +144,19 @@ int gesture_import(char * file_name, struct Binding * binding)
 		goto EXIT;
 	}
 
-	for (int phase = 0; phase < binding->phases; phase++)
+	for (int i = 0; i < gesture->phases; i++)
 	{
-		int phase_label = 0;
+		int phase = 0;
 		int tokens = fscanf(file, "%d X=%hd Y=%hd Z=%hd THUMB=%hd INDEX=%hd MIDDLE=%hd RING=%hd PINKY=%hd\n",
-		                    &phase_label,
-		                    &(binding->criteria[phase].accel[X]),
-		                    &(binding->criteria[phase].accel[Y]),
-		                    &(binding->criteria[phase].accel[Z]),
-		                    &(binding->criteria[phase].flex[THUMB]),
-		                    &(binding->criteria[phase].flex[INDEX]),
-		                    &(binding->criteria[phase].flex[MIDDLE]),
-		                    &(binding->criteria[phase].flex[RING]),
-		                    &(binding->criteria[phase].flex[PINKY]));
+		                    &phase,
+		                    &(gesture->criteria[i].accel[X]),
+		                    &(gesture->criteria[i].accel[Y]),
+		                    &(gesture->criteria[i].accel[Z]),
+		                    &(gesture->criteria[i].flex[THUMB]),
+		                    &(gesture->criteria[i].flex[INDEX]),
+		                    &(gesture->criteria[i].flex[MIDDLE]),
+		                    &(gesture->criteria[i].flex[RING]),
+		                    &(gesture->criteria[i].flex[PINKY]));
 
 		if (tokens != 1 + NUM_DIRECTIONS + NUM_FINGERS)
 		{
@@ -160,14 +164,14 @@ int gesture_import(char * file_name, struct Binding * binding)
 			goto EXIT;
 		}
 
-		if (phase_label != phase)
+		if (phase != i)
 		{
-			log_print(LOG_ERROR, "%s(): Incorrect phase label: Expected '%d' but parsed '%d'\n", __func__, phase, phase_label);
+			log_print(LOG_ERROR, "%s(): Incorrect phase label: Expected '%d' but parsed '%d'\n", __func__, i, phase);
 			goto EXIT;
 		}
 	}
 
-	log_print(LOG_SUCCESS, "%s(): Imported binding from file '%s'\n", __func__, file_name);
+	log_print(LOG_SUCCESS, "%s(): Imported gesture from file '%s'\n", __func__, file_name);
 	rc = SUCCESS;
 
 EXIT:
@@ -175,17 +179,17 @@ EXIT:
 	return rc;
 }
 
-int gesture_export(char * file_name, struct Binding * binding)
+int gesture_export(char * file_name, struct Gesture * gesture)
 {
-	if (file_name == NULL || binding == NULL)
+	if (file_name == NULL || gesture == NULL)
 	{
 		log_print(LOG_ERROR, "%s(): Invalid arguments\n", __func__);
 		return ERROR;
 	}
 
-	if (!binding_valid(binding))
+	if (!gesture_valid(gesture))
 	{
-		log_print(LOG_ERROR, "%s(): Invalid binding\n", __func__, file_name);
+		log_print(LOG_ERROR, "%s(): Invalid gesture\n", __func__, file_name);
 		return ERROR;
 	}
 
@@ -197,41 +201,41 @@ int gesture_export(char * file_name, struct Binding * binding)
 		return ERROR;
 	}
 
-	fprintf(file, "GESTURE=%s\n", GESTURES[binding->gesture]);
-	fprintf(file, "PHASES=%d\n", binding->phases);
+	fprintf(file, "ACTION=%s\n", ACTIONS[gesture->action]);
+	fprintf(file, "PHASES=%d\n", gesture->phases);
 
-	fprintf(file, "IGNORE ");
+	fprintf(file, "IGNORE");
 
 	for (enum Direction direction = 0; direction < NUM_DIRECTIONS; direction++)
 	{
-		fprintf(file, " %s=%hhd", DIRECTIONS[direction], (S8)binding->ignore.accel[direction]);
+		fprintf(file, " %s=%hhd", DIRECTIONS[direction], (S8)gesture->ignore.accel[direction]);
 	}
 
 	for (enum Finger finger = 0; finger < NUM_FINGERS; finger++)
 	{
-		fprintf(file, " %s=%hhd", FINGERS[finger], (S8)binding->ignore.flex[finger]);
+		fprintf(file, " %s=%hhd", FINGERS[finger], (S8)gesture->ignore.flex[finger]);
 	}
 
 	fprintf(file, "\n");
 
-	for (int phase = 0; phase < binding->phases; phase++)
+	for (int i = 0; i < gesture->phases; i++)
 	{
-		fprintf(file, "%-7d", phase);
+		fprintf(file, "%6d", i);
 
 		for (enum Direction direction = 0; direction < NUM_DIRECTIONS; direction++)
 		{
-			fprintf(file, " %s=%hd", DIRECTIONS[direction], binding->criteria[phase].accel[direction]);
+			fprintf(file, " %s=%hd", DIRECTIONS[direction], gesture->criteria[i].accel[direction]);
 		}
 
 		for (enum Finger finger = 0; finger < NUM_FINGERS; finger++)
 		{
-			fprintf(file, " %s=%hd", FINGERS[finger], binding->criteria[phase].flex[finger]);
+			fprintf(file, " %s=%hd", FINGERS[finger], gesture->criteria[i].flex[finger]);
 		}
 
 		fprintf(file, "\n");
 	}
 
-	log_print(LOG_SUCCESS, "%s(): Exported binding to file '%s'\n", __func__, file_name);
+	log_print(LOG_SUCCESS, "%s(): Exported gesture to file '%s'\n", __func__, file_name);
 	fclose(file);
 	return SUCCESS;
 }
@@ -255,7 +259,7 @@ int gesture_export(char * file_name, struct Binding * binding)
 //	return SUCCESS;
 //}
 
-//bool gesture_compare(enum Gesture gesture, struct Hand * hand)
+//bool gesture_compare(enum Action action, struct Hand * hand)
 //{
 //	if (hand == NULL)
 //	{
@@ -295,7 +299,7 @@ int gesture_export(char * file_name, struct Binding * binding)
 //	return false;
 //}
 
-//enum Gesture gesture_identify(struct Hand * hand)
+//enum Action action_identify(struct Hand * hand)
 //{
 //	if (hand == NULL)
 //	{
@@ -306,3 +310,49 @@ int gesture_export(char * file_name, struct Binding * binding)
 //	//if (hand->accel[X])
 //	return GESTURE_UNKNOWN;
 //}
+
+int gesture_print(struct Gesture * gesture)
+{
+	if (!gesture_valid(gesture))
+	{
+		log_print(LOG_ERROR, "%s(): Invalid arguments\n", __func__);
+		return ERROR;
+	}
+
+	printf("=============================================================================\n");
+	printf("ACTION: %s\n", ACTIONS[gesture->action]);
+	printf("PHASES: %d\n", gesture->phases);
+	printf("IGNORE:");
+
+	for (enum Direction direction = 0; direction < NUM_DIRECTIONS; direction++)
+	{
+		printf(" %s=%hhd", DIRECTIONS[direction], (S8)gesture->ignore.accel[direction]);
+	}
+
+	for (enum Finger finger = 0; finger < NUM_FINGERS; finger++)
+	{
+		printf(" %s=%hhd", FINGERS[finger], (S8)gesture->ignore.flex[finger]);
+	}
+
+	printf("\n");
+	printf("-----------------------------------------------------------------------------\n");
+
+	for (int i = 0; i < gesture->phases; i++)
+	{
+		printf("%6d:", i);
+
+		for (enum Direction direction = 0; direction < NUM_DIRECTIONS; direction++)
+		{
+			printf(" %s=%hd", DIRECTIONS[direction], gesture->criteria[i].accel[direction]);
+		}
+
+		for (enum Finger finger = 0; finger < NUM_FINGERS; finger++)
+		{
+			printf(" %s=%hd", FINGERS[finger], gesture->criteria[i].flex[finger]);
+		}
+
+		printf("\n");
+	}
+
+	printf("=============================================================================\n");
+}

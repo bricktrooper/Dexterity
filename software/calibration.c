@@ -56,7 +56,7 @@ int calibration_import(char * file_name, struct Calibration * calibration)
 	{
 		if (fscanf(file, "%s", sensor_label) != 1)
 		{
-			log_print(LOG_ERROR, "%s(): sensor label was incorrectly parsed\n", __func__, file_name);
+			log_print(LOG_ERROR, "%s(): sensor label was incorrectly parsed\n", __func__);
 			goto EXIT;
 		}
 
@@ -74,7 +74,7 @@ int calibration_import(char * file_name, struct Calibration * calibration)
 
 		if (tokens != NUM_PARAMETERS)
 		{
-			log_print(LOG_ERROR, "%s(): Sensor parameters were incorrectly parsed\n", __func__, file_name);
+			log_print(LOG_ERROR, "%s(): Sensor parameters were incorrectly parsed\n", __func__);
 			goto EXIT;
 		}
 	}
@@ -83,7 +83,7 @@ int calibration_import(char * file_name, struct Calibration * calibration)
 	{
 		if (fscanf(file, "%s", sensor_label) != 1)
 		{
-			log_print(LOG_ERROR, "%s(): sensor label was incorrectly parsed\n", __func__, file_name);
+			log_print(LOG_ERROR, "%s(): sensor label was incorrectly parsed\n", __func__);
 			goto EXIT;
 		}
 
@@ -101,7 +101,7 @@ int calibration_import(char * file_name, struct Calibration * calibration)
 
 		if (tokens != NUM_PARAMETERS)
 		{
-			log_print(LOG_ERROR, "%s(): Sensor parameters were incorrectly parsed\n", __func__, file_name);
+			log_print(LOG_ERROR, "%s(): Sensor parameters were incorrectly parsed\n", __func__);
 			goto EXIT;
 		}
 	}
@@ -202,7 +202,7 @@ int calibration_interactive(struct Calibration * calibration)
 
 	if (raw() == ERROR)
 	{
-		log_print(LOG_ERROR, "%s(): Failed to set device to raw sampling mode\n");
+		log_print(LOG_ERROR, "%s(): Failed to set device to raw sampling mode\n", __func__);
 		return ERROR;
 	}
 

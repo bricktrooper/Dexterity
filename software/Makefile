@@ -10,6 +10,8 @@ MMFLAGS += $(addprefix -I , $(INCLUDE))
 
 CFLAGS += -Wall
 CFLAGS += -Wpedantic
+CFLAGS += -Wformat
+CFLAGS += -Wextra
 CFLAGS += -std=c17
 CFLAGS += -g
 CFLAGS += $(addprefix -I , $(INCLUDE))

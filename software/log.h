@@ -15,6 +15,6 @@ enum LogType
 };
 
 void log_suppress(enum LogType type, bool suppress);
-int log_print(enum LogType type, const char * format, ...);
+int log_print(enum LogType type, const char * format, ...) __attribute__ ((format (printf, 2, 3)));
 
 #endif /* LOG_H */

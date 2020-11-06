@@ -8,6 +8,5 @@ int raw(void);
 int scaled(void);
 int upload(struct Calibration * calibration);
 int download(struct Calibration * calibration);
-int average(int * data, int elements, float * avg);
 
 #endif /* UTILS_H */

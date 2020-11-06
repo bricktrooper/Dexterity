@@ -32,109 +32,147 @@ char * COMMANDS [NUM_COMMANDS] = {
 	"record",
 };
 
-static int command_run(void)
+static int command_run(char * file_name)
 {
+	if (file_name == NULL)
+	{
+		log_print(LOG_ERROR, "%s(): No gesture file was provided\n", __func__);
+		return ERROR;
+	}
+
+	// TODO: we also need to upload the calibration ad set the scaled mode
+
+	int rc = ERROR;
 	struct Gesture * gestures = NULL;
 	int num_gestures = 0;
 
-	if (gesture_import("gesture.txt", &gestures, &num_gestures) == ERROR)
+	if (gesture_import(file_name, &gestures, &num_gestures) == ERROR)
 	{
-		printf(":(\n");
-		return ERROR;
+		log_print(LOG_ERROR, "%s(): Failed to import gestures from '%s'\n", __func__, file_name);
+		goto EXIT;
 	}
+
+	//if (num_gestures != NUM_ACTIONS)
+	//{
+	//  you also need to add the tolerance into the file and struct
+	//	log_print(LOG_ERROR, "%s(): Incorrect number of gestures imported from '%s': Expected %d but imported %d\n",
+	//	                     __func__, file_name, NUM_ACTIONS, num_gestures);
+	//}
+
+	//for (enum Action expected = 0; expected < NUM_ACTIONS; expected++)
+	//{
+	//	enum Action actual = gestures[expected].action;
+
+	//	if (actual != expected)
+	//	{
+	//		log_print(LOG_ERROR, "%s(): Incorrect action for gesture #%d: Expected '%s' but parsed '%s'\n",
+	//		                     __func__, expected, ACTIONS[expected], ACTIONS[actual]);
+	//		goto EXIT;
+	//	}
+	//}
+
+	log_print(LOG_SUCCESS, "%s(): Imported %d gestures from '%s'\n", __func__, num_gestures, file_name);
 
 	for (int i = 0; i < num_gestures; i++)
 	{
 		gesture_print(&gestures[i]);
 	}
 
-	if (gesture_export("test.txt", gestures, num_gestures) == ERROR)
-	{
-		printf(":(\n");
-		return ERROR;
-	}
-
-	gesture_destroy(gestures, num_gestures);
-	gestures = NULL;
-
-	return 0;
 	struct Hand hand;
-	// mouse_glide(234, 345);
-	// return SUCCESS;
+	enum Control control = 0;
+	int phase = 0;
+	//bool disabled = false;
 
 	while (1)
 	{
 		if (sample(&hand) == ERROR)
 		{
 			log_print(LOG_ERROR, "%s(): Failed to sample sensors\n", __func__);
-			return ERROR;
+			goto EXIT;
 		}
+
+		// CHECK FOR ENABLE DISABLE HERE
 
 		// you should apply any deadzone before doing any inference
 		// apply the deadzones to the entire hand here before doing anything else
-		//if (!gesture_compare(GESTURE_MOVE, &hand))
+
+
+		// start with mouse mode.  Run the current mode.  If while in the mode you detetch a switch, exit the function
+		// and cycle, then run the new gesture.  gesture execute should return cycle when ?
+
+		//&gestures[ACTION_CYCLE]
+		if (gesture_compare(&gestures[0], &hand, phase))
+		{
+			phase++;   // increment the phase
+
+			if (phase == gestures[0].phases)   // check if the last phase has been reached
+			{
+				control = (control + 1) % NUM_CONTROLS;   // cycle to next control
+				phase = 0;                                // reset phase once a gesture is recongized
+			}
+
+			continue;
+		}
+
+		switch (control)
+		{
+			case CONTROL_ZOOM:
+				printf("Controlling ZOOM\n");
+				break;
+
+			case CONTROL_SCROLL:
+				printf("Controlling SCROLL\n");
+				break;
+
+			case CONTROL_VOLUME:
+				printf("Controlling VOLUME\n");
+				break;
+
+			case CONTROL_MOUSE:
+			default:
+				printf("Controlling MOUSE\n");
+				break;
+		}
+
+		//int deadzone = 5;
+		//int x = -hand.accel[Z];
+		//int y = -hand.accel[X];
+
+		//if (abs(x) < deadzone)
 		//{
-		//	continue;
+		//	x = 0;
+		//}
+		//else if (x > 0)
+		//{
+		//	x -= deadzone;
+		//}
+		//else if (x < 0)
+		//{
+		//	x += deadzone;
 		//}
 
-		int deadzone = 5;
-		int x = -hand.accel[Z];
-		int y = -hand.accel[X];
+		//if (abs(y) < deadzone)
+		//{
+		//	y = 0;
+		//}
+		//else if (x > 0)
+		//{
+		//	y -= deadzone;
+		//}
+		//else if (x < 0)
+		//{
+		//	y += deadzone;
+		//}
 
-		if (abs(x) < deadzone)
-		{
-			x = 0;
-		}
-		else if (x > 0)
-		{
-			x -= deadzone;
-		}
-		else if (x < 0)
-		{
-			x += deadzone;
-		}
-
-		if (abs(y) < deadzone)
-		{
-			y = 0;
-		}
-		else if (x > 0)
-		{
-			y -= deadzone;
-		}
-		else if (x < 0)
-		{
-			y += deadzone;
-		}
-
-		mouse_move(x, y);
-
-		// if (hand.flex[F1] > 0 && hand.flex[F2] > 0 && hand.flex[F3] <= 0 && hand.flex[F4] <= 0 && hand.flex[F5] <= 0)
-		// {
-		// 	mouse_single_click(MOUSE_BUTTON_LEFT);
-		// }
-
-		// if (hand.accel[X] == 0)
-		// {
-		// 	printf("STOP\n");
-		// 	// mouse_move(0, 0);
-		// 	// mouse_scroll(MOUSE_SCROLL_UP, 0);
-		// }
-		// else if (hand.accel[X] > 0)
-		// {
-		// 	printf("UP\n");
-		// 	mouse_move(0, -2);
-		// 	// mouse_scroll(MOUSE_SCROLL_UP, 1);
-		// }
-		// if (hand.accel[X] < 0)
-		// {
-		// 	printf("DOWN\n");
-		// 	mouse_move(0, 2);
-		// 	// mouse_scroll(MOUSE_SCROLL_DOWN, 1);
-		// }
+		//mouse_move(x, y);
 	}
 
-	return SUCCESS;
+	rc = SUCCESS;
+
+EXIT:
+	gesture_destroy(gestures, num_gestures);
+	gestures = NULL;
+	return rc;
 }
 
 static int command_sample(void)
@@ -353,7 +391,7 @@ int command_execute(char * program, enum Command command, char * argument)
 	switch (command)
 	{
 		case COMMAND_RUN:
-			return command_run();
+			return command_run(argument);
 			break;
 
 		case COMMAND_SAMPLE:

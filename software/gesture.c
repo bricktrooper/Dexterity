@@ -11,32 +11,13 @@
 
 #include "gesture.h"
 
-#define TOLERANCE   2.0   // how much deviation is tolerated in the confidence (average of the individual deviations)
+#define TOLERANCE   0.1   // how much deviation is tolerated in the confidence (average of the individual deviations)
 
 char * CONTROLS [NUM_CONTROLS] = {
 	"MOUSE",
 	"ZOOM",
 	"SCROLL",
 	"VOLUME"
-};
-
-
-char * ACTIONS [NUM_ACTIONS] = {
-	"MOVE",
-	"DRAG",
-	"LEFT_CLICK",
-	"RIGHT_CLICK",
-	"DOUBLE_CLICK",
-	"ZOOM_IN",
-	"ZOOM_OUT",
-	"SCROLL_UP",
-	"SCROLL_DOWN",
-	"VOLUME_UP",
-	"VOLUME_DOWN",
-	"SWITCH_CONTROLS",
-	"DISABLE",
-	"ENABLE",
-	"UNKNOWN"
 };
 
 struct Gesture * gesture_create(int quantity)
@@ -53,7 +34,7 @@ struct Gesture * gesture_create(int quantity)
 	{
 		gestures[i].action = ACTION_UNKNOWN;
 		gestures[i].phases = -1;
-		memset(&gestures[i].ignore, 0, sizeof(struct Ignore));
+		memset(&gestures[i].ignores, 0, sizeof(struct Ignores));
 		gestures[i].criteria = NULL;
 	}
 
@@ -173,7 +154,7 @@ int gesture_import(char * file_name, struct Gesture ** gestures, int * quantity)
 			goto EXIT;
 		}
 
-		gesture->criteria = malloc(gesture->phases * sizeof(struct Criteria));
+		gesture->criteria = malloc(gesture->phases * sizeof(struct Sensors));
 
 		if (gesture->criteria == NULL)
 		{
@@ -182,14 +163,14 @@ int gesture_import(char * file_name, struct Gesture ** gestures, int * quantity)
 		}
 
 		int tokens = fscanf(file, "IGNORE X=%hhd Y=%hhd Z=%hhd THUMB=%hhd INDEX=%hhd MIDDLE=%hhd RING=%hhd PINKY=%hhd\n",
-							(S8 *)&gesture->ignore.accel[X],
-							(S8 *)&gesture->ignore.accel[Y],
-							(S8 *)&gesture->ignore.accel[Z],
-							(S8 *)&gesture->ignore.flex[THUMB],
-							(S8 *)&gesture->ignore.flex[INDEX],
-							(S8 *)&gesture->ignore.flex[MIDDLE],
-							(S8 *)&gesture->ignore.flex[RING],
-							(S8 *)&gesture->ignore.flex[PINKY]);
+							(S8 *)&gesture->ignores.accel[X],
+							(S8 *)&gesture->ignores.accel[Y],
+							(S8 *)&gesture->ignores.accel[Z],
+							(S8 *)&gesture->ignores.flex[THUMB],
+							(S8 *)&gesture->ignores.flex[INDEX],
+							(S8 *)&gesture->ignores.flex[MIDDLE],
+							(S8 *)&gesture->ignores.flex[RING],
+							(S8 *)&gesture->ignores.flex[PINKY]);
 
 		if (tokens != NUM_DIRECTIONS + NUM_FINGERS)
 		{
@@ -282,12 +263,12 @@ int gesture_export(char * file_name, struct Gesture * gestures, int quantity)
 
 		for (enum Direction direction = 0; direction < NUM_DIRECTIONS; direction++)
 		{
-			fprintf(file, " %s=%hhd", DIRECTIONS[direction], (S8)gesture->ignore.accel[direction]);
+			fprintf(file, " %s=%hhd", DIRECTIONS[direction], (S8)gesture->ignores.accel[direction]);
 		}
 
 		for (enum Finger finger = 0; finger < NUM_FINGERS; finger++)
 		{
-			fprintf(file, " %s=%hhd", FINGERS[finger], (S8)gesture->ignore.flex[finger]);
+			fprintf(file, " %s=%hhd", FINGERS[finger], (S8)gesture->ignores.flex[finger]);
 		}
 
 		fprintf(file, "\n");
@@ -335,7 +316,7 @@ int gesture_record(struct Gesture * gesture)
 	// The gesture action and ignores must be manually set in the file.
 
 	gesture->action = ACTION_UNKNOWN;
-	memset(&gesture->ignore, 0, sizeof(struct Ignore));
+	memset(&gesture->ignores, 0, sizeof(struct Ignores));
 
 	printf("Enter the number of phases: ");
 
@@ -353,7 +334,7 @@ int gesture_record(struct Gesture * gesture)
 		return ERROR;
 	}
 
-	gesture->criteria = malloc(gesture->phases * sizeof(struct Criteria));
+	gesture->criteria = malloc(gesture->phases * sizeof(struct Sensors));
 
 	if (gesture->criteria == NULL)
 	{
@@ -418,76 +399,78 @@ int gesture_record(struct Gesture * gesture)
 	return SUCCESS;
 }
 
-//int gesture_load_profiles(void)
+bool gesture_compare(struct Gesture * gesture, struct Hand * hand, int phase)
+{
+	if (gesture == NULL || hand == NULL || phase < 0)
+	{
+		log_print(LOG_ERROR, "%s(): Invalid arguments\n", __func__);
+		return false;
+	}
+
+	struct Ignores * ignores = (struct Ignores *)&gesture->ignores;
+	struct Sensors * criteria = (struct Sensors *)&gesture->criteria[phase];
+	int total = 0;
+	int sum = 0;
+
+	for (enum Direction direction = 0; direction < NUM_DIRECTIONS; direction++)
+	{
+		if (!ignores->accel[direction])
+		{
+			// accumulate deviations
+			sum += abs(criteria->accel[direction] - hand->accel[direction]);
+			total++;
+		}
+	}
+
+	for (enum Finger finger = 0; finger < NUM_FINGERS; finger++)
+	{
+		if (!ignores->flex[finger])
+		{
+			// accumulate deviations
+			sum += abs(criteria->flex[finger] - hand->flex[finger]);
+			total++;
+		}
+	}
+
+	if (total == 0)   // prevent divide by zero when averaging
+	{
+		log_print(LOG_WARNING, "%s(): All sensor readings are ignored\n", __func__);
+		return true;
+	}
+
+	float deviation = (float)sum / total;
+
+	//printf("%f\n", deviation);
+
+	if (deviation < TOLERANCE)
+	{
+		return true;
+	}
+
+	return false;
+}
+
+//enum Action gesture_identify(struct Gesture * gesture, struct Hand * hand, int phase)
 //{
-//	for (enum Direction direction = 0; direction < NUM_DIRECTIONS; direction++)
-//	{
-//		profiles[GESTURE_MOVE].ignore.accel[direction] = true;
-//		profiles[GESTURE_MOVE].hand.accel[direction] = 0;
-//	}
-
-//	// all fingers need to be straight to move cursor
-//	// don't care about accel
-//	for (enum Finger finger = 0; finger < NUM_FINGERS; finger++)
-//	{
-//		profiles[GESTURE_MOVE].ignore.flex[finger] = false;
-//		profiles[GESTURE_MOVE].hand.flex[finger] = 0;
-//	}
-
-//	return SUCCESS;
-//}
-
-//bool gesture_compare(enum Action action, struct Hand * hand)
-//{
-//	if (hand == NULL)
+//	if (gesture == NULL || hand == NULL || phase < 0)
 //	{
 //		log_print(LOG_ERROR, "%s(): Invalid arguments\n", __func__);
-//		return false;
+//		return ACTION_UNKNOWN;
 //	}
 
-//	// hardcoded for hand right now.  Don't consider aceleration
-//	int deviation [NUM_FINGERS];
-
-//	for (enum Finger finger = 0; finger < NUM_FINGERS; finger++)
+//	if (!gesture_compare(gesture, hand, phase))
 //	{
-//		if (profiles[GESTURE_MOVE].ignore.flex[finger])
-//		{
-//			deviation[finger] = 0;
-//			continue;
-//		}
-
-//		deviation[finger] = profiles[GESTURE_MOVE].hand.flex[finger] - hand->flex[finger];
+//		return ACTION_UNKNOWN;
 //	}
 
-//	float confidence = TOLERANCE + 1;   // assume it is not a match
-
-//	if (average(deviation, NUM_FINGERS, &confidence) == ERROR)
+//	// check if the last phase has been reached
+//	if (phase + 1 == gesture->phases)
 //	{
-//		log_print(LOG_ERROR, "%s(): Failed to calulate average deviation\n", __func__);
-//		return false;
+//		return gesture->action
 //	}
-
-//	printf("%d %d %d %d %d -> %f\n", deviation[THUMB], deviation[INDEX], deviation[MIDDLE], deviation[RING], deviation[PINKY], confidence);
-
-//	if (fabs(confidence) < TOLERANCE)
-//	{
-//		return true;
-//	}
-
-//	return false;
 //}
 
-//enum Action action_identify(struct Hand * hand)
-//{
-//	if (hand == NULL)
-//	{
-//		log_print(LOG_ERROR, "%s(): Invalid arguments\n", __func__);
-//		return GESTURE_UNKNOWN;
-//	}
-
-//	//if (hand->accel[X])
-//	return GESTURE_UNKNOWN;
-//}
+int gesture_execute(struct Gesture gesture, struct Hand * hand);
 
 int gesture_print(struct Gesture * gesture)
 {
@@ -504,12 +487,12 @@ int gesture_print(struct Gesture * gesture)
 
 	for (enum Direction direction = 0; direction < NUM_DIRECTIONS; direction++)
 	{
-		printf(" %s=%hhd", DIRECTIONS[direction], (S8)gesture->ignore.accel[direction]);
+		printf(" %s=%hhd", DIRECTIONS[direction], (S8)gesture->ignores.accel[direction]);
 	}
 
 	for (enum Finger finger = 0; finger < NUM_FINGERS; finger++)
 	{
-		printf(" %s=%hhd", FINGERS[finger], (S8)gesture->ignore.flex[finger]);
+		printf(" %s=%hhd", FINGERS[finger], (S8)gesture->ignores.flex[finger]);
 	}
 
 	printf("\n");

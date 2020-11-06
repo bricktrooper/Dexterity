@@ -125,22 +125,3 @@ int download(struct Calibration * calibration)
 
 	return SUCCESS;
 }
-
-int average(int * data, int elements, float * avg)
-{
-	if (data == NULL || elements <= 0 || avg == NULL)
-	{
-		log_print(LOG_ERROR, "%s(): Invalid arguments\n", __func__);
-		return ERROR;
-	}
-
-	int sum = 0;
-
-	for (int i = 0; i < elements; i++)
-	{
-		sum += data[i];
-	}
-
-	*avg = (float)sum / elements;
-	return SUCCESS;
-}

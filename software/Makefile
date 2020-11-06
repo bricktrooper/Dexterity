@@ -45,6 +45,7 @@ SRC += command.c
 SRC += mouse.c
 SRC += keyboard.c
 SRC += gesture.c
+SRC += action.c
 
 OBJ = $(SRC:.c=.o)
 DEP = $(SRC:.c=.d)

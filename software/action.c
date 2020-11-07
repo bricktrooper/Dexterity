@@ -4,6 +4,7 @@
 #include "action.h"
 
 char * ACTIONS [NUM_ACTIONS] = {
+	"CYCLE",
 	"MOVE",
 	"DRAG",
 	"LEFT_CLICK",
@@ -14,6 +15,5 @@ char * ACTIONS [NUM_ACTIONS] = {
 	"SCROLL_UP",
 	"SCROLL_DOWN",
 	"VOLUME_UP",
-	"VOLUME_DOWN",
-	"CYCLE"
+	"VOLUME_DOWN"
 };

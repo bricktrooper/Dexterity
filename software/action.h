@@ -7,6 +7,7 @@
 
 enum Action
 {
+	ACTION_CYCLE,          // cycle between controls
 	ACTION_MOVE,           // move the mouse cursor
 	ACTION_DRAG,           // drag left click
 	ACTION_LEFT_CLICK,     // single left click
@@ -18,16 +19,13 @@ enum Action
 	ACTION_SCROLL_DOWN,    // scroll down
 	ACTION_VOLUME_UP,      // increase the volume
 	ACTION_VOLUME_DOWN,    // decrease the volume
-	ACTION_CYCLE,          // cycle between controls
+	//ACTION_DISABLE,        // ignore all input from device until re-enabled (button triggered)
+	//ACTION_ENABLE,         // bring the device back from a disabled state (button triggered)
 
 	NUM_ACTIONS,
 
-	ACTION_UNKNOWN,        // the gesture could not be interpreted
-	ACTION_DISABLE,        // ignore all input from device until re-enabled (button triggered)
-	ACTION_ENABLE          // bring the device back from a disabled state (button triggered)
+	ACTION_UNKNOWN         // the gesture could not be interpreted
 };
-
-#endif /* ACTION_H */
 
 extern char * ACTIONS [NUM_ACTIONS];
 
@@ -44,3 +42,5 @@ int action_volume_up(struct Hand * hand);
 int action_volume_down(struct Hand * hand);
 int action_disable(struct Hand * hand);
 int action_enable(struct Hand * hand);
+
+#endif /* ACTION_H */

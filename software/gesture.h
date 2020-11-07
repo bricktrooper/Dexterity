@@ -6,16 +6,6 @@
 #include "dexterity.h"
 #include "action.h"
 
-enum Control
-{
-	CONTROL_MOUSE,     // move the mouse cursor and click mouse buttons
-	CONTROL_ZOOM,      // zoom +/-
-	CONTROL_SCROLL,    // scroll up/down
-	CONTROL_VOLUME,    // volume +/-
-
-	NUM_CONTROLS
-};
-
 // OKAY NEVERMID
 // this is what we're gonna do
 // the glove is very effective when it's only doing one type of gesture
@@ -64,8 +54,6 @@ struct Gesture
 	struct Sensors * criteria;   // array of criteria for multiphase gestures
 };
 
-extern char * CONTROLS [NUM_CONTROLS];
-
 struct Gesture * gesture_create(int quantity);
 int gesture_destroy(struct Gesture * gestures, int quantity);
 bool gesture_valid(struct Gesture * gesture);
@@ -73,10 +61,6 @@ int gesture_import(char * file_name, struct Gesture ** gestures, int * quantity)
 int gesture_export(char * file_name, struct Gesture * gestures, int quantity);
 int gesture_record(struct Gesture * gesture);
 bool gesture_compare(struct Gesture * gesture, struct Hand * hand, int phase);
-
-enum Action gesture_identify(struct Gesture * gesture, struct Hand * hand, int phase);
-
-int gesture_control(enum Control control, struct Hand * hand);
 int gesture_print(struct Gesture * gesture);
 
 #endif /* GESTURE_H */

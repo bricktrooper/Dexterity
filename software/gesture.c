@@ -13,13 +13,6 @@
 
 #define TOLERANCE   0.1   // how much deviation is tolerated in the confidence (average of the individual deviations)
 
-char * CONTROLS [NUM_CONTROLS] = {
-	"MOUSE",
-	"ZOOM",
-	"SCROLL",
-	"VOLUME"
-};
-
 struct Gesture * gesture_create(int quantity)
 {
 	struct Gesture * gestures = malloc(quantity * sizeof(struct Gesture));
@@ -313,9 +306,9 @@ int gesture_record(struct Gesture * gesture)
 	}
 
 	// The purpose of this function is just to record an N-phase gesture.
-	// The gesture action and ignores must be manually set in the file.
+	// The gesture action and ignores should be manually set in the file.
 
-	gesture->action = ACTION_UNKNOWN;
+	gesture->action = ACTION_MOVE;
 	memset(&gesture->ignores, 0, sizeof(struct Ignores));
 
 	printf("Enter the number of phases: ");
@@ -449,28 +442,6 @@ bool gesture_compare(struct Gesture * gesture, struct Hand * hand, int phase)
 
 	return false;
 }
-
-//enum Action gesture_identify(struct Gesture * gesture, struct Hand * hand, int phase)
-//{
-//	if (gesture == NULL || hand == NULL || phase < 0)
-//	{
-//		log_print(LOG_ERROR, "%s(): Invalid arguments\n", __func__);
-//		return ACTION_UNKNOWN;
-//	}
-
-//	if (!gesture_compare(gesture, hand, phase))
-//	{
-//		return ACTION_UNKNOWN;
-//	}
-
-//	// check if the last phase has been reached
-//	if (phase + 1 == gesture->phases)
-//	{
-//		return gesture->action
-//	}
-//}
-
-int gesture_execute(struct Gesture gesture, struct Hand * hand);
 
 int gesture_print(struct Gesture * gesture)
 {

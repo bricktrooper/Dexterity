@@ -11,10 +11,10 @@
 #include "serial.h"
 
 #define ARGV_MIN          1   // no subcommand
-#define ARGV_MAX          3   // subcommand + argument
+#define ARGV_MAX          4   // subcommand + arguments
 #define ARGV_PROGRAM      0
 #define ARGV_SUBCOMMAND   1
-#define ARGV_ARGUMENT     2
+#define ARGV_ARGUMENTS    2
 
 int init(void);
 void end(int code);
@@ -28,14 +28,27 @@ int main(int argc, char ** argv)
 {
 	char * program = basename(argv[ARGV_PROGRAM]);
 
-	if (argc < ARGV_MIN || argc > ARGV_MAX || argv == NULL)
+	if (argc < ARGV_MIN)
 	{
-		log_print(LOG_ERROR, "%s: Invalid arguments\n", program);
+		log_print(LOG_ERROR, "%s: Insufficient arguments\n", program);
+		return ERROR;
+	}
+
+	if (argc > ARGV_MAX)
+	{
+		log_print(LOG_ERROR, "%s: Too many arguments\n", program);
+		return ERROR;
+	}
+
+	if (argv == NULL)
+	{
+		log_print(LOG_ERROR, "%s: Invalid argument vector\n", program);
 		return ERROR;
 	}
 
 	char * subcommand = NULL;
-	char * argument = NULL;
+	char ** arguments = NULL;
+	int count = 0;
 
 	if (argc > 1)
 	{
@@ -44,7 +57,8 @@ int main(int argc, char ** argv)
 
 	if (argc > 2)
 	{
-		argument = argv[ARGV_ARGUMENT];
+		count = argc - 2;
+		arguments = &argv[ARGV_ARGUMENTS];
 	}
 
 	enum Command command = command_identify(subcommand);
@@ -62,7 +76,7 @@ int main(int argc, char ** argv)
 		return result;
 	}
 
-	result = command_execute(program, command, argument);
+	result = command_execute(program, command, arguments, count);
 	end(result);
 
 	return SUCCESS;

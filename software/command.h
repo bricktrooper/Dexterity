@@ -17,6 +17,6 @@ enum Command
 };
 
 enum Command command_identify(char * subcommand);
-int command_execute(char * program, enum Command command, char * argument);
+int command_execute(char * program, enum Command command, char ** arguments, int count);
 
 #endif /* COMMAND_H */

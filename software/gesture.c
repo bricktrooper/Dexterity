@@ -392,11 +392,17 @@ int gesture_record(struct Gesture * gesture)
 	return SUCCESS;
 }
 
-bool gesture_compare(struct Gesture * gesture, struct Hand * hand, int phase)
+bool gesture_matches(struct Gesture * gesture, struct Hand * hand, int phase)
 {
 	if (gesture == NULL || hand == NULL || phase < 0)
 	{
 		log_print(LOG_ERROR, "%s(): Invalid arguments\n", __func__);
+		return false;
+	}
+
+	if (!gesture_valid(gesture))
+	{
+		log_print(LOG_ERROR, "%s(): Invalid gesture\n", __func__);
 		return false;
 	}
 
@@ -438,6 +444,28 @@ bool gesture_compare(struct Gesture * gesture, struct Hand * hand, int phase)
 	if (deviation < TOLERANCE)
 	{
 		return true;
+	}
+
+	return false;
+}
+
+bool gesture_compare(enum Action action, struct Gesture * gestures, int count, struct Hand * hand, int * phase)
+{
+	if (action >= NUM_ACTIONS || gestures == NULL || count <  0 || hand == NULL || phase == NULL)
+	{
+		log_print(LOG_ERROR, "%s(): Invalid arguments\n", __func__);
+		return false;
+	}
+
+	if (gesture_matches(&gestures[action], hand, *phase))
+	{
+		(*phase)++;   // increment the phase
+
+		if (*phase == gestures[action].phases)   // check if the last phase has been reached
+		{
+			*phase = 0;                               // reset phase once a gesture is recongized
+			return true;
+		}
 	}
 
 	return false;

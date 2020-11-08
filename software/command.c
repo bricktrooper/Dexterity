@@ -103,17 +103,53 @@ static int command_run(char * calibration_file, char * gestures_file)
 	struct Hand hand;
 	enum Control control = CONTROL_MOUSE;
 	int phase = 0;
-	//bool disabled = false;
+	bool disabled = false;
 
 	while (1)
 	{
+		// READ SENSORS //
+
 		if (sample(&hand) == ERROR)
 		{
 			log_print(LOG_ERROR, "%s(): Failed to sample sensors\n", PROGRAM);
 			goto EXIT;
 		}
 
-		// CHECK FOR ENABLE DISABLE HERE
+		// ENABLE / DISABLE //
+
+		if (hand.button == BUTTON_PRESSED)
+		{
+			// wait until the button is released
+			do
+			{
+				if (sample(&hand) == ERROR)
+				{
+					log_print(LOG_ERROR, "%s(): Failed to sample sensors\n", PROGRAM);
+					goto EXIT;
+				}
+			}
+			while (hand.button != BUTTON_RELEASED);
+
+			if (disabled)
+			{
+				printf("ENABLED\n");
+				disabled = false;   // re-enable
+			}
+			else
+			{
+				printf("DISABLED\n");
+				disabled = true;   // disable and block until re-enabled
+			}
+
+			continue;
+		}
+
+		if (disabled)
+		{
+			continue;   // don't run program if disabled
+		}
+
+		// We also need to deal with the freeing of the gestures when control C happens
 
 		// you should apply any deadzone before doing any inference
 		// apply the deadzones to the entire hand here before doing anything else
@@ -122,16 +158,9 @@ static int command_run(char * calibration_file, char * gestures_file)
 		// start with mouse mode.  Run the current mode.  If while in the mode you detetch a switch, exit the function
 		// and cycle, then run the new gesture.  gesture execute should return cycle when ?
 
-		if (gesture_compare(&gestures[ACTION_CYCLE], &hand, phase))
+		if (gesture_compare(ACTION_CYCLE, gestures, num_gestures, &hand, &phase))
 		{
-			phase++;   // increment the phase
-
-			if (phase == gestures[ACTION_CYCLE].phases)   // check if the last phase has been reached
-			{
-				control = (control + 1) % NUM_CONTROLS;   // cycle to next control
-				phase = 0;                                // reset phase once a gesture is recongized
-			}
-
+			control = (control + 1) % NUM_CONTROLS;   // cycle to next control
 			continue;
 		}
 

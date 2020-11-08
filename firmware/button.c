@@ -21,18 +21,18 @@ int button_released(void)
 	return !BUTTON;
 }
 
-void button_wait_press(void)
+void button_wait_for_press(void)
 {
 	while (button_released());
 }
 
-void button_wait_release(void)
+void button_wait_for_release(void)
 {
 	while (button_pressed());
 }
 
-void button_wait_click(void)
+void button_wait_for_click(void)
 {
-	button_wait_press();
-	button_wait_release();
+	button_wait_for_press();
+	button_wait_for_release();
 }

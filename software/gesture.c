@@ -11,7 +11,7 @@
 
 #include "gesture.h"
 
-#define TOLERANCE   0.1   // how much deviation is tolerated in the confidence (average of the individual deviations)
+#define DEFAULT_TOLERANCE   0.1   // how much deviation is tolerated in the confidence (average of the individual deviations)
 
 struct Gesture * gesture_create(int quantity)
 {
@@ -27,6 +27,7 @@ struct Gesture * gesture_create(int quantity)
 	{
 		gestures[i].action = ACTION_UNKNOWN;
 		gestures[i].phases = -1;
+		gestures[i].tolerance = DEFAULT_TOLERANCE;
 		memset(&gestures[i].ignores, 0, sizeof(struct Ignores));
 		gestures[i].criteria = NULL;
 	}
@@ -59,6 +60,7 @@ bool gesture_valid(struct Gesture * gesture)
 	if (gesture == NULL ||
 		gesture->action >= NUM_ACTIONS ||
 		gesture->phases <= 0 ||
+		gesture->tolerance < 0 ||
 		gesture->criteria == NULL)
 	{
 		return false;
@@ -109,7 +111,7 @@ int gesture_import(char * file_name, struct Gesture ** gestures, int * quantity)
 
 	for (int i = 0; i < count; i++)
 	{
-		struct Gesture *gesture = (struct Gesture *)&elements[i];
+		struct Gesture * gesture = (struct Gesture *)&elements[i];
 		char name [MAX_ACTION_NAME_LENGTH + 1];
 
 		if (fscanf(file, "ACTION=%s\n", name) != 1)
@@ -144,6 +146,18 @@ int gesture_import(char * file_name, struct Gesture ** gestures, int * quantity)
 		if (gesture->phases < 0)
 		{
 			log_print(LOG_ERROR, "%s(): Parsed an negative phase count '%d'\n", __func__, gesture->phases);
+			goto EXIT;
+		}
+
+		if (fscanf(file, "TOLERANCE=%f\n", &gesture->tolerance) != 1)
+		{
+			log_print(LOG_ERROR, "%s(): Tolerance was incorrectly parsed for gesture #%d\n", __func__, i + 1);
+			goto EXIT;
+		}
+
+		if (gesture->tolerance < 0)
+		{
+			log_print(LOG_ERROR, "%s(): Parsed an negative tolerance '%f'\n", __func__, gesture->tolerance);
 			goto EXIT;
 		}
 
@@ -251,6 +265,7 @@ int gesture_export(char * file_name, struct Gesture * gestures, int quantity)
 
 		fprintf(file, "ACTION=%s\n", ACTIONS[gesture->action]);
 		fprintf(file, "PHASES=%d\n", gesture->phases);
+		fprintf(file, "TOLERANCE=%f\n", gesture->tolerance);
 
 		fprintf(file, "IGNORE");
 
@@ -308,7 +323,8 @@ int gesture_record(struct Gesture * gesture)
 	// The purpose of this function is just to record an N-phase gesture.
 	// The gesture action and ignores should be manually set in the file.
 
-	gesture->action = ACTION_MOVE;
+	gesture->action = ACTION_IDLE;
+	gesture->tolerance = DEFAULT_TOLERANCE;
 	memset(&gesture->ignores, 0, sizeof(struct Ignores));
 
 	printf("Enter the number of phases: ");
@@ -392,18 +408,18 @@ int gesture_record(struct Gesture * gesture)
 	return SUCCESS;
 }
 
-bool gesture_matches(struct Gesture * gesture, struct Hand * hand, int phase)
+float gesture_compare(struct Gesture * gesture, struct Hand * hand, int phase)
 {
 	if (gesture == NULL || hand == NULL || phase < 0)
 	{
 		log_print(LOG_ERROR, "%s(): Invalid arguments\n", __func__);
-		return false;
+		return ERROR;
 	}
 
 	if (!gesture_valid(gesture))
 	{
 		log_print(LOG_ERROR, "%s(): Invalid gesture\n", __func__);
-		return false;
+		return ERROR;
 	}
 
 	struct Ignores * ignores = (struct Ignores *)&gesture->ignores;
@@ -434,30 +450,21 @@ bool gesture_matches(struct Gesture * gesture, struct Hand * hand, int phase)
 	if (total == 0)   // prevent divide by zero when averaging
 	{
 		log_print(LOG_WARNING, "%s(): All sensor readings are ignored\n", __func__);
-		return true;
+		return 0.0;   // "exact" match
 	}
 
-	float deviation = (float)sum / total;
-
-	//printf("%f\n", deviation);
-
-	if (deviation < TOLERANCE)
-	{
-		return true;
-	}
-
-	return false;
+	return (float)sum / total;
 }
 
-bool gesture_compare(enum Action action, struct Gesture * gestures, int count, struct Hand * hand, int * phase)
+bool gesture_matches(enum Action action, struct Gesture * gestures, struct Hand * hand, int * phase)
 {
-	if (action >= NUM_ACTIONS || gestures == NULL || count <  0 || hand == NULL || phase == NULL)
+	if (action >= NUM_ACTIONS || gestures == NULL || hand == NULL || phase == NULL)
 	{
 		log_print(LOG_ERROR, "%s(): Invalid arguments\n", __func__);
 		return false;
 	}
 
-	if (gesture_matches(&gestures[action], hand, *phase))
+	if (gesture_compare(&gestures[action], hand, *phase) < gestures[action].tolerance)
 	{
 		(*phase)++;   // increment the phase
 
@@ -482,6 +489,7 @@ int gesture_print(struct Gesture * gesture)
 	printf("=============================================================================\n");
 	printf("ACTION: %s\n", ACTIONS[gesture->action]);
 	printf("PHASES: %d\n", gesture->phases);
+	printf("TOLERANCE: %f\n", gesture->tolerance);
 	printf("IGNORE:");
 
 	for (enum Direction direction = 0; direction < NUM_DIRECTIONS; direction++)

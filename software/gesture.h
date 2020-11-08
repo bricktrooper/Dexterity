@@ -22,6 +22,7 @@ struct Gesture
 {
 	enum Action action;          // the gesture to execute when this binding is activated
 	int phases;                  // the number of phases in the gesture
+	int state;                   // tracks the current phase of the gesture (only used at runtime)
 	float tolerance;             // how much deviation is tolerated in the sensor readings
 	struct Ignores ignores;      // which sensors to ignore
 	struct Sensors * criteria;   // array of criteria for multiphase gestures
@@ -33,8 +34,8 @@ bool gesture_valid(struct Gesture * gesture);
 int gesture_import(char * file_name, struct Gesture ** gestures, int * quantity);
 int gesture_export(char * file_name, struct Gesture * gestures, int quantity);
 int gesture_record(struct Gesture * gesture);
-float gesture_compare(struct Gesture * gesture, struct Hand * hand, int phase);
-bool gesture_matches(enum Action action, struct Gesture * gestures, struct Hand * hand, int * phase);
+float gesture_compare(struct Gesture * gesture, struct Hand * hand);
+bool gesture_matches(enum Action action, struct Gesture * gestures, struct Hand * hand);
 int gesture_print(struct Gesture * gesture);
 
 #endif /* GESTURE_H */

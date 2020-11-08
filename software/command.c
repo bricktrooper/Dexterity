@@ -102,7 +102,6 @@ static int command_run(char * calibration_file, char * gestures_file)
 
 	struct Hand hand;
 	enum Control control = CONTROL_MOUSE;
-	int phase = 0;
 	bool disabled = false;
 
 	while (1)
@@ -133,12 +132,12 @@ static int command_run(char * calibration_file, char * gestures_file)
 			if (disabled)
 			{
 				printf("ENABLED\n");
-				disabled = false;   // re-enable
+				disabled = false;   // bring the device back from a disabled state
 			}
 			else
 			{
 				printf("DISABLED\n");
-				disabled = true;   // disable and block until re-enabled
+				disabled = true;   // ignore all input from device until re-enabled
 			}
 
 			continue;
@@ -158,63 +157,17 @@ static int command_run(char * calibration_file, char * gestures_file)
 		// start with mouse mode.  Run the current mode.  If while in the mode you detetch a switch, exit the function
 		// and cycle, then run the new gesture.  gesture execute should return cycle when ?
 
-		if (gesture_compare(ACTION_CYCLE, gestures, num_gestures, &hand, &phase))
+		if (gesture_matches(ACTION_CYCLE, gestures, &hand))
 		{
 			control = (control + 1) % NUM_CONTROLS;   // cycle to next control
 			continue;
 		}
 
-		switch (control)
+		if (control_execute(control, gestures, &hand) == ERROR)
 		{
-			case CONTROL_ZOOM:
-				printf("Controlling ZOOM\n");
-				break;
-
-			case CONTROL_SCROLL:
-				printf("Controlling SCROLL\n");
-				break;
-
-			case CONTROL_VOLUME:
-				printf("Controlling VOLUME\n");
-				break;
-
-			case CONTROL_MOUSE:
-			default:
-				printf("Controlling MOUSE\n");
-				break;
+			log_print(LOG_ERROR, "%s(): Failed to control %s\n", PROGRAM, CONTROLS[control]);
+			goto EXIT;
 		}
-
-		//int deadzone = 5;
-		//int x = -hand.accel[Z];
-		//int y = -hand.accel[X];
-
-		//if (abs(x) < deadzone)
-		//{
-		//	x = 0;
-		//}
-		//else if (x > 0)
-		//{
-		//	x -= deadzone;
-		//}
-		//else if (x < 0)
-		//{
-		//	x += deadzone;
-		//}
-
-		//if (abs(y) < deadzone)
-		//{
-		//	y = 0;
-		//}
-		//else if (x > 0)
-		//{
-		//	y -= deadzone;
-		//}
-		//else if (x < 0)
-		//{
-		//	y += deadzone;
-		//}
-
-		//mouse_move(x, y);
 	}
 
 	rc = SUCCESS;
@@ -444,31 +397,24 @@ int command_execute(char * program, enum Command command, char ** arguments, int
 	{
 		case COMMAND_RUN:
 			return command_run(arguments[0], arguments[1]);
-			break;
 
 		case COMMAND_SAMPLE:
 			return command_sample();
-			break;
 
 		case COMMAND_CALIBRATE:
 			return command_calibrate(arguments[0]);
-			break;
 
 		case COMMAND_UPLOAD:
 			return command_upload(arguments[0]);
-			break;
 
 		case COMMAND_DOWNLOAD:
 			return command_download(arguments[0]);
-			break;
 
 		case COMMAND_MODE:
 			return command_mode(arguments[0]);
-			break;
 
 		case COMMAND_RECORD:
 			return command_record(arguments[0]);
-			break;
 
 		default:
 			log_print(LOG_ERROR, "%s: Invalid command\n", PROGRAM);

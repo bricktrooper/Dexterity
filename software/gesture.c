@@ -27,6 +27,7 @@ struct Gesture * gesture_create(int quantity)
 	{
 		gestures[i].action = ACTION_UNKNOWN;
 		gestures[i].phases = -1;
+		gestures[i].state = 0;
 		gestures[i].tolerance = DEFAULT_TOLERANCE;
 		memset(&gestures[i].ignores, 0, sizeof(struct Ignores));
 		gestures[i].criteria = NULL;
@@ -60,6 +61,7 @@ bool gesture_valid(struct Gesture * gesture)
 	if (gesture == NULL ||
 		gesture->action >= NUM_ACTIONS ||
 		gesture->phases <= 0 ||
+		gesture->state < 0 ||
 		gesture->tolerance < 0 ||
 		gesture->criteria == NULL)
 	{
@@ -408,9 +410,9 @@ int gesture_record(struct Gesture * gesture)
 	return SUCCESS;
 }
 
-float gesture_compare(struct Gesture * gesture, struct Hand * hand, int phase)
+float gesture_compare(struct Gesture * gesture, struct Hand * hand)
 {
-	if (gesture == NULL || hand == NULL || phase < 0)
+	if (gesture == NULL || hand == NULL)
 	{
 		log_print(LOG_ERROR, "%s(): Invalid arguments\n", __func__);
 		return ERROR;
@@ -423,7 +425,7 @@ float gesture_compare(struct Gesture * gesture, struct Hand * hand, int phase)
 	}
 
 	struct Ignores * ignores = (struct Ignores *)&gesture->ignores;
-	struct Sensors * criteria = (struct Sensors *)&gesture->criteria[phase];
+	struct Sensors * criteria = (struct Sensors *)&gesture->criteria[gesture->state];
 	int total = 0;
 	int sum = 0;
 
@@ -456,21 +458,21 @@ float gesture_compare(struct Gesture * gesture, struct Hand * hand, int phase)
 	return (float)sum / total;
 }
 
-bool gesture_matches(enum Action action, struct Gesture * gestures, struct Hand * hand, int * phase)
+bool gesture_matches(enum Action action, struct Gesture * gestures, struct Hand * hand)
 {
-	if (action >= NUM_ACTIONS || gestures == NULL || hand == NULL || phase == NULL)
+	if (action >= NUM_ACTIONS || gestures == NULL || hand == NULL)
 	{
 		log_print(LOG_ERROR, "%s(): Invalid arguments\n", __func__);
 		return false;
 	}
 
-	if (gesture_compare(&gestures[action], hand, *phase) < gestures[action].tolerance)
+	if (gesture_compare(&gestures[action], hand) <= gestures[action].tolerance)
 	{
-		(*phase)++;   // increment the phase
+		(gestures[action].state)++;   // increment the current phase
 
-		if (*phase == gestures[action].phases)   // check if the last phase has been reached
+		if (gestures[action].state == gestures[action].phases)   // check if the last phase has been reached
 		{
-			*phase = 0;                               // reset phase once a gesture is recongized
+			gestures[action].state = 0;   // reset state once a gesture is recongized
 			return true;
 		}
 	}

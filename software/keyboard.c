@@ -362,7 +362,11 @@ int keyboard_combo(enum Key * keys, int length)
             log_print(LOG_ERROR, "%s(): Failed to press key '%s'\n", __func__, KEY_NAMES[key]);
             return ERROR;
         }
+
+        usleep(50);
     }
+
+
 
     for (int i = 0; i < length; i++)
     {
@@ -371,6 +375,8 @@ int keyboard_combo(enum Key * keys, int length)
             log_print(LOG_ERROR, "%s(): Failed to release key '%s'\n", __func__, KEY_NAMES[keys[i]]);
             return ERROR;
         }
+
+        usleep(50);
     }
 
     return SUCCESS;

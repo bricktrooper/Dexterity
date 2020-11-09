@@ -102,7 +102,9 @@ static int command_run(char * calibration_file, char * gestures_file)
 
 	struct Hand hand;
 	enum Control control = CONTROL_MOUSE;
-	bool disabled = false;
+	bool disabled = true;
+
+	printf("DISABLED\n");
 
 	while (1)
 	{

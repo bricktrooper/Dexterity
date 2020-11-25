@@ -8,5 +8,6 @@ int raw(void);
 int scaled(void);
 int upload(struct Calibration * calibration);
 int download(struct Calibration * calibration);
+int deadzone(struct Hand * hand, int deadzone);
 
 #endif /* UTILS_H */

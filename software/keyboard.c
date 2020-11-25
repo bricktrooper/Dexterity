@@ -301,11 +301,21 @@ int keyboard_tap(enum Key key)
         return ERROR;
     }
 
-    if (keyboard_press(key) == ERROR || keyboard_release(key) == ERROR)
+    if (keyboard_press(key) == ERROR)
     {
-        log_print(LOG_ERROR, "%s(): Failed to tap key\n", __func__);
+        log_print(LOG_ERROR, "%s(): Failed to press key\n", __func__);
         return ERROR;
     }
+
+    usleep(50);
+
+    if (keyboard_release(key) == ERROR)
+    {
+        log_print(LOG_ERROR, "%s(): Failed to release key\n", __func__);
+        return ERROR;
+    }
+
+    usleep(50);
 
     log_print(LOG_INFO, "%s(): Tapped '%s'\n", __func__, KEY_NAMES[key]);
     return SUCCESS;

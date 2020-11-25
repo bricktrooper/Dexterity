@@ -125,3 +125,30 @@ int download(struct Calibration * calibration)
 
 	return SUCCESS;
 }
+
+int deadzone(struct Hand * hand, int radius)
+{
+	if (hand == NULL)
+	{
+		log_print(LOG_ERROR, "%s(): Invalid arguments\n", __func__);
+		return ERROR;
+	}
+
+	for (enum Direction direction = 0; direction < NUM_DIRECTIONS; direction++)
+	{
+		if (abs(hand->accel[direction]) <= radius)
+		{
+			hand->accel[direction] = 0;
+		}
+		else if (hand->accel[direction] > 0)
+		{
+			hand->accel[direction] -= radius;
+		}
+		else if (hand->accel[direction] < 0)
+		{
+			hand->accel[direction] += radius;
+		}
+	}
+
+	return SUCCESS;
+}

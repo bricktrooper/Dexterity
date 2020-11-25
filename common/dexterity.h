@@ -19,6 +19,8 @@
 #define ACCEL_DEFAULT_RANGE   100
 #define FLEX_DEFAULT_RANGE    20
 
+#define DEADZONE   3
+
 typedef uint8_t  U8;
 typedef uint16_t U16;
 typedef uint32_t U32;

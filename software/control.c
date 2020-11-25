@@ -33,12 +33,12 @@ static int control_mouse(struct Gesture * gestures, int quantity, struct Hand * 
 
 	if (gesture_matches(ACTION_LEFT_CLICK, gestures, quantity, hand))
 	{
-		printf("left click");
+		printf("left click ");
 		return action_left_click();
 	}
 	else if (gesture_matches(ACTION_RIGHT_CLICK, gestures, quantity, hand))
 	{
-		printf("right click");
+		printf("right click ");
 		//return action_right_click();
 		enum Key stroke [] = {KEY_COMMAND, KEY_F3};
 	return keyboard_combo(stroke, 2);
@@ -47,7 +47,7 @@ static int control_mouse(struct Gesture * gestures, int quantity, struct Hand * 
 	}
 	else if (gesture_matches(ACTION_DOUBLE_CLICK, gestures, quantity, hand))
 	{
-		printf("double click");
+		printf("double click ");
 		return action_double_click();
 	}
 	//else if (gesture_matches(ACTION_OVERVIEW, gestures, quantity, hand))
@@ -57,25 +57,25 @@ static int control_mouse(struct Gesture * gestures, int quantity, struct Hand * 
 	//}
 	else if (!pressed && gesture_matches(ACTION_PRESS, gestures, quantity, hand))
 	{
-		printf("press");
+		printf("press ");
 		mouse_press(MOUSE_BUTTON_LEFT);
 		pressed = true;
 	}
 	else if (pressed && gesture_matches(ACTION_RELEASE, gestures, quantity, hand))
 	{
-		printf("release");
+		printf("release ");
 		mouse_release(MOUSE_BUTTON_LEFT);
 		pressed = false;
 	}
 
 	if (pressed)
 	{
-		printf("drag");
+		printf("drag ");
 		return action_drag(hand);
 	}
 	else
 	{
-		printf("cursor");
+		printf("cursor ");
 		return action_move(hand);
 	}
 }
@@ -84,16 +84,16 @@ static int control_zoom(struct Gesture * gestures, int quantity, struct Hand * h
 {
 	if (hand->accel[Z] > 0 && gesture_matches(ACTION_ZOOM_IN, gestures, quantity, hand))
 	{
-		printf("in");
+		printf("in ");
 		return action_zoom_in();
 	}
 	else if (hand->accel[Z] < 0 && gesture_matches(ACTION_ZOOM_OUT, gestures, quantity, hand))
 	{
-		printf("out");
+		printf("out ");
 		return action_zoom_out();
 	}
 
-	printf("idle");
+	printf("idle ");
 	return SUCCESS;
 }
 
@@ -101,16 +101,16 @@ static int control_swipe(struct Gesture * gestures, int quantity, struct Hand * 
 {
 	if (hand->accel[Z] > 0 && gesture_matches(ACTION_SWIPE_LEFT, gestures, quantity, hand))
 	{
-		printf("left");
+		printf("left ");
 		return action_swipe_left();
 	}
 	else if (hand->accel[Z] < 0 && gesture_matches(ACTION_SWIPE_RIGHT, gestures, quantity, hand))
 	{
-		printf("right");
+		printf("right ");
 		return action_swipe_right();
 	}
 
-	printf("idle");
+	printf("idle ");
 	return SUCCESS;
 }
 
@@ -118,21 +118,21 @@ static int control_scroll(struct Gesture * gestures, int quantity, struct Hand *
 {
 	if (hand->accel[Z] < 0 && gesture_matches(ACTION_SCROLL_DOWN, gestures, quantity, hand))
 	{
-		printf("down");
+		printf("down ");
 		return action_scroll_down(hand);
 	}
 	else if (hand->accel[Z] > 0 && gesture_matches(ACTION_SCROLL_UP, gestures, quantity, hand))
 	{
-		printf("up");
+		printf("up ");
 		return action_scroll_up(hand);
 	}
 
-	printf("idle");
+	printf("idle ");
 	return SUCCESS;
 }
 static int control_volume(struct Gesture * gestures, int quantity, struct Hand * hand)
 {
-	printf("idle");
+	printf("idle ");
 	return SUCCESS;
 }
 

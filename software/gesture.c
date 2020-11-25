@@ -107,7 +107,7 @@ int gesture_import(char * file_name, struct Gesture ** gestures, int * quantity)
 
 	if (elements == NULL)
 	{
-		log_print(LOG_ERROR, "%s(): Parsed invalid gesture quantity '%d'\n", __func__, count);
+		log_print(LOG_ERROR, "%s(): Failed to allocate memory for %d gestures\n", __func__, count);
 		goto EXIT;
 	}
 
@@ -458,9 +458,9 @@ float gesture_compare(struct Gesture * gesture, struct Hand * hand)
 	return (float)sum / total;
 }
 
-bool gesture_matches(enum Action action, struct Gesture * gestures, struct Hand * hand)
+bool gesture_matches(enum Action action, struct Gesture * gestures, int quantity, struct Hand * hand)
 {
-	if (action >= NUM_ACTIONS || gestures == NULL || hand == NULL)
+	if (action >= NUM_ACTIONS || gestures == NULL || quantity < 0 || hand == NULL)
 	{
 		log_print(LOG_ERROR, "%s(): Invalid arguments\n", __func__);
 		return false;
@@ -472,12 +472,28 @@ bool gesture_matches(enum Action action, struct Gesture * gestures, struct Hand 
 
 		if (gestures[action].state == gestures[action].phases)   // check if the last phase has been reached
 		{
-			gestures[action].state = 0;   // reset state once a gesture is recongized
+			gesture_reset(gestures, quantity);   // reset all gestures states once a gesture is recongized
 			return true;
 		}
 	}
 
 	return false;
+}
+
+int gesture_reset(struct Gesture * gestures, int quantity)
+{
+	if (gestures == NULL || quantity < 0)
+	{
+		log_print(LOG_ERROR, "%s(): Invalid arguments\n", __func__);
+		return ERROR;
+	}
+
+	for (int i = 0; i < quantity; i++)
+	{
+		gestures[i].state = 0;   // reset phase state for all gestures
+	}
+
+	return SUCCESS;
 }
 
 int gesture_print(struct Gesture * gesture)

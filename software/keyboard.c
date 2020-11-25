@@ -366,8 +366,6 @@ int keyboard_combo(enum Key * keys, int length)
         usleep(50);
     }
 
-
-
     for (int i = 0; i < length; i++)
     {
         if (keyboard_release(keys[i]) == ERROR)

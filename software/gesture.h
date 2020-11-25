@@ -35,7 +35,8 @@ int gesture_import(char * file_name, struct Gesture ** gestures, int * quantity)
 int gesture_export(char * file_name, struct Gesture * gestures, int quantity);
 int gesture_record(struct Gesture * gesture);
 float gesture_compare(struct Gesture * gesture, struct Hand * hand);
-bool gesture_matches(enum Action action, struct Gesture * gestures, struct Hand * hand);
+bool gesture_matches(enum Action action, struct Gesture * gestures, int quantity, struct Hand * hand);
+int gesture_reset(struct Gesture * gestures, int quantity);
 int gesture_print(struct Gesture * gesture);
 
 #endif /* GESTURE_H */

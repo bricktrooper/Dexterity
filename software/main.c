@@ -92,6 +92,8 @@ int init(void)
 	log_suppress(LOG_DEBUG, false);
 	log_suppress(LOG_INFO, true);
 
+	log_trace(false);
+
 	if (serial_open() == ERROR)
 	{
 		log_print(LOG_ERROR, "Initialization failed\n");

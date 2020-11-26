@@ -8,14 +8,14 @@
 #include "log.h"
 
 static char * prefixes [] = {
-	RED     "X "  WHITE,
-	YELLOW  "! "  WHITE,
-	GREEN   "~ "  WHITE,
-	BLUE    "# "  WHITE,
-	PURPLE  "> "  WHITE
+	RED     "X"  WHITE,
+	YELLOW  "!"  WHITE,
+	GREEN   "~"  WHITE,
+	BLUE    "#"  WHITE,
+	PURPLE  ">"  WHITE
 };
 
-static int supressed [] = {
+static bool suppressed [] = {
 	false,
 	false,
 	false,
@@ -23,29 +23,43 @@ static int supressed [] = {
 	false
 };
 
+static bool trace = false;
+
 void log_suppress(enum LogType type, bool suppress)
 {
-	supressed[type] = suppress;
+	suppressed[type] = suppress;
 }
 
-int log_print(enum LogType type, const char * format, ...)
+void log_trace(bool enabled)
 {
-	if (format == NULL)
-	{
-		return ERROR;
-	}
+	trace = enabled;
+}
 
-	if (supressed[type])
+int log_print(const char * function, const char * file, int line, enum LogType type, const char * format, ...)
+{
+	if (suppressed[type])
 	{
 		return SUCCESS;
 	}
 
-	va_list args;
-    va_start(args, format);
+	if (format == NULL || function == NULL || file == NULL)
+	{
+		return ERROR;
+	}
 
 	printf("%s", prefixes[type]);
-	vprintf(format, args);
 
+	if (trace)
+	{
+		printf(" %s():%s:%d:", function, file, line);
+	}
+
+	printf(" ");
+
+	va_list args;
+    va_start(args, format);
+	vprintf(format, args);
     va_end(args);
+
 	return SUCCESS;
 }

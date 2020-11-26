@@ -40,6 +40,7 @@ char * COMMANDS [NUM_COMMANDS] = {
 
 static int command_run(char * calibration_file, char * gestures_file)
 {
+	return 0;
 	if (calibration_file == NULL)
 	{
 		log_print(LOG_ERROR, "%s: No calibration file provided\n", PROGRAM);

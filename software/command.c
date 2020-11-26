@@ -392,30 +392,44 @@ int command_execute(enum Command command, char ** arguments, int count)
 		return ERROR;
 	}
 
-	usleep(1000);   // give the serial port some time to initialize
+	// Assume no arguments are provided
+	char * arg0 = NULL;
+	char * arg1 = NULL;
 
+	if (count > 0)
+	{
+		arg0 = arguments[0];
+	}
+
+	if (count > 1)
+	{
+		arg1 = arguments[1];
+	}
+
+	usleep(1000);   // give the serial port some time to initialize
+printf("Hello %d\n", count);
 	switch (command)
 	{
 		case COMMAND_RUN:
-			return command_run(arguments[0], arguments[1]);
+			return command_run(arg0, arg1);
 
 		case COMMAND_SAMPLE:
 			return command_sample();
 
 		case COMMAND_CALIBRATE:
-			return command_calibrate(arguments[0]);
+			return command_calibrate(arg0);
 
 		case COMMAND_UPLOAD:
-			return command_upload(arguments[0]);
+			return command_upload(arg0);
 
 		case COMMAND_DOWNLOAD:
-			return command_download(arguments[0]);
+			return command_download(arg0);
 
 		case COMMAND_MODE:
-			return command_mode(arguments[0]);
+			return command_mode(arg0);
 
 		case COMMAND_RECORD:
-			return command_record(arguments[0]);
+			return command_record(arg0);
 
 		default:
 			log(LOG_ERROR, "Invalid command\n");

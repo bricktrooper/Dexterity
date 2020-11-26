@@ -140,7 +140,7 @@ int control_execute(enum Control control, struct Gesture * gestures, int quantit
 {
 	if (control >= NUM_CONTROLS || gestures == NULL || quantity < 0 || hand == NULL)
 	{
-		log_print(LOG_ERROR, "%s(): Invalid arguments\n", __func__);
+		log(LOG_ERROR, "Invalid arguments\n");
 		return ERROR;
 	}
 

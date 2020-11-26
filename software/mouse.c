@@ -17,7 +17,7 @@ static CGEventRef mouse_create_event(CGEventType type)
 
 	if (!mouse_valid(mouse))
 	{
-		log_print(LOG_WARNING, "%s(): Invalid mouse cursor location (%d,%d)\n", __func__, mouse.x, mouse.y);
+		log(LOG_WARNING, "Invalid mouse cursor location (%d,%d)\n", mouse.x, mouse.y);
 		mouse_correct(&mouse);
 	}
 
@@ -31,7 +31,7 @@ static CGEventRef mouse_create_event(CGEventType type)
 
 	if (event == NULL)
 	{
-		log_print(LOG_ERROR, "%s(): Failed to create mouse event\n", __func__);
+		log(LOG_ERROR, "Failed to create mouse event\n");
 		return NULL;
 	}
 
@@ -57,7 +57,7 @@ int mouse_correct(struct Mouse * mouse)
 {
 	if (mouse == NULL)
 	{
-		log_print(LOG_ERROR, "%s(): Mouse is NULL\n", __func__);
+		log(LOG_ERROR, "Mouse is NULL\n");
 		return ERROR;
 	}
 
@@ -79,7 +79,7 @@ int mouse_correct(struct Mouse * mouse)
 		mouse->y = Y_MAX;
 	}
 
-	log_print(LOG_INFO, "%s(): Corrected cursor position to edge (%d,%d)\n", __func__, mouse->x, mouse->y);
+	log(LOG_INFO, "Corrected cursor position to edge (%d,%d)\n", mouse->x, mouse->y);
 	return SUCCESS;
 }
 
@@ -95,7 +95,7 @@ struct Mouse mouse_get(void)
 
 	if (event == NULL)
 	{
-		log_print(LOG_ERROR, "%s(): Failed to create event to get cursor position\n", __func__);
+		log(LOG_ERROR, "Failed to create event to get cursor position\n");
 		return mouse;
 	}
 
@@ -114,7 +114,7 @@ int mouse_set(struct Mouse mouse)
 
 	if (!mouse_valid(mouse))
 	{
-		log_print(LOG_WARNING, "%s(): Invalid mouse cursor location (%d,%d)\n", __func__, mouse.x, mouse.y);
+		log(LOG_WARNING, "Invalid mouse cursor location (%d,%d)\n", mouse.x, mouse.y);
 		mouse_correct(&mouse);
 		rc = WARNING;
 	}
@@ -123,7 +123,7 @@ int mouse_set(struct Mouse mouse)
 
 	if (event == NULL)
 	{
-		log_print(LOG_ERROR, "%s(): Failed to create event to move cursor\n", __func__);
+		log(LOG_ERROR, "Failed to create event to move cursor\n");
 		return ERROR;
 	}
 
@@ -141,7 +141,7 @@ int mouse_move(int x_offset, int y_offset)
 
 	if (!mouse_valid(mouse))
 	{
-		log_print(LOG_WARNING, "%s(): Invalid mouse cursor location (%d,%d)\n", __func__, mouse.x, mouse.y);
+		log(LOG_WARNING, "Invalid mouse cursor location (%d,%d)\n", mouse.x, mouse.y);
 		mouse_correct(&mouse);
 		rc = WARNING;
 	}
@@ -151,7 +151,7 @@ int mouse_move(int x_offset, int y_offset)
 
 	if (mouse_set(mouse) == ERROR)
 	{
-		log_print(LOG_ERROR, "%s(): Failed to move mouse cursor to (%d,%d)\n", __func__, mouse.x, mouse.y);
+		log(LOG_ERROR, "Failed to move mouse cursor to (%d,%d)\n", mouse.x, mouse.y);
 		return ERROR;
 	}
 
@@ -162,7 +162,7 @@ int mouse_press(enum MouseButton button)
 {
 	if (button != MOUSE_BUTTON_LEFT && button != MOUSE_BUTTON_RIGHT)
 	{
-		log_print(LOG_ERROR, "%s(): Invalid mouse button\n", __func__);
+		log(LOG_ERROR, "Invalid mouse button\n");
 		return ERROR;
 	}
 
@@ -170,7 +170,7 @@ int mouse_press(enum MouseButton button)
 
 	if (event == NULL)
 	{
-		log_print(LOG_ERROR, "%s(): Failed to create event to press mouse button\n", __func__);
+		log(LOG_ERROR, "Failed to create event to press mouse button\n");
 		return ERROR;
 	}
 
@@ -184,7 +184,7 @@ int mouse_release(enum MouseButton button)
 {
 	if (button != MOUSE_BUTTON_LEFT && button != MOUSE_BUTTON_RIGHT)
 	{
-		log_print(LOG_ERROR, "%s(): Invalid mouse button\n", __func__);
+		log(LOG_ERROR, "Invalid mouse button\n");
 		return ERROR;
 	}
 
@@ -192,7 +192,7 @@ int mouse_release(enum MouseButton button)
 
 	if (event == NULL)
 	{
-		log_print(LOG_ERROR, "%s(): Failed to create event to release mouse button\n", __func__);
+		log(LOG_ERROR, "Failed to create event to release mouse button\n");
 		return ERROR;
 	}
 
@@ -206,7 +206,7 @@ int mouse_single_click(enum MouseButton button)
 {
 	if (button != MOUSE_BUTTON_LEFT && button != MOUSE_BUTTON_RIGHT)
 	{
-		log_print(LOG_ERROR, "%s(): Invalid mouse button\n", __func__);
+		log(LOG_ERROR, "Invalid mouse button\n");
 		return ERROR;
 	}
 
@@ -217,7 +217,7 @@ int mouse_single_click(enum MouseButton button)
 
 	if (event == NULL)
 	{
-		log_print(LOG_ERROR, "%s(): Failed to create event to single click mouse button\n", __func__);
+		log(LOG_ERROR, "Failed to create event to single click mouse button\n");
 		return ERROR;
 	}
 
@@ -234,7 +234,7 @@ int mouse_double_click(enum MouseButton button)
 {
 	if (button != MOUSE_BUTTON_LEFT && button != MOUSE_BUTTON_RIGHT)
 	{
-		log_print(LOG_ERROR, "%s(): Invalid mouse button\n", __func__);
+		log(LOG_ERROR, "Invalid mouse button\n");
 		return ERROR;
 	}
 
@@ -245,7 +245,7 @@ int mouse_double_click(enum MouseButton button)
 
 	if (event == NULL)
 	{
-		log_print(LOG_ERROR, "%s(): Failed to create event to double click mouse button\n", __func__);
+		log(LOG_ERROR, "Failed to create event to double click mouse button\n");
 		return ERROR;
 	}
 
@@ -273,7 +273,7 @@ int mouse_drag(enum MouseButton button, int x_offset, int y_offset)
 
 	if (!mouse_valid(mouse))
 	{
-		log_print(LOG_WARNING, "%s(): Invalid mouse cursor location (%d,%d)\n", __func__, mouse.x, mouse.y);
+		log(LOG_WARNING, "Invalid mouse cursor location (%d,%d)\n", mouse.x, mouse.y);
 		mouse_correct(&mouse);
 		rc = WARNING;
 	}
@@ -283,7 +283,7 @@ int mouse_drag(enum MouseButton button, int x_offset, int y_offset)
 
 	if (!mouse_valid(mouse))
 	{
-		log_print(LOG_WARNING, "%s(): Invalid mouse cursor location (%d,%d)\n", __func__, mouse.x, mouse.y);
+		log(LOG_WARNING, "Invalid mouse cursor location (%d,%d)\n", mouse.x, mouse.y);
 		mouse_correct(&mouse);
 		rc = WARNING;
 	}
@@ -292,7 +292,7 @@ int mouse_drag(enum MouseButton button, int x_offset, int y_offset)
 
 	if (event == NULL)
 	{
-		log_print(LOG_ERROR, "%s(): Failed to create event to drag cursor\n", __func__);
+		log(LOG_ERROR, "Failed to create event to drag cursor\n");
 		return ERROR;
 	}
 
@@ -307,13 +307,13 @@ int mouse_scroll(enum ScrollDirection direction, S32 speed)
 {
 	if (direction != MOUSE_SCROLL_UP && direction != MOUSE_SCROLL_DOWN)
 	{
-		log_print(LOG_ERROR, "%s(): Invalid scroll direction\n", __func__);
+		log(LOG_ERROR, "Invalid scroll direction\n");
 		return ERROR;
 	}
 
 	if (speed < 0)
 	{
-		log_print(LOG_ERROR, "%s(): Scroll speed '%d' cannot be negative\n", __func__, speed);
+		log(LOG_ERROR, "Scroll speed '%d' cannot be negative\n", speed);
 		return ERROR;
 	}
 
@@ -326,7 +326,7 @@ int mouse_scroll(enum ScrollDirection direction, S32 speed)
 
 	if (event == NULL)
 	{
-		log_print(LOG_ERROR, "%s(): Failed to create mouse scroll event\n", __func__);
+		log(LOG_ERROR, "Failed to create mouse scroll event\n");
 		return ERROR;
 	}
 

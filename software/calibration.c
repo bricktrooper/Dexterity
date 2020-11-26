@@ -19,7 +19,7 @@ int calibration_import(char * file_name, struct Calibration * calibration)
 {
 	if (file_name == NULL || calibration == NULL)
 	{
-		log_print(LOG_ERROR, "%s(): Invalid arguments\n", __func__);
+		log(LOG_ERROR, "Invalid arguments\n");
 		return ERROR;
 	}
 
@@ -27,7 +27,7 @@ int calibration_import(char * file_name, struct Calibration * calibration)
 
 	if (file == NULL)
 	{
-		log_print(LOG_ERROR, "%s(): Failed to open file '%s': %s (%d)\n", __func__, file_name, strerror(errno), errno);
+		log(LOG_ERROR, "Failed to open file '%s': %s (%d)\n", file_name, strerror(errno), errno);
 		return ERROR;
 	}
 
@@ -35,19 +35,19 @@ int calibration_import(char * file_name, struct Calibration * calibration)
 
 	if (fscanf(file, "accel-range=%hd\n", &calibration->accel.range) != 1)
 	{
-		log_print(LOG_ERROR, "%s(): Accel range was incorrectly parsed\n", __func__);
+		log(LOG_ERROR, "Accel range was incorrectly parsed\n");
 		goto EXIT;
 	}
 
 	if (fscanf(file, "flex-range=%hd\n", &calibration->flex.range) != 1)
 	{
-		log_print(LOG_ERROR, "%s(): Flex range was incorrectly parsed\n", __func__);
+		log(LOG_ERROR, "Flex range was incorrectly parsed\n");
 		goto EXIT;
 	}
 
 	if (calibration->accel.range < 0 || calibration->flex.range < 0)
 	{
-		log_print(LOG_ERROR, "%s(): Analogue range cannot be negative\n", __func__);
+		log(LOG_ERROR, "Analogue range cannot be negative\n");
 		goto EXIT;
 	}
 
@@ -57,14 +57,14 @@ int calibration_import(char * file_name, struct Calibration * calibration)
 	{
 		if (fscanf(file, "%s", sensor_label) != 1)
 		{
-			log_print(LOG_ERROR, "%s(): sensor label was incorrectly parsed\n", __func__);
+			log(LOG_ERROR, "sensor label was incorrectly parsed\n");
 			goto EXIT;
 		}
 
 		if (strncmp(sensor_label, DIRECTIONS[direction], MAX_SENSOR_NAME_LENGTH) != 0)
 		{
-			log_print(LOG_ERROR, "%s(): Incorrect sensor label: Expected '%s' but parsed '%s'\n",
-			                     __func__, DIRECTIONS[direction], sensor_label);
+			log(LOG_ERROR, "Incorrect sensor label: Expected '%s' but parsed '%s'\n",
+			                     DIRECTIONS[direction], sensor_label);
 			goto EXIT;
 		}
 
@@ -75,7 +75,7 @@ int calibration_import(char * file_name, struct Calibration * calibration)
 
 		if (tokens != NUM_PARAMETERS)
 		{
-			log_print(LOG_ERROR, "%s(): Sensor parameters were incorrectly parsed\n", __func__);
+			log(LOG_ERROR, "Sensor parameters were incorrectly parsed\n");
 			goto EXIT;
 		}
 	}
@@ -84,14 +84,14 @@ int calibration_import(char * file_name, struct Calibration * calibration)
 	{
 		if (fscanf(file, "%s", sensor_label) != 1)
 		{
-			log_print(LOG_ERROR, "%s(): sensor label was incorrectly parsed\n", __func__);
+			log(LOG_ERROR, "sensor label was incorrectly parsed\n");
 			goto EXIT;
 		}
 
 		if (strncmp(sensor_label, FINGERS[finger], MAX_SENSOR_NAME_LENGTH) != 0)
 		{
-			log_print(LOG_ERROR, "%s(): Incorrect sensor label: Expected '%s' but parsed '%s'\n",
-			                     __func__, FINGERS[finger], sensor_label);
+			log(LOG_ERROR, "Incorrect sensor label: Expected '%s' but parsed '%s'\n",
+			                     FINGERS[finger], sensor_label);
 			goto EXIT;
 		}
 
@@ -102,12 +102,12 @@ int calibration_import(char * file_name, struct Calibration * calibration)
 
 		if (tokens != NUM_PARAMETERS)
 		{
-			log_print(LOG_ERROR, "%s(): Sensor parameters were incorrectly parsed\n", __func__);
+			log(LOG_ERROR, "Sensor parameters were incorrectly parsed\n");
 			goto EXIT;
 		}
 	}
 
-	log_print(LOG_SUCCESS, "%s(): Imported calibration from file '%s'\n", __func__, file_name);
+	log(LOG_SUCCESS, "Imported calibration from file '%s'\n", file_name);
 	rc = SUCCESS;
 
 EXIT:
@@ -119,7 +119,7 @@ int calibration_export(char * file_name, struct Calibration * calibration)
 {
 	if (file_name == NULL || calibration == NULL)
 	{
-		log_print(LOG_ERROR, "%s(): Invalid arguments\n", __func__);
+		log(LOG_ERROR, "Invalid arguments\n");
 		return ERROR;
 	}
 
@@ -127,7 +127,7 @@ int calibration_export(char * file_name, struct Calibration * calibration)
 
 	if (file == NULL)
 	{
-		log_print(LOG_ERROR, "%s(): Failed to open file '%s': %s (%d)\n", __func__, file_name, strerror(errno), errno);
+		log(LOG_ERROR, "Failed to open file '%s': %s (%d)\n", file_name, strerror(errno), errno);
 		return ERROR;
 	}
 
@@ -152,7 +152,7 @@ int calibration_export(char * file_name, struct Calibration * calibration)
 		        calibration->flex.params[finger][CENTRE]);
 	}
 
-	log_print(LOG_SUCCESS, "%s(): Export calibration to file '%s'\n", __func__, file_name);
+	log(LOG_SUCCESS, "Export calibration to file '%s'\n", file_name);
 	fclose(file);
 	return SUCCESS;
 }
@@ -161,17 +161,17 @@ int calibration_download(struct Calibration * calibration)
 {
 	if (calibration == NULL)
 	{
-		log_print(LOG_ERROR, "%s(): Invalid arguments\n", __func__);
+		log(LOG_ERROR, "Invalid arguments\n");
 		return ERROR;
 	}
 
 	if (download(calibration) == ERROR)
 	{
-		log_print(LOG_ERROR, "%s(): Failed to download calibration settings from device\n", __func__);
+		log(LOG_ERROR, "Failed to download calibration settings from device\n");
 		return ERROR;
 	}
 
-	log_print(LOG_SUCCESS, "%s(): Calibration downloaded from device\n", __func__);
+	log(LOG_SUCCESS, "Calibration downloaded from device\n");
 	return SUCCESS;
 }
 
@@ -179,17 +179,17 @@ int calibration_upload(struct Calibration * calibration)
 {
 	if (calibration == NULL)
 	{
-		log_print(LOG_ERROR, "%s(): Invalid arguments\n", __func__);
+		log(LOG_ERROR, "Invalid arguments\n");
 		return ERROR;
 	}
 
 	if (upload(calibration) == ERROR)
 	{
-		log_print(LOG_ERROR, "%s(): Failed to upload calibration settings to device\n", __func__);
+		log(LOG_ERROR, "Failed to upload calibration settings to device\n");
 		return ERROR;
 	}
 
-	log_print(LOG_SUCCESS, "%s(): Calibration uploaded to device\n", __func__);
+	log(LOG_SUCCESS, "Calibration uploaded to device\n");
 	return SUCCESS;
 }
 
@@ -197,13 +197,13 @@ int calibration_interactive(struct Calibration * calibration)
 {
 	if (calibration == NULL)
 	{
-		log_print(LOG_ERROR, "%s(): Invalid arguments\n", __func__);
+		log(LOG_ERROR, "Invalid arguments\n");
 		return ERROR;
 	}
 
 	if (raw() == ERROR)
 	{
-		log_print(LOG_ERROR, "%s(): Failed to set device to raw sampling mode\n", __func__);
+		log(LOG_ERROR, "Failed to set device to raw sampling mode\n");
 		return ERROR;
 	}
 
@@ -229,8 +229,8 @@ int calibration_interactive(struct Calibration * calibration)
 			{
 				if (sample(&hand) == ERROR)
 				{
-					log_print(LOG_ERROR, "%s(): Sample failed while calibrating '%s %s'\n",
-					                     __func__, DIRECTIONS[direction], PARAMETERS[parameter]);
+					log(LOG_ERROR, "Sample failed while calibrating '%s %s'\n",
+					                     DIRECTIONS[direction], PARAMETERS[parameter]);
 					return ERROR;
 				}
 
@@ -257,8 +257,8 @@ int calibration_interactive(struct Calibration * calibration)
 			{
 				if (sample(&hand) == ERROR)
 				{
-					log_print(LOG_ERROR, "%s(): Sample failed while waiting for button release after calibrating '%s %s'\n",
-					                     __func__, DIRECTIONS[direction], PARAMETERS[parameter]);
+					log(LOG_ERROR, "Sample failed while waiting for button release after calibrating '%s %s'\n",
+					                     DIRECTIONS[direction], PARAMETERS[parameter]);
 					return ERROR;
 				}
 			}
@@ -272,8 +272,8 @@ int calibration_interactive(struct Calibration * calibration)
 			{
 				if (sample(&hand) == ERROR)
 				{
-					log_print(LOG_ERROR, "%s(): Sample failed while calibrating '%s %s'\n",
-					                     __func__, FINGERS[finger], PARAMETERS[parameter]);
+					log(LOG_ERROR, "Sample failed while calibrating '%s %s'\n",
+					                     FINGERS[finger], PARAMETERS[parameter]);
 					return ERROR;
 				}
 
@@ -297,7 +297,7 @@ int calibration_interactive(struct Calibration * calibration)
 
 			if (calibration->flex.params[finger][MIN] == calibration->flex.params[finger][MAX])
 			{
-				log_print(LOG_WARNING, "%s(): MIN and MAX are the same for '%s'\n", __func__, FINGERS[finger]);
+				log(LOG_WARNING, "MIN and MAX are the same for '%s'\n", FINGERS[finger]);
 			}
 
 			// wait for user to release button
@@ -305,8 +305,8 @@ int calibration_interactive(struct Calibration * calibration)
 			{
 				if (sample(&hand) == ERROR)
 				{
-					log_print(LOG_ERROR, "%s(): Sample failed while waiting for button release after calibrating '%s %s'\n",
-					                     __func__, FINGERS[finger], PARAMETERS[parameter]);
+					log(LOG_ERROR, "Sample failed while waiting for button release after calibrating '%s %s'\n",
+					                     FINGERS[finger], PARAMETERS[parameter]);
 					return ERROR;
 				}
 			}
@@ -316,7 +316,7 @@ int calibration_interactive(struct Calibration * calibration)
 		printf("=======================\n");
 	}
 
-	log_print(LOG_SUCCESS, "%s(): Interactive calibration complete\n", __func__);
+	log(LOG_SUCCESS, "Interactive calibration complete\n");
 	return SUCCESS;
 }
 
@@ -324,7 +324,7 @@ int calibration_print(struct Calibration * calibration)
 {
 	if (calibration == NULL)
 	{
-		log_print(LOG_ERROR, "%s(): Invalid arguments\n", __func__);
+		log(LOG_ERROR, "Invalid arguments\n");
 		return ERROR;
 	}
 

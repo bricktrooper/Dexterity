@@ -26,23 +26,21 @@ void print_usage(void);
 
 int main(int argc, char ** argv)
 {
-	char * program = basename(argv[ARGV_PROGRAM]);
-
 	if (argc < ARGV_MIN)
 	{
-		log_print(LOG_ERROR, "%s: Insufficient arguments\n", program);
+		log(LOG_ERROR, "Insufficient arguments\n");
 		return ERROR;
 	}
 
 	if (argc > ARGV_MAX)
 	{
-		log_print(LOG_ERROR, "%s: Too many arguments\n", program);
+		log(LOG_ERROR, "Too many arguments\n");
 		return ERROR;
 	}
 
 	if (argv == NULL)
 	{
-		log_print(LOG_ERROR, "%s: Invalid argument vector\n", program);
+		log(LOG_ERROR, "Invalid argument vector\n");
 		return ERROR;
 	}
 
@@ -65,7 +63,7 @@ int main(int argc, char ** argv)
 
 	if (command == COMMAND_UNKNOWN)
 	{
-		log_print(LOG_ERROR, "%s: Unknown subcommand '%s'\n", program, subcommand);
+		log(LOG_ERROR, "Unknown subcommand '%s'\n", subcommand);
 		return ERROR;
 	}
 
@@ -76,7 +74,7 @@ int main(int argc, char ** argv)
 		return result;
 	}
 
-	result = command_execute(program, command, arguments, count);
+	result = command_execute(command, arguments, count);
 	end(result);
 
 	return SUCCESS;
@@ -96,11 +94,11 @@ int init(void)
 
 	if (serial_open() == ERROR)
 	{
-		log_print(LOG_ERROR, "Initialization failed\n");
+		log(LOG_ERROR, "Initialization failed\n");
 		end(ERROR);
 	}
 
-	log_print(LOG_SUCCESS, "Initialized Dexterity\n");
+	log(LOG_SUCCESS, "Initialized Dexterity\n");
 	return SUCCESS;
 }
 
@@ -113,6 +111,6 @@ void end(int code)
 
 	serial_purge();
 	serial_close();
-	log_print(LOG_SUCCESS, "Terminated Dexterity\n");
+	log(LOG_SUCCESS, "Terminated Dexterity\n");
 	exit(code);
 }

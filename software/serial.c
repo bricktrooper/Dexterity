@@ -27,7 +27,7 @@ int serial_open(void)
 
 	if (serial_is_open())
 	{
-		log_print(LOG_WARNING, "%s(): The serial port is already open\n", __func__);
+		log(LOG_WARNING, "The serial port is already open\n");
 		return WARNING;
 	}
 
@@ -38,17 +38,17 @@ int serial_open(void)
 
 	if (serial_port < 0)
 	{
-		log_print(LOG_ERROR, "%s(): Failed to open serial port '%s': %s (%d)\n", __func__, SERIAL_PORT, strerror(errno), errno);
+		log(LOG_ERROR, "Failed to open serial port '%s': %s (%d)\n", SERIAL_PORT, strerror(errno), errno);
 		return ERROR;
 	}
 
-	log_print(LOG_SUCCESS, "%s(): Opened serial port '%s'\n", __func__, SERIAL_PORT);
+	log(LOG_SUCCESS, "Opened serial port '%s'\n", SERIAL_PORT);
 
 	// GET SERIAL PORT ATTRIBUTES //
 
 	if (tcgetattr(serial_port, &settings) != 0)
 	{
-		log_print(LOG_ERROR, "%s(): Failed to get serial port attributes: %s (%d)\n", __func__, strerror(errno), errno);
+		log(LOG_ERROR, "Failed to get serial port attributes: %s (%d)\n", strerror(errno), errno);
 		goto EXIT;
 	}
 
@@ -103,13 +103,13 @@ int serial_open(void)
 
 	if (cfsetispeed(&settings, BAUD_RATE) < 0)   // Set input baud rate to 115200
 	{
-		log_print(LOG_ERROR, "%s(): Failed to set input baud rate to %d: %s (%d)\n", __func__, BAUD_RATE, strerror(errno), errno);
+		log(LOG_ERROR, "Failed to set input baud rate to %d: %s (%d)\n", BAUD_RATE, strerror(errno), errno);
 		goto EXIT;
 	}
 
 	if (cfsetospeed(&settings, BAUD_RATE) < 0)   // Set output baud rate to 115200
 	{
-		log_print(LOG_ERROR, "%s(): Failed to set output baud rate to %d: %s (%d)\n", __func__, BAUD_RATE, strerror(errno), errno);
+		log(LOG_ERROR, "Failed to set output baud rate to %d: %s (%d)\n", BAUD_RATE, strerror(errno), errno);
 		goto EXIT;
 	}
 
@@ -117,7 +117,7 @@ int serial_open(void)
 
 	if (tcsetattr(serial_port, TCSANOW, &settings) != 0)
 	{
-		log_print(LOG_ERROR, "%s(): Failed to set serial port attributes: %s (%d)\n", __func__, strerror(errno), errno);
+		log(LOG_ERROR, "Failed to set serial port attributes: %s (%d)\n", strerror(errno), errno);
 	}
 
 	rc = SUCCESS;
@@ -135,13 +135,13 @@ int serial_close(void)
 {
 	if (!serial_is_open())
 	{
-		log_print(LOG_WARNING, "%s(): The serial port is not open\n", __func__);
+		log(LOG_WARNING, "The serial port is not open\n");
 		return WARNING;
 	}
 
 	close(serial_port);
 	serial_port = -1;
-	log_print(LOG_SUCCESS, "%s(): Closed serial port '%s'\n", __func__, SERIAL_PORT);
+	log(LOG_SUCCESS, "Closed serial port '%s'\n", SERIAL_PORT);
 
 	return SUCCESS;
 }
@@ -155,17 +155,17 @@ int serial_purge(void)
 {
 	if (!serial_is_open())
 	{
-		log_print(LOG_ERROR, "%s(): The serial port is not open\n", __func__);
+		log(LOG_ERROR, "The serial port is not open\n");
 		return ERROR;
 	}
 
 	if (tcflush(serial_port, TCIFLUSH) == ERROR)
 	{
-		log_print(LOG_ERROR, "%s(): Failed to purge serial port RX buffer: %s (%d)\n", __func__, strerror(errno), errno);
+		log(LOG_ERROR, "Failed to purge serial port RX buffer: %s (%d)\n", strerror(errno), errno);
 		return ERROR;
 	}
 
-	log_print(LOG_INFO, "%s(): Purged serial port RX buffer\n", __func__);
+	log(LOG_INFO, "Purged serial port RX buffer\n");
 	return SUCCESS;
 }
 
@@ -173,13 +173,13 @@ int serial_read(void * buffer, int size)
 {
 	if (buffer == NULL || size < 0)
 	{
-		log_print(LOG_ERROR, "%s(): Invalid arguments\n", __func__);
+		log(LOG_ERROR, "Invalid arguments\n");
 		return ERROR;
 	}
 
 	if (!serial_is_open())
 	{
-		log_print(LOG_ERROR, "%s(): The serial port is not open\n", __func__);
+		log(LOG_ERROR, "The serial port is not open\n");
 		return ERROR;
 	}
 
@@ -208,16 +208,16 @@ int serial_read(void * buffer, int size)
 	{
 		if (errno == ETIMEDOUT)
 		{
-			log_print(LOG_WARNING, "%s(): %s (%d)\n", __func__, strerror(errno), errno);
+			log(LOG_WARNING, "%s (%d)\n", strerror(errno), errno);
 		}
 		else
 		{
-			log_print(LOG_ERROR, "%s(): Failed to read from serial port: %s (%d)\n", __func__, strerror(errno), errno);
+			log(LOG_ERROR, "Failed to read from serial port: %s (%d)\n", strerror(errno), errno);
 			return ERROR;
 		}
 	}
 
-	log_print(LOG_INFO, "%s(): Read %dB from the serial port\n", __func__, received);
+	log(LOG_INFO, "Read %dB from the serial port\n", received);
 	return received;
 }
 
@@ -225,19 +225,19 @@ int serial_write(void * buffer, int size)
 {
 	if (buffer == NULL || size < 0)
 	{
-		log_print(LOG_ERROR, "%s(): Invalid arguments\n", __func__);
+		log(LOG_ERROR, "Invalid arguments\n");
 		return ERROR;
 	}
 
 	if (!serial_is_open())
 	{
-		log_print(LOG_ERROR, "%s(): The serial port is not open\n", __func__);
+		log(LOG_ERROR, "The serial port is not open\n");
 		return ERROR;
 	}
 
 	if (serial_purge() == ERROR)
 	{
-		log_print(LOG_ERROR, "%s(): Failed to purge the serial port before writing new data\n", __func__);
+		log(LOG_ERROR, "Failed to purge the serial port before writing new data\n");
 		return ERROR;
 	}
 
@@ -267,11 +267,11 @@ int serial_write(void * buffer, int size)
 
 	if (transmitted != size)
 	{
-		log_print(LOG_ERROR, "%s(): Failed to write to serial port: %s (%d)\n", __func__, strerror(errno), errno);
+		log(LOG_ERROR, "Failed to write to serial port: %s (%d)\n", strerror(errno), errno);
 		return ERROR;
 	}
 
-	log_print(LOG_INFO, "%s(): Wrote %dB to the serial port\n", __func__, transmitted);
+	log(LOG_INFO, "Wrote %dB to the serial port\n", transmitted);
 	return transmitted;
 }
 
@@ -287,7 +287,7 @@ enum Message serial_read_message(void)
 	{
 		if (serial_read(&next, 1) != 1)  // read 1B at a time
 		{
-			log_print(LOG_ERROR, "%s(): Failed to read message character #%d\n", __func__, i + 1);
+			log(LOG_ERROR, "Failed to read message character #%d\n", i + 1);
 			return MESSAGE_UNKNOWN;
 		}
 
@@ -321,7 +321,7 @@ int serial_write_message(enum Message message)
 
 	if (serial_write(buffer, length) != length)
 	{
-		log_print(LOG_ERROR, "%s(): Failed to write message to serial port\n", __func__);
+		log(LOG_ERROR, "Failed to write message to serial port\n");
 		return ERROR;
 	}
 

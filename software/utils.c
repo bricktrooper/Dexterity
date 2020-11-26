@@ -15,19 +15,19 @@ int sample(struct Hand * hand)
 {
 	if (hand == NULL)
 	{
-		log_print(LOG_ERROR, "%s(): Invalid arguments\n", __func__);
+		log(LOG_ERROR, "Invalid arguments\n");
 		return ERROR;
 	}
 
 	if (serial_write_message(MESSAGE_SAMPLE) == ERROR)
 	{
-		log_print(LOG_ERROR, "%s(): Failed to send sample request to device\n", __func__);
+		log(LOG_ERROR, "Failed to send sample request to device\n");
 		return ERROR;
 	}
 
 	if (serial_read(hand, sizeof(struct Hand)) != sizeof(struct Hand))
 	{
-		log_print(LOG_ERROR, "%s(): Failed to receive sensor data\n", __func__);
+		log(LOG_ERROR, "Failed to receive sensor data\n");
 		return ERROR;
 	}
 
@@ -38,13 +38,13 @@ int raw(void)
 {
 	if (serial_write_message(MESSAGE_RAW) == ERROR)
 	{
-		log_print(LOG_ERROR, "%s(): Failed to send raw mode request to device\n", __func__);
+		log(LOG_ERROR, "Failed to send raw mode request to device\n");
 		return ERROR;
 	}
 
 	if (serial_read_message() != MESSAGE_SUCCESS)
 	{
-		log_print(LOG_ERROR, "%s(): Device did not acknowledge raw mode request\n", __func__);
+		log(LOG_ERROR, "Device did not acknowledge raw mode request\n");
 		return ERROR;
 	}
 
@@ -55,13 +55,13 @@ int scaled(void)
 {
 	if (serial_write_message(MESSAGE_SCALED) == ERROR)
 	{
-		log_print(LOG_ERROR, "%s(): Failed to send scaled mode request to device\n", __func__);
+		log(LOG_ERROR, "Failed to send scaled mode request to device\n");
 		return ERROR;
 	}
 
 	if (serial_read_message() != MESSAGE_SUCCESS)
 	{
-		log_print(LOG_ERROR, "%s(): Device did not acknowledge scaled mode request\n", __func__);
+		log(LOG_ERROR, "Device did not acknowledge scaled mode request\n");
 		return ERROR;
 	}
 
@@ -72,31 +72,31 @@ int upload(struct Calibration * calibration)
 {
 	if (calibration == NULL)
 	{
-		log_print(LOG_ERROR, "%s(): Invalid arguments\n", __func__);
+		log(LOG_ERROR, "Invalid arguments\n");
 		return ERROR;
 	}
 
 	if (serial_write_message(MESSAGE_UPLOAD) == ERROR)
 	{
-		log_print(LOG_ERROR, "%s(): Failed to send calibration upload request to device\n", __func__);
+		log(LOG_ERROR, "Failed to send calibration upload request to device\n");
 		return ERROR;
 	}
 
 	if (serial_read_message() != MESSAGE_SUCCESS)
 	{
-		log_print(LOG_ERROR, "%s(): Device did not acknowledge calibration upload request\n", __func__);
+		log(LOG_ERROR, "Device did not acknowledge calibration upload request\n");
 		return ERROR;
 	}
 
 	if (serial_write(calibration, sizeof(struct Calibration)) != sizeof(struct Calibration))
 	{
-		log_print(LOG_ERROR, "%s(): Failed to send calibration data to device\n", __func__);
+		log(LOG_ERROR, "Failed to send calibration data to device\n");
 		return ERROR;
 	}
 
 	if (serial_read_message() != MESSAGE_SUCCESS)
 	{
-		log_print(LOG_ERROR, "%s(): Device did not acknowledge the result of calibration upload\n", __func__);
+		log(LOG_ERROR, "Device did not acknowledge the result of calibration upload\n");
 		return ERROR;
 	}
 
@@ -107,19 +107,19 @@ int download(struct Calibration * calibration)
 {
 	if (calibration == NULL)
 	{
-		log_print(LOG_ERROR, "%s(): Invalid arguments\n", __func__);
+		log(LOG_ERROR, "Invalid arguments\n");
 		return ERROR;
 	}
 
 	if (serial_write_message(MESSAGE_DOWNLOAD) == ERROR)
 	{
-		log_print(LOG_ERROR, "%s(): Failed to send calibration download request to device\n", __func__);
+		log(LOG_ERROR, "Failed to send calibration download request to device\n");
 		return ERROR;
 	}
 
 	if (serial_read(calibration, sizeof(struct Calibration)) != sizeof(struct Calibration))
 	{
-		log_print(LOG_ERROR, "%s(): Failed to receive calibration data from device\n", __func__);
+		log(LOG_ERROR, "Failed to receive calibration data from device\n");
 		return ERROR;
 	}
 
@@ -130,7 +130,7 @@ int deadzone(struct Hand * hand, int radius)
 {
 	if (hand == NULL)
 	{
-		log_print(LOG_ERROR, "%s(): Invalid arguments\n", __func__);
+		log(LOG_ERROR, "Invalid arguments\n");
 		return ERROR;
 	}
 

@@ -19,7 +19,7 @@ struct Gesture * gesture_create(int quantity)
 
 	if (gestures == NULL)
 	{
-		log_print(LOG_ERROR, "%s(): Failed to allocate memory for %d gestures\n", __func__, quantity);
+		log(LOG_ERROR, "Failed to allocate memory for %d gestures\n", quantity);
 		return NULL;
 	}
 
@@ -40,7 +40,7 @@ int gesture_destroy(struct Gesture * gestures, int quantity)
 {
 	if (quantity < 0)
 	{
-		log_print(LOG_ERROR, "%s(): Invalid arguments\n", __func__);
+		log(LOG_ERROR, "Invalid arguments\n");
 		return ERROR;
 	}
 
@@ -75,7 +75,7 @@ int gesture_import(char * file_name, struct Gesture ** gestures, int * quantity)
 {
 	if (file_name == NULL || gestures == NULL || quantity == NULL)
 	{
-		log_print(LOG_ERROR, "%s(): Invalid arguments\n", __func__);
+		log(LOG_ERROR, "Invalid arguments\n");
 		return ERROR;
 	}
 
@@ -83,7 +83,7 @@ int gesture_import(char * file_name, struct Gesture ** gestures, int * quantity)
 
 	if (file == NULL)
 	{
-		log_print(LOG_ERROR, "%s(): Failed to open file '%s': %s (%d)\n", __func__, file_name, strerror(errno), errno);
+		log(LOG_ERROR, "Failed to open file '%s': %s (%d)\n", file_name, strerror(errno), errno);
 		return ERROR;
 	}
 
@@ -93,13 +93,13 @@ int gesture_import(char * file_name, struct Gesture ** gestures, int * quantity)
 
 	if (fscanf(file, "QUANTITY=%d\n\n", &count) != 1)
 	{
-		log_print(LOG_ERROR, "%s(): Gesture quantity was incorrectly parsed\n", __func__);
+		log(LOG_ERROR, "Gesture quantity was incorrectly parsed\n");
 		goto EXIT;
 	}
 
 	if (count < 1)
 	{
-		log_print(LOG_ERROR, "%s(): Parsed invalid gesture quantity '%d'\n", __func__, count);
+		log(LOG_ERROR, "Parsed invalid gesture quantity '%d'\n", count);
 		goto EXIT;
 	}
 
@@ -107,7 +107,7 @@ int gesture_import(char * file_name, struct Gesture ** gestures, int * quantity)
 
 	if (elements == NULL)
 	{
-		log_print(LOG_ERROR, "%s(): Failed to allocate memory for %d gestures\n", __func__, count);
+		log(LOG_ERROR, "Failed to allocate memory for %d gestures\n", count);
 		goto EXIT;
 	}
 
@@ -118,7 +118,7 @@ int gesture_import(char * file_name, struct Gesture ** gestures, int * quantity)
 
 		if (fscanf(file, "ACTION=%s\n", name) != 1)
 		{
-			log_print(LOG_ERROR, "%s(): Gesture action was incorrectly parsed for gesture #%d\n", __func__, i + 1);
+			log(LOG_ERROR, "Gesture action was incorrectly parsed for gesture #%d\n", i + 1);
 			goto EXIT;
 		}
 
@@ -135,31 +135,31 @@ int gesture_import(char * file_name, struct Gesture ** gestures, int * quantity)
 
 		if (gesture->action == ACTION_UNKNOWN)
 		{
-			log_print(LOG_ERROR, "%s(): Parsed an invalid action '%s'\n", __func__, name);
+			log(LOG_ERROR, "Parsed an invalid action '%s'\n", name);
 			goto EXIT;
 		}
 
 		if (fscanf(file, "PHASES=%d\n", &gesture->phases) != 1)
 		{
-			log_print(LOG_ERROR, "%s(): Phase count was incorrectly parsed for gesture #%d\n", __func__, i + 1);
+			log(LOG_ERROR, "Phase count was incorrectly parsed for gesture #%d\n", i + 1);
 			goto EXIT;
 		}
 
 		if (gesture->phases < 0)
 		{
-			log_print(LOG_ERROR, "%s(): Parsed an negative phase count '%d'\n", __func__, gesture->phases);
+			log(LOG_ERROR, "Parsed an negative phase count '%d'\n", gesture->phases);
 			goto EXIT;
 		}
 
 		if (fscanf(file, "TOLERANCE=%f\n", &gesture->tolerance) != 1)
 		{
-			log_print(LOG_ERROR, "%s(): Tolerance was incorrectly parsed for gesture #%d\n", __func__, i + 1);
+			log(LOG_ERROR, "Tolerance was incorrectly parsed for gesture #%d\n", i + 1);
 			goto EXIT;
 		}
 
 		if (gesture->tolerance < 0)
 		{
-			log_print(LOG_ERROR, "%s(): Parsed an negative tolerance '%f'\n", __func__, gesture->tolerance);
+			log(LOG_ERROR, "Parsed an negative tolerance '%f'\n", gesture->tolerance);
 			goto EXIT;
 		}
 
@@ -167,7 +167,7 @@ int gesture_import(char * file_name, struct Gesture ** gestures, int * quantity)
 
 		if (gesture->criteria == NULL)
 		{
-			log_print(LOG_ERROR, "%s(): Failed to allocate memory for %d phases\n", __func__, gesture->phases);
+			log(LOG_ERROR, "Failed to allocate memory for %d phases\n", gesture->phases);
 			goto EXIT;
 		}
 
@@ -183,7 +183,7 @@ int gesture_import(char * file_name, struct Gesture ** gestures, int * quantity)
 
 		if (tokens != NUM_DIRECTIONS + NUM_FINGERS)
 		{
-			log_print(LOG_ERROR, "%s(): Sensor ignores were incorrectly parsed for gesture #%d\n", __func__, i + 1);
+			log(LOG_ERROR, "Sensor ignores were incorrectly parsed for gesture #%d\n", i + 1);
 			goto EXIT;
 		}
 
@@ -203,25 +203,25 @@ int gesture_import(char * file_name, struct Gesture ** gestures, int * quantity)
 
 			if (tokens != 1 + NUM_DIRECTIONS + NUM_FINGERS)
 			{
-				log_print(LOG_ERROR, "%s(): Sensor criteria were incorrectly parsed for gesture #%d\n", __func__, i + 1);
+				log(LOG_ERROR, "Sensor criteria were incorrectly parsed for gesture #%d\n", i + 1);
 				goto EXIT;
 			}
 
 			if (phase_label != phase)
 			{
-				log_print(LOG_ERROR, "%s(): Incorrect phase label for gesture #%d: Expected '%d' but parsed '%d'\n", __func__, i + 1, phase, phase_label);
+				log(LOG_ERROR, "Incorrect phase label for gesture #%d: Expected '%d' but parsed '%d'\n", i + 1, phase, phase_label);
 				goto EXIT;
 			}
 		}
 
 		if (fscanf(file, "\n") < 0)
 		{
-			log_print(LOG_ERROR, "%s(): Failed to parse break between gestures\n", __func__);
+			log(LOG_ERROR, "Failed to parse break between gestures\n");
 			goto EXIT;
 		}
 	}
 
-	log_print(LOG_SUCCESS, "%s(): Imported %d gestures from file '%s'\n", __func__, count, file_name);
+	log(LOG_SUCCESS, "Imported %d gestures from file '%s'\n", count, file_name);
 	*gestures = elements;
 	*quantity = count;
 	rc = SUCCESS;
@@ -240,7 +240,7 @@ int gesture_export(char * file_name, struct Gesture * gestures, int quantity)
 {
 	if (file_name == NULL || gestures == NULL || quantity < 1)
 	{
-		log_print(LOG_ERROR, "%s(): Invalid arguments\n", __func__);
+		log(LOG_ERROR, "Invalid arguments\n");
 		return ERROR;
 	}
 
@@ -248,7 +248,7 @@ int gesture_export(char * file_name, struct Gesture * gestures, int quantity)
 
 	if (file == NULL)
 	{
-		log_print(LOG_ERROR, "%s(): Failed to open file '%s': %s (%d)\n", __func__, file_name, strerror(errno), errno);
+		log(LOG_ERROR, "Failed to open file '%s': %s (%d)\n", file_name, strerror(errno), errno);
 		return ERROR;
 	}
 
@@ -261,7 +261,7 @@ int gesture_export(char * file_name, struct Gesture * gestures, int quantity)
 
 		if (!gesture_valid(gesture))
 		{
-			log_print(LOG_ERROR, "%s(): Invalid gesture\n", __func__);
+			log(LOG_ERROR, "Invalid gesture\n");
 			return ERROR;
 		}
 
@@ -303,7 +303,7 @@ int gesture_export(char * file_name, struct Gesture * gestures, int quantity)
 		fprintf(file, "\n");
 	}
 
-	log_print(LOG_SUCCESS, "%s(): Exported %d gestures to file '%s'\n", __func__, quantity, file_name);
+	log(LOG_SUCCESS, "Exported %d gestures to file '%s'\n", quantity, file_name);
 	fclose(file);
 	return SUCCESS;
 }
@@ -312,13 +312,13 @@ int gesture_record(struct Gesture * gesture)
 {
 	if (gesture == NULL)
 	{
-		log_print(LOG_ERROR, "%s(): Invalid arguments\n", __func__);
+		log(LOG_ERROR, "Invalid arguments\n");
 		return ERROR;
 	}
 
 	if (scaled() == ERROR)
 	{
-		log_print(LOG_ERROR, "%s(): Failed to set device to scaled sampling mode\n", __func__);
+		log(LOG_ERROR, "Failed to set device to scaled sampling mode\n");
 		return ERROR;
 	}
 
@@ -333,7 +333,7 @@ int gesture_record(struct Gesture * gesture)
 
 	if (scanf("%d", &gesture->phases) < 1)
 	{
-		log_print(LOG_ERROR, "%s(): Failed to input phase count\n", __func__);
+		log(LOG_ERROR, "Failed to input phase count\n");
 		return ERROR;
 	}
 
@@ -341,7 +341,7 @@ int gesture_record(struct Gesture * gesture)
 
 	if (gesture->phases < 1)
 	{
-		log_print(LOG_ERROR, "%s(): The phase count cannot be less than 1\n", __func__);
+		log(LOG_ERROR, "The phase count cannot be less than 1\n");
 		return ERROR;
 	}
 
@@ -349,7 +349,7 @@ int gesture_record(struct Gesture * gesture)
 
 	if (gesture->criteria == NULL)
 	{
-		log_print(LOG_ERROR, "%s(): Failed to allocate memory for %d phases\n", __func__, gesture->phases);
+		log(LOG_ERROR, "Failed to allocate memory for %d phases\n", gesture->phases);
 		return ERROR;
 	}
 
@@ -364,7 +364,7 @@ int gesture_record(struct Gesture * gesture)
 		{
 			if (sample(&hand) == ERROR)
 			{
-				log_print(LOG_ERROR, "%s(): Sample failed while recording phase #%d\n", __func__, phase);
+				log(LOG_ERROR, "Sample failed while recording phase #%d\n", phase);
 				return ERROR;
 			}
 
@@ -399,14 +399,14 @@ int gesture_record(struct Gesture * gesture)
 		{
 			if (sample(&hand) == ERROR)
 			{
-				log_print(LOG_ERROR, "%s(): Sample failed while waiting for button release after recording phase #%d\n", __func__, phase);
+				log(LOG_ERROR, "Sample failed while waiting for button release after recording phase #%d\n", phase);
 				return ERROR;
 			}
 		}
 		while (hand.button == BUTTON_PRESSED);
 	}
 
-	log_print(LOG_SUCCESS, "%s(): Recorded %d phase gesture\n", __func__, gesture->phases);
+	log(LOG_SUCCESS, "Recorded %d phase gesture\n", gesture->phases);
 	return SUCCESS;
 }
 
@@ -414,13 +414,13 @@ float gesture_compare(struct Gesture * gesture, struct Hand * hand)
 {
 	if (gesture == NULL || hand == NULL)
 	{
-		log_print(LOG_ERROR, "%s(): Invalid arguments\n", __func__);
+		log(LOG_ERROR, "Invalid arguments\n");
 		return ERROR;
 	}
 
 	if (!gesture_valid(gesture))
 	{
-		log_print(LOG_ERROR, "%s(): Invalid gesture\n", __func__);
+		log(LOG_ERROR, "Invalid gesture\n");
 		return ERROR;
 	}
 
@@ -451,7 +451,7 @@ float gesture_compare(struct Gesture * gesture, struct Hand * hand)
 
 	if (total == 0)   // prevent divide by zero when averaging
 	{
-		log_print(LOG_WARNING, "%s(): All sensor readings are ignored\n", __func__);
+		log(LOG_WARNING, "All sensor readings are ignored\n");
 		return 0.0;   // "exact" match
 	}
 
@@ -462,7 +462,7 @@ bool gesture_matches(enum Action action, struct Gesture * gestures, int quantity
 {
 	if (action >= NUM_ACTIONS || gestures == NULL || quantity < 0 || hand == NULL)
 	{
-		log_print(LOG_ERROR, "%s(): Invalid arguments\n", __func__);
+		log(LOG_ERROR, "Invalid arguments\n");
 		return false;
 	}
 
@@ -484,7 +484,7 @@ int gesture_reset(struct Gesture * gestures, int quantity)
 {
 	if (gestures == NULL || quantity < 0)
 	{
-		log_print(LOG_ERROR, "%s(): Invalid arguments\n", __func__);
+		log(LOG_ERROR, "Invalid arguments\n");
 		return ERROR;
 	}
 
@@ -500,7 +500,7 @@ int gesture_print(struct Gesture * gesture)
 {
 	if (!gesture_valid(gesture))
 	{
-		log_print(LOG_ERROR, "%s(): Invalid arguments\n", __func__);
+		log(LOG_ERROR, "Invalid arguments\n");
 		return ERROR;
 	}
 

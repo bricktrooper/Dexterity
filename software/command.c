@@ -18,8 +18,6 @@
 #define MODE_COMMAND_RAW      "raw"
 #define MODE_COMMAND_SCALED   "scaled"
 
-static char * PROGRAM = "";
-
 static int command_run(char * calibration_file, char * gestures_file);
 static int command_sample(void);
 static int command_calibrate(char * calibration_file);
@@ -40,16 +38,15 @@ char * COMMANDS [NUM_COMMANDS] = {
 
 static int command_run(char * calibration_file, char * gestures_file)
 {
-	return 0;
 	if (calibration_file == NULL)
 	{
-		log_print(LOG_ERROR, "%s: No calibration file provided\n", PROGRAM);
+		log(LOG_ERROR, "No calibration file provided\n");
 		return ERROR;
 	}
 
 	if (gestures_file == NULL)
 	{
-		log_print(LOG_ERROR, "%s: No gestures file provided\n", PROGRAM);
+		log(LOG_ERROR, "No gestures file provided\n");
 		return ERROR;
 	}
 
@@ -59,14 +56,14 @@ static int command_run(char * calibration_file, char * gestures_file)
 
 	if (gesture_import(gestures_file, &gestures, &quantity) == ERROR)
 	{
-		log_print(LOG_ERROR, "%s: Failed to import gestures from '%s'\n", PROGRAM, gestures_file);
+		log(LOG_ERROR, "Failed to import gestures from '%s'\n", gestures_file);
 		goto EXIT;
 	}
 
 	if (quantity != NUM_ACTIONS)
 	{
-		log_print(LOG_ERROR, "%s: Incorrect number of gestures imported from '%s': Expected %d but imported %d\n",
-		                     PROGRAM, gestures_file, NUM_ACTIONS, quantity);
+		log(LOG_ERROR, "Incorrect number of gestures imported from '%s': Expected %d but imported %d\n",
+		                gestures_file, NUM_ACTIONS, quantity);
 	}
 
 	for (enum Action expected = 0; expected < NUM_ACTIONS; expected++)
@@ -75,13 +72,13 @@ static int command_run(char * calibration_file, char * gestures_file)
 
 		if (actual != expected)
 		{
-			log_print(LOG_ERROR, "%s: Incorrect action for gesture #%d: Expected '%s' but parsed '%s'\n",
-			                     PROGRAM, expected, ACTIONS[expected], ACTIONS[actual]);
+			log(LOG_ERROR, "Incorrect action for gesture #%d: Expected '%s' but parsed '%s'\n",
+			                expected, ACTIONS[expected], ACTIONS[actual]);
 			goto EXIT;
 		}
 	}
 
-	log_print(LOG_SUCCESS, "%s: Imported %d gestures from '%s'\n", PROGRAM, quantity, gestures_file);
+	log(LOG_SUCCESS, "Imported %d gestures from '%s'\n", quantity, gestures_file);
 
 	for (int i = 0; i < quantity; i++)
 	{
@@ -90,13 +87,13 @@ static int command_run(char * calibration_file, char * gestures_file)
 
 	if (command_upload(calibration_file) == ERROR)
 	{
-		log_print(LOG_ERROR, "%s: Upload failed\n", PROGRAM);
+		log(LOG_ERROR, "Upload failed\n");
 		goto EXIT;
 	}
 
 	if (scaled() == ERROR)
 	{
-		log_print(LOG_ERROR, "%s: Failed to set device to scaled sampling mode\n", PROGRAM);
+		log(LOG_ERROR, "Failed to set device to scaled sampling mode\n");
 		goto EXIT;
 	}
 
@@ -112,7 +109,7 @@ static int command_run(char * calibration_file, char * gestures_file)
 
 		if (sample(&hand) == ERROR)
 		{
-			log_print(LOG_ERROR, "%s(): Failed to sample sensors\n", PROGRAM);
+			log(LOG_ERROR, "Failed to sample sensors\n");
 			goto EXIT;
 		}
 
@@ -125,7 +122,7 @@ static int command_run(char * calibration_file, char * gestures_file)
 			{
 				if (sample(&hand) == ERROR)
 				{
-					log_print(LOG_ERROR, "%s(): Failed to sample sensors\n", PROGRAM);
+					log(LOG_ERROR, "Failed to sample sensors\n");
 					goto EXIT;
 				}
 			}
@@ -147,7 +144,7 @@ static int command_run(char * calibration_file, char * gestures_file)
 
 		if (disabled)
 		{
-			continue;   // don't run program if disabled
+			continue;   // don't ru if disabled
 		}
 
 		// We also need to deal with the freeing of the gestures when control C happens
@@ -174,7 +171,7 @@ static int command_run(char * calibration_file, char * gestures_file)
 
 		if (control_execute(control, gestures, quantity, &hand) == ERROR)
 		{
-			log_print(LOG_ERROR, "\n%s(): Failed to control %s\n", PROGRAM, CONTROLS[control]);
+			log(LOG_ERROR, "\nFailed to control %s\n", CONTROLS[control]);
 			goto EXIT;
 		}
 	}
@@ -203,7 +200,7 @@ static int command_sample(void)
 
 		if (result == ERROR)
 		{
-			log_print(LOG_ERROR, "%s: Failed to sample sensors\n", PROGRAM);
+			log(LOG_ERROR, "Failed to sample sensors\n");
 			return result;
 		}
 
@@ -233,7 +230,7 @@ static int command_calibrate(char * calibration_file)
 {
 	if (calibration_file == NULL)
 	{
-		log_print(LOG_ERROR, "%s: No output file provided for calibration data\n", PROGRAM);
+		log(LOG_ERROR, "No output file provided for calibration data\n");
 		return ERROR;
 	}
 
@@ -241,7 +238,7 @@ static int command_calibrate(char * calibration_file)
 
 	if (calibration_interactive(&calibration) == ERROR)
 	{
-		log_print(LOG_ERROR, "%s: Interactive calibration failed\n", PROGRAM);
+		log(LOG_ERROR, "Interactive calibration failed\n");
 		return ERROR;
 	}
 
@@ -249,7 +246,7 @@ static int command_calibrate(char * calibration_file)
 
 	if (calibration_export(calibration_file, &calibration) == ERROR)
 	{
-		log_print(LOG_ERROR, "%s: Failed to export calibration to '%s'\n", PROGRAM, calibration_file);
+		log(LOG_ERROR, "Failed to export calibration to '%s'\n", calibration_file);
 		return ERROR;
 	}
 
@@ -260,7 +257,7 @@ static int command_upload(char * calibration_file)
 {
 	if (calibration_file == NULL)
 	{
-		log_print(LOG_ERROR, "%s: No calibration file provided\n", PROGRAM);
+		log(LOG_ERROR, "No calibration file provided\n");
 		return ERROR;
 	}
 
@@ -268,7 +265,7 @@ static int command_upload(char * calibration_file)
 
 	if (calibration_import(calibration_file, &calibration) == ERROR)
 	{
-		log_print(LOG_ERROR, "%s: Failed to import calibration from '%s'\n", PROGRAM, calibration_file);
+		log(LOG_ERROR, "Failed to import calibration from '%s'\n", calibration_file);
 		return ERROR;
 	}
 
@@ -276,7 +273,7 @@ static int command_upload(char * calibration_file)
 
 	if (calibration_upload(&calibration) == ERROR)
 	{
-		log_print(LOG_ERROR, "%s: Failed to upload calibration file '%s'\n", PROGRAM, calibration_file);
+		log(LOG_ERROR, "Failed to upload calibration file '%s'\n", calibration_file);
 		return ERROR;
 	}
 
@@ -289,7 +286,7 @@ static int command_download(char * calibration_file)
 
 	if (calibration_download(&calibration) == ERROR)
 	{
-		log_print(LOG_ERROR, "%s: Failed to download calibration from device\n", PROGRAM);
+		log(LOG_ERROR, "Failed to download calibration from device\n");
 		return ERROR;
 	}
 
@@ -302,7 +299,7 @@ static int command_download(char * calibration_file)
 
 	if (calibration_export(calibration_file, &calibration) == ERROR)
 	{
-		log_print(LOG_ERROR, "%s: Failed to export calibration to '%s'\n", PROGRAM, calibration_file);
+		log(LOG_ERROR, "Failed to export calibration to '%s'\n", calibration_file);
 		return ERROR;
 	}
 
@@ -313,7 +310,7 @@ static int command_mode(char * mode)
 {
 	if (mode == NULL)
 	{
-		log_print(LOG_ERROR, "%s: No argument provided for scaling mode\n", PROGRAM);
+		log(LOG_ERROR, "No argument provided for scaling mode\n");
 		return ERROR;
 	}
 
@@ -321,7 +318,7 @@ static int command_mode(char * mode)
 	{
 		if (raw() == ERROR)
 		{
-			log_print(LOG_SUCCESS, "%s: Failed to set device to %s mode\n", PROGRAM, mode);
+			log(LOG_SUCCESS, "Failed to set device to %s mode\n", mode);
 			return ERROR;
 		}
 	}
@@ -329,17 +326,17 @@ static int command_mode(char * mode)
 	{
 		if (scaled() == ERROR)
 		{
-			log_print(LOG_SUCCESS, "%s: Failed to set device to %s mode\n", PROGRAM, mode);
+			log(LOG_SUCCESS, "Failed to set device to %s mode\n", mode);
 			return ERROR;
 		}
 	}
 	else
 	{
-		log_print(LOG_ERROR, "%s: Unknown scaling mode '%s'\n", PROGRAM, mode);
+		log(LOG_ERROR, "Unknown scaling mode '%s'\n", mode);
 		return ERROR;
 	}
 
-	log_print(LOG_SUCCESS, "%s: Set device to %s mode\n", PROGRAM, mode);
+	log(LOG_SUCCESS, "Set device to %s mode\n", mode);
 	return SUCCESS;
 }
 
@@ -349,7 +346,7 @@ static int command_record(char * gesture_file)
 
 	if (gesture_record(&gesture) == ERROR)
 	{
-		log_print(LOG_SUCCESS, "%s: Failed to record gesture\n", PROGRAM);
+		log(LOG_SUCCESS, "Failed to record gesture\n");
 		return ERROR;
 	}
 
@@ -362,10 +359,10 @@ static int command_record(char * gesture_file)
 
 	if (gesture_export(gesture_file, &gesture, 1) == ERROR)
 	{
-		log_print(LOG_ERROR, "%s: Failed to export gesture to '%s'\n", PROGRAM, gesture_file);
+		log(LOG_ERROR, "Failed to export gesture to '%s'\n", gesture_file);
 	}
 
-	log_print(LOG_SUCCESS, "%s: Recorded gesture\n", PROGRAM);
+	log(LOG_SUCCESS, "Recorded gesture\n");
 	return SUCCESS;
 }
 
@@ -387,17 +384,12 @@ enum Command command_identify(char * subcommand)
 	return COMMAND_UNKNOWN;
 }
 
-int command_execute(char * program, enum Command command, char ** arguments, int count)
+int command_execute(enum Command command, char ** arguments, int count)
 {
 	if (count < 0)
 	{
-		log_print(LOG_ERROR, "%s: Argument count is negative\n", PROGRAM);
+		log(LOG_ERROR, "Argument count is negative\n");
 		return ERROR;
-	}
-
-	if (program != NULL)
-	{
-		PROGRAM = program;
 	}
 
 	usleep(1000);   // give the serial port some time to initialize
@@ -426,7 +418,7 @@ int command_execute(char * program, enum Command command, char ** arguments, int
 			return command_record(arguments[0]);
 
 		default:
-			log_print(LOG_ERROR, "%s: Invalid command\n", PROGRAM);
+			log(LOG_ERROR, "Invalid command\n");
 			return ERROR;
 	}
 }

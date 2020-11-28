@@ -6,6 +6,12 @@
 
 #include "keyboard.h"
 
+// Additional Virtual Keycodes
+#define kVK_BrightnessDown   107
+#define kVK_BrightnessUp     113
+#define kVK_MissionControl   160
+#define kVK_Dashboard        130
+
 // Mac OS X virtual keycodes
 static const CGKeyCode KEYCODES [NUM_KEYS] = {
     kVK_ANSI_A,
@@ -121,7 +127,11 @@ static const CGKeyCode KEYCODES [NUM_KEYS] = {
     kVK_RightArrow,
     kVK_DownArrow,
     kVK_UpArrow,
-    kVK_ISO_Section
+    kVK_ISO_Section,
+    kVK_BrightnessDown,
+    kVK_BrightnessUp,
+    kVK_MissionControl,
+    kVK_Dashboard
 };
 
 static char * KEY_NAMES [NUM_KEYS] = {
@@ -238,7 +248,11 @@ static char * KEY_NAMES [NUM_KEYS] = {
 	"RIGHT_ARROW",
 	"DOWN_ARROW",
 	"UP_ARROW",
-	"ISO_SECTION"
+	"ISO_SECTION",
+	"BRIGHTNESS_DOWN",
+	"BRIGHTNESS_UP",
+	"MISSION_CONTROL",
+	"DASHBOARD"
 };
 
 int keyboard_press(enum Key key)

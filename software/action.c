@@ -59,8 +59,7 @@ int action_double_click(void)
 
 int action_overview(void)
 {
-	enum Key stroke [] = {KEY_COMMAND, KEY_F3};
-	return keyboard_combo(stroke, sizeof(stroke) / sizeof(enum Key));
+	return keyboard_tap(KEY_MISSION_CONTROL);
 }
 
 int action_zoom_in(void)

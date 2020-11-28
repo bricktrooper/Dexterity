@@ -10,7 +10,7 @@
 
 #include "control.h"
 
-#define DOUBLE_CLICK_DELAY_US   20000
+#define DOUBLE_CLICK_DELAY_US   15000
 
 char * CONTROLS [NUM_CONTROLS] = {
 	"MOUSE",
@@ -53,16 +53,12 @@ static int control_mouse(struct Gesture * gestures, int quantity, struct Hand * 
 	{
 		printf("right click\n");
 		return action_right_click();
-		//enum Key stroke [] = {KEY_COMMAND, KEY_F3};
-	//return keyboard_combo(stroke, 2);
-
-	// maybe we need to flush it or something
 	}
-	//else if (gesture_matches(ACTION_OVERVIEW, gestures, quantity, hand))
-	//{
-	//	printf("overview");
-	//	return action_overview();
-	//}
+	else if (gesture_matches(ACTION_OVERVIEW, gestures, quantity, hand))
+	{
+		printf("overview");
+		return action_overview();
+	}
 	else if (!pressed && gesture_matches(ACTION_PRESS, gestures, quantity, hand))
 	{
 		printf("press\n");

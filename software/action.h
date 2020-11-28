@@ -10,9 +10,8 @@ enum Action
 	ACTION_CYCLE,          // cycle between controls
 	ACTION_PRESS,          // press left click
 	ACTION_RELEASE,        // release left click
-	ACTION_LEFT_CLICK,     // single left click
+	ACTION_LEFT_CLICK,     // single left click (click fast for double click)
 	ACTION_RIGHT_CLICK,    // single right click
-	ACTION_DOUBLE_CLICK,   // double left click
 	ACTION_OVERVIEW,       // show all windows
 	ACTION_ZOOM_IN,        // zoom in
 	ACTION_ZOOM_OUT,       // zoom out

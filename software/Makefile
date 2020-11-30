@@ -21,6 +21,7 @@ LDFLAGS += -Wpedantic
 LDFLAGS += -std=c17
 LDFLAGS += -g
 LDFLAGS += -framework ApplicationServices
+LDFLAGS += -framework AppKit
 
 TARGET = $(word 1, $(MAKECMDGOALS))
 
@@ -47,9 +48,13 @@ SRC += keyboard.c
 SRC += gesture.c
 SRC += action.c
 SRC += control.c
+SRC += special.m
 
-OBJ = $(SRC:.c=.o)
-DEP = $(SRC:.c=.d)
+OBJ := $(SRC:.c=.o)   # C object files
+OBJ := $(OBJ:.m=.o)   # Objective-C object files
+
+DEP := $(SRC:.c=.d)   # C dependency files
+DEP := $(DEP:.m=.d)   # Objective-C dependency files
 
 ART = bin
 
@@ -68,6 +73,13 @@ $(ART)/%.o: %.c
 	@$(CC) $(CFLAGS) -c $< -o $@
 
 $(ART)/%.d: %.c
+	@$(MM) $(MMFLAGS) -MM $< -MT $(subst .d,.o,$@) -MF $@
+
+$(ART)/%.o: %.m
+	@echo "CC   $(notdir $<)"
+	@$(CC) $(CFLAGS) -c $< -o $@
+
+$(ART)/%.d: %.m
 	@$(MM) $(MMFLAGS) -MM $< -MT $(subst .d,.o,$@) -MF $@
 
 ifneq ($(TARGET), clean)

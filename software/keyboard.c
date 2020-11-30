@@ -1,14 +1,14 @@
 #include <ApplicationServices/ApplicationServices.h>
 #include <Carbon/Carbon.h>
+#include <IOKit/hidsystem/ev_keymap.h>
 
 #include "dexterity.h"
 #include "log.h"
+#include "special.h"
 
 #include "keyboard.h"
 
 // Additional Virtual Keycodes
-#define kVK_BrightnessDown   107
-#define kVK_BrightnessUp     113
 #define kVK_MissionControl   160
 #define kVK_Dashboard        130
 
@@ -95,9 +95,6 @@ static const CGKeyCode KEYCODES [NUM_KEYS] = {
 	kVK_RightControl,
 	kVK_Function,
 	kVK_F17,
-	kVK_VolumeUp,
-	kVK_VolumeDown,
-	kVK_Mute,
 	kVK_F18,
 	kVK_F19,
 	kVK_F20,
@@ -128,10 +125,26 @@ static const CGKeyCode KEYCODES [NUM_KEYS] = {
 	kVK_DownArrow,
 	kVK_UpArrow,
 	kVK_ISO_Section,
-	kVK_BrightnessDown,
-	kVK_BrightnessUp,
 	kVK_MissionControl,
-	kVK_Dashboard
+	kVK_Dashboard,
+
+	// SPECIAL KEYCODES //
+	// See IOKit/hidsystem/ev_keymap.h for more keys
+	// Requires NSEvent Objective-C code
+	NX_KEYTYPE_SOUND_UP,
+	NX_KEYTYPE_SOUND_DOWN,
+	NX_KEYTYPE_BRIGHTNESS_UP,
+	NX_KEYTYPE_BRIGHTNESS_DOWN,
+	NX_KEYTYPE_MUTE,
+	NX_KEYTYPE_LAUNCH_PANEL,
+	NX_KEYTYPE_PLAY,
+	NX_KEYTYPE_NEXT,
+	NX_KEYTYPE_PREVIOUS,
+	NX_KEYTYPE_FAST,
+	NX_KEYTYPE_REWIND,
+	NX_KEYTYPE_ILLUMINATION_UP,
+	NX_KEYTYPE_ILLUMINATION_DOWN,
+	NX_KEYTYPE_ILLUMINATION_TOGGLE
 };
 
 static char * KEY_NAMES [NUM_KEYS] = {
@@ -216,9 +229,6 @@ static char * KEY_NAMES [NUM_KEYS] = {
 	"RIGHT_CONTROL",
 	"FUNCTION",
 	"F17",
-	"VOLUME_UP",
-	"VOLUME_DOWN",
-	"MUTE",
 	"F18",
 	"F19",
 	"F20",
@@ -249,10 +259,22 @@ static char * KEY_NAMES [NUM_KEYS] = {
 	"DOWN_ARROW",
 	"UP_ARROW",
 	"ISO_SECTION",
-	"BRIGHTNESS_DOWN",
-	"BRIGHTNESS_UP",
 	"MISSION_CONTROL",
-	"DASHBOARD"
+	"DASHBOARD",
+	"VOLUME_UP",
+	"VOLUME_DOWN",
+	"BRIGHTNESS_UP",
+	"BRIGHTNESS_DOWN",
+	"MUTE",
+	"LAUNCH_PANEL",
+	"PLAY",
+	"NEXT",
+	"PREVIOUS",
+	"FAST_FORWARD",
+	"REWIND",
+	"KEYBOARD_BACKLIGHT_UP",
+	"KEYBOARD_BACKLIGHT_DOWN",
+	"KEYBOARD_BACKLIGHT_TOGGLE"
 };
 
 int keyboard_press(enum Key key)
@@ -261,6 +283,12 @@ int keyboard_press(enum Key key)
 	{
 		log(LOG_ERROR, "Invalid keycode '%d'\n", key);
 		return ERROR;
+	}
+
+	// if special keycode then call Objective-C functions
+	if (key >= KEY_VOLUME_UP)
+	{
+		return keyboard_special_press(KEYCODES[key]);
 	}
 
 	CGEventRef event = CGEventCreateKeyboardEvent(
@@ -287,6 +315,12 @@ int keyboard_release(enum Key key)
 	{
 		log(LOG_ERROR, "Invalid keycode '%d'\n", key);
 		return ERROR;
+	}
+
+	// if special keycode then call Objective-C functions
+	if (key >= KEY_VOLUME_UP)
+	{
+		return keyboard_special_release(KEYCODES[key]);
 	}
 
 	CGEventRef event = CGEventCreateKeyboardEvent(

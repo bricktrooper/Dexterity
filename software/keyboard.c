@@ -257,149 +257,149 @@ static char * KEY_NAMES [NUM_KEYS] = {
 
 int keyboard_press(enum Key key)
 {
-    if (key < 0 || key >= NUM_KEYS)
-    {
-        log(LOG_ERROR, "Invalid keycode '%d'\n", key);
-        return ERROR;
-    }
+	if (key < 0 || key >= NUM_KEYS)
+	{
+		log(LOG_ERROR, "Invalid keycode '%d'\n", key);
+		return ERROR;
+	}
 
-    CGEventRef event = CGEventCreateKeyboardEvent(
-                            NULL,             // source of the event
-                            KEYCODES[key],    // OS X virtual keycode
-                            true              // key state (true == pressed, false == released)
-                            );
+	CGEventRef event = CGEventCreateKeyboardEvent(
+							NULL,             // source of the event
+							KEYCODES[key],    // OS X virtual keycode
+							true              // key state (true == pressed, false == released)
+							);
 
-    if (event == NULL)
-    {
-        log(LOG_ERROR, "Failed to create keyboard press event\n");
-        return ERROR;
-    }
+	if (event == NULL)
+	{
+		log(LOG_ERROR, "Failed to create keyboard press event\n");
+		return ERROR;
+	}
 
-    CGEventPost(kCGHIDEventTap, event);   // inject event into HID stream
-    CFRelease(event);
+	CGEventPost(kCGHIDEventTap, event);   // inject event into HID stream
+	CFRelease(event);
 
-    return SUCCESS;
+	return SUCCESS;
 }
 
 int keyboard_release(enum Key key)
 {
-    if (key < 0 || key >= NUM_KEYS)
-    {
-        log(LOG_ERROR, "Invalid keycode '%d'\n", key);
-        return ERROR;
-    }
+	if (key < 0 || key >= NUM_KEYS)
+	{
+		log(LOG_ERROR, "Invalid keycode '%d'\n", key);
+		return ERROR;
+	}
 
-    CGEventRef event = CGEventCreateKeyboardEvent(
-                            NULL,             // source of the event
-                            KEYCODES[key],    // OS X virtual keycode
-                            false             // key state (true == pressed, false == released)
-                            );
+	CGEventRef event = CGEventCreateKeyboardEvent(
+							NULL,             // source of the event
+							KEYCODES[key],    // OS X virtual keycode
+							false             // key state (true == pressed, false == released)
+							);
 
-    if (event == NULL)
-    {
-        log(LOG_ERROR, "Failed to create keyboard release event\n");
-        return ERROR;
-    }
+	if (event == NULL)
+	{
+		log(LOG_ERROR, "Failed to create keyboard release event\n");
+		return ERROR;
+	}
 
-    CGEventPost(kCGHIDEventTap, event);   // inject event into HID stream
-    CFRelease(event);
+	CGEventPost(kCGHIDEventTap, event);   // inject event into HID stream
+	CFRelease(event);
 
-    return SUCCESS;
+	return SUCCESS;
 }
 
 int keyboard_tap(enum Key key)
 {
-    if (key < 0 || key >= NUM_KEYS)
-    {
-        log(LOG_ERROR, "Invalid keycode '%d'\n", key);
-        return ERROR;
-    }
+	if (key < 0 || key >= NUM_KEYS)
+	{
+		log(LOG_ERROR, "Invalid keycode '%d'\n", key);
+		return ERROR;
+	}
 
-    if (keyboard_press(key) == ERROR)
-    {
-        log(LOG_ERROR, "Failed to press key\n");
-        return ERROR;
-    }
+	if (keyboard_press(key) == ERROR)
+	{
+		log(LOG_ERROR, "Failed to press key\n");
+		return ERROR;
+	}
 
-    usleep(50);
+	usleep(50);
 
-    if (keyboard_release(key) == ERROR)
-    {
-        log(LOG_ERROR, "Failed to release key\n");
-        return ERROR;
-    }
+	if (keyboard_release(key) == ERROR)
+	{
+		log(LOG_ERROR, "Failed to release key\n");
+		return ERROR;
+	}
 
-    usleep(50);
+	usleep(50);
 
-    log(LOG_INFO, "Tapped '%s'\n", KEY_NAMES[key]);
-    return SUCCESS;
+	log(LOG_INFO, "Tapped '%s'\n", KEY_NAMES[key]);
+	return SUCCESS;
 }
 
 int keyboard_type(enum Key * keys, int length)
 {
-    if (keys == NULL || length < 0)
-    {
-        log(LOG_ERROR, "Invalid arguments\n");
-        return ERROR;
-    }
+	if (keys == NULL || length < 0)
+	{
+		log(LOG_ERROR, "Invalid arguments\n");
+		return ERROR;
+	}
 
-    for (int i = 0; i < length; i++)
-    {
-        enum Key key = keys[i];
+	for (int i = 0; i < length; i++)
+	{
+		enum Key key = keys[i];
 
-        if (key < 0 || key >= NUM_KEYS)
-        {
-            log(LOG_ERROR, "Invalid keycode '%d' (key #%d)\n", key, i);
-            return ERROR;
-        }
+		if (key < 0 || key >= NUM_KEYS)
+		{
+			log(LOG_ERROR, "Invalid keycode '%d' (key #%d)\n", key, i);
+			return ERROR;
+		}
 
-        if (keyboard_tap(key) == ERROR)
-        {
-            log(LOG_ERROR, "Failed to tap key '%s'\n", KEY_NAMES[key]);
-            return ERROR;
-        }
-    }
+		if (keyboard_tap(key) == ERROR)
+		{
+			log(LOG_ERROR, "Failed to tap key '%s'\n", KEY_NAMES[key]);
+			return ERROR;
+		}
+	}
 
-    return SUCCESS;
+	return SUCCESS;
 }
 
 int keyboard_combo(enum Key * keys, int length)
 {
-    if (keys == NULL || length < 0)
-    {
-        log(LOG_ERROR, "Invalid arguments\n");
-        return ERROR;
-    }
+	if (keys == NULL || length < 0)
+	{
+		log(LOG_ERROR, "Invalid arguments\n");
+		return ERROR;
+	}
 
-    for (int i = 0; i < length; i++)
-    {
-        enum Key key = keys[i];
+	for (int i = 0; i < length; i++)
+	{
+		enum Key key = keys[i];
 
-        if (key < 0 || key >= NUM_KEYS)
-        {
-            log(LOG_ERROR, "Invalid keycode '%d' (key #%d)\n", key, i);
-            return ERROR;
-        }
+		if (key < 0 || key >= NUM_KEYS)
+		{
+			log(LOG_ERROR, "Invalid keycode '%d' (key #%d)\n", key, i);
+			return ERROR;
+		}
 
-        if (keyboard_press(key) == ERROR)
-        {
-            log(LOG_ERROR, "Failed to press key '%s'\n", KEY_NAMES[key]);
-            return ERROR;
-        }
+		if (keyboard_press(key) == ERROR)
+		{
+			log(LOG_ERROR, "Failed to press key '%s'\n", KEY_NAMES[key]);
+			return ERROR;
+		}
 
-        usleep(50);
-    }
+		usleep(50);
+	}
 
-    for (int i = 0; i < length; i++)
-    {
-        if (keyboard_release(keys[i]) == ERROR)
-        {
-            log(LOG_ERROR, "Failed to release key '%s'\n", KEY_NAMES[keys[i]]);
-            return ERROR;
-        }
+	for (int i = 0; i < length; i++)
+	{
+		if (keyboard_release(keys[i]) == ERROR)
+		{
+			log(LOG_ERROR, "Failed to release key '%s'\n", KEY_NAMES[keys[i]]);
+			return ERROR;
+		}
 
-        usleep(50);
-    }
+		usleep(50);
+	}
 
-    return SUCCESS;
+	return SUCCESS;
 }

@@ -19,7 +19,11 @@
 #define ACCEL_DEFAULT_RANGE   100
 #define FLEX_DEFAULT_RANGE    20
 
-#define DEADZONE   3
+#define CURSOR_DEADZONE_RADIUS     3
+#define VOLUME_DEADZONE_RADIUS     10
+#define VOLUME_ACTIVATION_RADIUS   30
+
+#define DOUBLE_CLICK_DELAY_US   15000
 
 typedef uint8_t  U8;
 typedef uint16_t U16;

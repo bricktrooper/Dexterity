@@ -5,12 +5,11 @@
 
 #include "dexterity.h"
 #include "log.h"
+#include "utils.h"
 #include "gesture.h"
 #include "mouse.h"
 
 #include "control.h"
-
-#define DOUBLE_CLICK_DELAY_US   15000
 
 char * CONTROLS [NUM_CONTROLS] = {
 	"MOUSE",
@@ -134,9 +133,40 @@ static int control_scroll(struct Gesture * gestures, int quantity, struct Hand *
 	printf("idle\n");
 	return SUCCESS;
 }
+
 static int control_volume(struct Gesture * gestures, int quantity, struct Hand * hand)
 {
-	printf("idle\n");
+	static bool reset = false;
+
+	if (abs(hand->accel[Z]) < VOLUME_DEADZONE_RADIUS)
+	{
+		reset = false;
+	}
+
+	if (!reset && gesture_matches(ACTION_CHANGE_VOLUME, gestures, quantity, hand))
+	{
+		if (hand->accel[Z] < -VOLUME_ACTIVATION_RADIUS)
+		{
+			reset = true;
+			printf("up\n");
+			return action_volume_up();
+		}
+		else if (hand->accel[Z] > VOLUME_ACTIVATION_RADIUS)
+		{
+			reset = true;
+			printf("down\n");
+			return action_volume_down();
+		}
+		else
+		{
+			printf("ready\n");
+		}
+	}
+	else
+	{
+		printf("idle\n");
+	}
+
 	return SUCCESS;
 }
 

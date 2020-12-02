@@ -19,8 +19,7 @@ char * ACTIONS [NUM_ACTIONS] = {
 	"ZOOM_OUT",
 	"SCROLL_UP",
 	"SCROLL_DOWN",
-	"VOLUME_UP",
-	"VOLUME_DOWN",
+	"CHANGE_VOLUME",
 	"SWIPE_LEFT",
 	"SWIPE_RIGHT",
 	"IDLE"
@@ -28,7 +27,7 @@ char * ACTIONS [NUM_ACTIONS] = {
 
 int action_move(struct Hand * hand)
 {
-	deadzone(hand, DEADZONE);   // apply deadzone to accel values
+	deadzone(hand, CURSOR_DEADZONE_RADIUS);   // apply deadzone to accel values
 	int x = -hand->accel[Z];
 	int y = -hand->accel[X];
 	return mouse_move(x, y);
@@ -36,7 +35,7 @@ int action_move(struct Hand * hand)
 
 int action_drag(struct Hand * hand)
 {
-	deadzone(hand, DEADZONE);   // apply deadzone to accel values
+	deadzone(hand, CURSOR_DEADZONE_RADIUS);   // apply deadzone to accel values
 	int x = -hand->accel[Z];
 	int y = -hand->accel[X];
 	return mouse_drag(MOUSE_BUTTON_LEFT, x, y);
@@ -84,12 +83,14 @@ int action_scroll_down(struct Hand * hand)
 	return mouse_scroll(MOUSE_SCROLL_DOWN, abs(hand->accel[Z]));
 }
 
-int action_volume_up(struct Hand * hand)
+int action_volume_up(void)
 {
-	enum Key stroke [] = {KEY_VOLUME_UP};
-	return keyboard_combo(stroke, sizeof(stroke) / sizeof(enum Key));
+	return keyboard_tap(KEY_VOLUME_UP);
 }
-int action_volume_down(struct Hand * hand);
+int action_volume_down(void)
+{
+	return keyboard_tap(KEY_VOLUME_DOWN);
+}
 
 int action_swipe_left(void)
 {

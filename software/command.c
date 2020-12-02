@@ -407,7 +407,7 @@ int command_execute(enum Command command, char ** arguments, int count)
 	}
 
 	usleep(1000);   // give the serial port some time to initialize
-printf("Hello %d\n", count);
+
 	switch (command)
 	{
 		case COMMAND_RUN:

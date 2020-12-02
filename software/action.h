@@ -17,8 +17,7 @@ enum Action
 	ACTION_ZOOM_OUT,       // zoom out
 	ACTION_SCROLL_UP,      // scroll up
 	ACTION_SCROLL_DOWN,    // scroll down
-	ACTION_VOLUME_UP,      // increase the volume
-	ACTION_VOLUME_DOWN,    // decrease the volume
+	ACTION_CHANGE_VOLUME,  // increase/decrease the volume
 	ACTION_SWIPE_LEFT,     // command + left arrow
 	ACTION_SWIPE_RIGHT,    // command + right arrow
 	ACTION_IDLE,           // do nothing (this is a dummy action)
@@ -40,8 +39,8 @@ int action_zoom_in(void);
 int action_zoom_out(void);
 int action_scroll_up(struct Hand * hand);
 int action_scroll_down(struct Hand * hand);
-int action_volume_up(struct Hand * hand);
-int action_volume_down(struct Hand * hand);
+int action_volume_up(void);
+int action_volume_down(void);
 int action_swipe_left(void);
 int action_swipe_right(void);
 

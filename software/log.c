@@ -35,7 +35,7 @@ void log_trace(bool enabled)
 	trace = enabled;
 }
 
-int log_print(const char * function, const char * file, int line, enum LogType type, const char * format, ...)
+int log_print(const char * file, int line, const char * function, enum LogType type, const char * format, ...)
 {
 	if (suppressed[type])
 	{
@@ -51,7 +51,7 @@ int log_print(const char * function, const char * file, int line, enum LogType t
 
 	if (trace)
 	{
-		printf(" %s():%s:%d:", function, file, line);
+		printf(" [%s:%d:%s]", file, line, function);
 	}
 
 	printf(" ");

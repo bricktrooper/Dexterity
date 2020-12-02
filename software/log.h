@@ -14,10 +14,10 @@ enum LogType
 	LOG_INFO
 };
 
-#define log(...)   log_print(__func__, __FILE__, __LINE__, __VA_ARGS__)
+#define log(...)   log_print(__FILE__, __LINE__, __func__, __VA_ARGS__)
 
 void log_suppress(enum LogType type, bool suppress);
 void log_trace(bool enabled);
-int log_print(const char * function, const char * file, int line, enum LogType type, const char * format, ...) __attribute__ ((format (printf, 5, 6)));
+int log_print(const char * file, int line, const char * function, enum LogType type, const char * format, ...) __attribute__ ((format (printf, 5, 6)));
 
 #endif /* LOG_H */

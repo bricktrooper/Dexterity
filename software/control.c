@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include <stddef.h>
+#include <stdlib.h>
 #include <stdbool.h>
 #include <time.h>
 
@@ -143,7 +143,7 @@ static int control_volume(struct Gesture * gestures, int quantity, struct Hand *
 		reset = false;
 	}
 
-	if (!reset && gesture_matches(ACTION_CHANGE_VOLUME, gestures, quantity, hand))
+	if (!reset && gesture_matches(ACTION_VOLUME_CHANGE, gestures, quantity, hand))
 	{
 		if (hand->accel[Z] < -VOLUME_ACTIVATION_RADIUS)
 		{
@@ -161,6 +161,12 @@ static int control_volume(struct Gesture * gestures, int quantity, struct Hand *
 		{
 			printf("ready\n");
 		}
+	}
+	else if (!reset && gesture_matches(ACTION_VOLUME_MUTE, gestures, quantity, hand))
+	{
+		reset = true;
+		printf("mute\n");
+		return action_volume_mute();   // toggles between muted and unmuted
 	}
 	else
 	{

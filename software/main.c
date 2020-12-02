@@ -90,7 +90,7 @@ int init(void)
 	log_suppress(LOG_DEBUG, false);
 	log_suppress(LOG_INFO, true);
 
-	log_trace(false);
+	log_trace(true);
 
 	if (serial_open() == ERROR)
 	{

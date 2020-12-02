@@ -19,7 +19,8 @@ char * ACTIONS [NUM_ACTIONS] = {
 	"ZOOM_OUT",
 	"SCROLL_UP",
 	"SCROLL_DOWN",
-	"CHANGE_VOLUME",
+	"VOLUME_CHANGE",
+	"VOLUME_MUTE",
 	"SWIPE_LEFT",
 	"SWIPE_RIGHT",
 	"IDLE"
@@ -90,6 +91,11 @@ int action_volume_up(void)
 int action_volume_down(void)
 {
 	return keyboard_tap(KEY_VOLUME_DOWN);
+}
+
+int action_volume_mute(void)
+{
+	return keyboard_tap(KEY_MUTE);
 }
 
 int action_swipe_left(void)

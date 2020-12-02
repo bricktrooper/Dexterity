@@ -7,24 +7,25 @@
 
 enum Action
 {
-	ACTION_CYCLE,          // cycle between controls
-	ACTION_PRESS,          // press left click
-	ACTION_RELEASE,        // release left click
-	ACTION_LEFT_CLICK,     // single left click (click fast for double click)
-	ACTION_RIGHT_CLICK,    // single right click
-	ACTION_OVERVIEW,       // show all windows
-	ACTION_ZOOM_IN,        // zoom in
-	ACTION_ZOOM_OUT,       // zoom out
-	ACTION_SCROLL_UP,      // scroll up
-	ACTION_SCROLL_DOWN,    // scroll down
-	ACTION_CHANGE_VOLUME,  // increase/decrease the volume
-	ACTION_SWIPE_LEFT,     // command + left arrow
-	ACTION_SWIPE_RIGHT,    // command + right arrow
-	ACTION_IDLE,           // do nothing (this is a dummy action)
+	ACTION_CYCLE,           // cycle between controls
+	ACTION_PRESS,           // press left click
+	ACTION_RELEASE,         // release left click
+	ACTION_LEFT_CLICK,      // single left click (click fast for double click)
+	ACTION_RIGHT_CLICK,     // single right click
+	ACTION_OVERVIEW,        // show all windows
+	ACTION_ZOOM_IN,         // zoom in
+	ACTION_ZOOM_OUT,        // zoom out
+	ACTION_SCROLL_UP,       // scroll up
+	ACTION_SCROLL_DOWN,     // scroll down
+	ACTION_VOLUME_CHANGE,   // increase/decrease the volume
+	ACTION_VOLUME_MUTE,     // mute/unmute the volume
+	ACTION_SWIPE_LEFT,      // command + left arrow
+	ACTION_SWIPE_RIGHT,     // command + right arrow
+	ACTION_IDLE,            // do nothing (this is a dummy action)
 
 	NUM_ACTIONS,
 
-	ACTION_UNKNOWN         // the gesture could not be interpreted
+	ACTION_UNKNOWN          // the gesture could not be interpreted
 };
 
 extern char * ACTIONS [NUM_ACTIONS];
@@ -41,6 +42,7 @@ int action_scroll_up(struct Hand * hand);
 int action_scroll_down(struct Hand * hand);
 int action_volume_up(void);
 int action_volume_down(void);
+int action_volume_mute(void);
 int action_swipe_left(void);
 int action_swipe_right(void);
 

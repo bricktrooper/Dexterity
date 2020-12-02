@@ -21,6 +21,9 @@ enum Action
 	ACTION_VOLUME_MUTE,     // mute/unmute the volume
 	ACTION_SWIPE_LEFT,      // command + left arrow
 	ACTION_SWIPE_RIGHT,     // command + right arrow
+	ACTION_FAST_FORWARD,    // next song (fast forward fuction key)
+	ACTION_REWIND,          // previous song (rewind fuction key)
+	ACTION_PAUSE_PLAY,      // pause/play media (pause/play fuction key)
 	ACTION_IDLE,            // do nothing (this is a dummy action)
 
 	NUM_ACTIONS,
@@ -43,6 +46,9 @@ int action_scroll_down(struct Hand * hand);
 int action_volume_up(void);
 int action_volume_down(void);
 int action_volume_mute(void);
+int action_fast_forward(void);
+int action_rewind(void);
+int action_pause_play(void);
 int action_swipe_left(void);
 int action_swipe_right(void);
 

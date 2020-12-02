@@ -16,15 +16,9 @@ char * CONTROLS [NUM_CONTROLS] = {
 	"ZOOM",
 	"SCROLL",
 	"VOLUME",
+	"MUSIC",
 	"SWIPE"
 };
-
-
-
-
-#include "keyboard.h" //////////////////////////////////////////////////////////////////////////
-
-
 
 static int control_mouse(struct Gesture * gestures, int quantity, struct Hand * hand)
 {
@@ -102,12 +96,12 @@ static int control_zoom(struct Gesture * gestures, int quantity, struct Hand * h
 
 static int control_swipe(struct Gesture * gestures, int quantity, struct Hand * hand)
 {
-	if (hand->accel[Z] > 0 && gesture_matches(ACTION_SWIPE_LEFT, gestures, quantity, hand))
+	if (hand->accel[Z] > SWIPE_ACTIVATION && gesture_matches(ACTION_SWIPE_LEFT, gestures, quantity, hand))
 	{
 		printf("left\n");
 		return action_swipe_left();
 	}
-	else if (hand->accel[Z] < 0 && gesture_matches(ACTION_SWIPE_RIGHT, gestures, quantity, hand))
+	else if (hand->accel[Z] < -SWIPE_ACTIVATION && gesture_matches(ACTION_SWIPE_RIGHT, gestures, quantity, hand))
 	{
 		printf("right\n");
 		return action_swipe_right();
@@ -119,12 +113,12 @@ static int control_swipe(struct Gesture * gestures, int quantity, struct Hand * 
 
 static int control_scroll(struct Gesture * gestures, int quantity, struct Hand * hand)
 {
-	if (hand->accel[Z] < 0 && gesture_matches(ACTION_SCROLL_DOWN, gestures, quantity, hand))
+	if (hand->accel[Z] < -SCROLL_ACTIVATION && gesture_matches(ACTION_SCROLL_DOWN, gestures, quantity, hand))
 	{
 		printf("down\n");
 		return action_scroll_down(hand);
 	}
-	else if (hand->accel[Z] > 0 && gesture_matches(ACTION_SCROLL_UP, gestures, quantity, hand))
+	else if (hand->accel[Z] > SCROLL_ACTIVATION && gesture_matches(ACTION_SCROLL_UP, gestures, quantity, hand))
 	{
 		printf("up\n");
 		return action_scroll_up(hand);
@@ -138,20 +132,20 @@ static int control_volume(struct Gesture * gestures, int quantity, struct Hand *
 {
 	static bool reset = false;
 
-	if (abs(hand->accel[Z]) < VOLUME_DEADZONE_RADIUS)
+	if (abs(hand->accel[Z]) < VOLUME_DEADZONE)
 	{
 		reset = false;
 	}
 
 	if (!reset && gesture_matches(ACTION_VOLUME_CHANGE, gestures, quantity, hand))
 	{
-		if (hand->accel[Z] < -VOLUME_ACTIVATION_RADIUS)
+		if (hand->accel[Z] < -VOLUME_ACTIVATION)
 		{
 			reset = true;
 			printf("up\n");
 			return action_volume_up();
 		}
-		else if (hand->accel[Z] > VOLUME_ACTIVATION_RADIUS)
+		else if (hand->accel[Z] > VOLUME_ACTIVATION)
 		{
 			reset = true;
 			printf("down\n");
@@ -173,6 +167,28 @@ static int control_volume(struct Gesture * gestures, int quantity, struct Hand *
 		printf("idle\n");
 	}
 
+	return SUCCESS;
+}
+
+static int control_music(struct Gesture * gestures, int quantity, struct Hand * hand)
+{
+	if (gesture_matches(ACTION_PAUSE_PLAY, gestures, quantity, hand))
+	{
+		printf("pause/play\n");
+		return action_pause_play();
+	}
+	else if (hand->accel[Z] > MUSIC_ACTIVATION && gesture_matches(ACTION_FAST_FORWARD, gestures, quantity, hand))
+	{
+		printf("fast forward\n");
+		return action_fast_forward();
+	}
+	else if (hand->accel[Z] < -MUSIC_ACTIVATION && gesture_matches(ACTION_REWIND, gestures, quantity, hand))
+	{
+		printf("rewind\n");
+		return action_rewind();
+	}
+
+	printf("idle\n");
 	return SUCCESS;
 }
 
@@ -204,6 +220,10 @@ int control_execute(enum Control control, struct Gesture * gestures, int quantit
 
 		case CONTROL_SWIPE:
 			result = control_swipe(gestures, quantity, hand);
+			break;
+
+		case CONTROL_MUSIC:
+			result = control_music(gestures, quantity, hand);
 			break;
 
 		case CONTROL_MOUSE:

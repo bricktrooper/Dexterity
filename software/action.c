@@ -23,12 +23,15 @@ char * ACTIONS [NUM_ACTIONS] = {
 	"VOLUME_MUTE",
 	"SWIPE_LEFT",
 	"SWIPE_RIGHT",
+	"FAST_FORWARD",
+	"REWIND",
+	"PAUSE_PLAY",
 	"IDLE"
 };
 
 int action_move(struct Hand * hand)
 {
-	deadzone(hand, CURSOR_DEADZONE_RADIUS);   // apply deadzone to accel values
+	deadzone(hand, CURSOR_DEADZONE);   // apply deadzone to accel values
 	int x = -hand->accel[Z];
 	int y = -hand->accel[X];
 	return mouse_move(x, y);
@@ -36,7 +39,7 @@ int action_move(struct Hand * hand)
 
 int action_drag(struct Hand * hand)
 {
-	deadzone(hand, CURSOR_DEADZONE_RADIUS);   // apply deadzone to accel values
+	deadzone(hand, CURSOR_DEADZONE);   // apply deadzone to accel values
 	int x = -hand->accel[Z];
 	int y = -hand->accel[X];
 	return mouse_drag(MOUSE_BUTTON_LEFT, x, y);
@@ -96,6 +99,21 @@ int action_volume_down(void)
 int action_volume_mute(void)
 {
 	return keyboard_tap(KEY_MUTE);
+}
+
+int action_fast_forward(void)
+{
+	return keyboard_tap(KEY_FAST_FORWARD);
+}
+
+int action_rewind(void)
+{
+	return keyboard_tap(KEY_REWIND);
+}
+
+int action_pause_play(void)
+{
+	return keyboard_tap(KEY_PAUSE_PLAY);
 }
 
 int action_swipe_left(void)

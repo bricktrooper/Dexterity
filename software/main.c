@@ -1,14 +1,12 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
 #include <libgen.h>
 
 #include "dexterity.h"
 #include "log.h"
-#include "calibration.h"
-#include "command.h"
 #include "serial.h"
+#include "command.h"
+#include "gesture.h"
 
 #define ARGV_MIN          1   // no subcommand
 #define ARGV_MAX          4   // subcommand + arguments
@@ -16,9 +14,12 @@
 #define ARGV_SUBCOMMAND   1
 #define ARGV_ARGUMENTS    2
 
+struct Gesture * GESTURES = NULL;   // point to the list of gestures (freed on exit)
+int NUM_GESTURES = 0;               // the number of gestures in the list
+
+int dexterity(char * subcommand, char ** arguments, int count);
 int init(void);
 void end(int code);
-void print_usage(void);
 
 // when we calibrate we should 1. have the devie send an ack to affim that it is ready,
 // and 2. check the data we just updloaded by requesting a download and comparing it immediately after
@@ -59,6 +60,12 @@ int main(int argc, char ** argv)
 		arguments = &argv[ARGV_ARGUMENTS];
 	}
 
+	end(dexterity(subcommand, arguments, count));
+	return SUCCESS;   // dead code for silencing compiler warnings
+}
+
+int dexterity(char * subcommand, char ** arguments, int count)
+{
 	enum Command command = command_identify(subcommand);
 
 	if (command == COMMAND_UNKNOWN)
@@ -67,23 +74,25 @@ int main(int argc, char ** argv)
 		return ERROR;
 	}
 
-	int result = init();
-
-	if (result == ERROR)
+	if (init() == ERROR)
 	{
-		return result;
+		return ERROR;
 	}
 
-	result = command_execute(command, arguments, count);
-	end(result);
-
-	return SUCCESS;
+	return command_execute(command, arguments, count);
 }
 
 int init(void)
 {
-	signal(SIGINT, end);   // register signal handler for CTRL+C
+	// SIGNAL HANDLERS //
+	signal(SIGINT, end);   // Ctrl + C
+    signal(SIGHUP, end);   // hangup Hang up detected on controlling terminal or death of controlling process
+    signal(SIGQUIT, end);  // Ctrl + D
+    signal(SIGFPE, end);   // arithmetic error
+    signal(SIGKILL, end);  // kill
+    signal(SIGTERM, end);  // terminate
 
+	// LOGGING SETTINGS //
 	log_suppress(LOG_ERROR, false);
 	log_suppress(LOG_WARNING, false);
 	log_suppress(LOG_SUCCESS, false);
@@ -92,6 +101,7 @@ int init(void)
 
 	log_trace(true);
 
+	// SERIAL PORT //
 	if (serial_open() == ERROR)
 	{
 		log(LOG_ERROR, "Initialization failed\n");
@@ -104,13 +114,20 @@ int init(void)
 
 void end(int code)
 {
-	if (code == SIGINT)
+	printf("\n");
+
+	// SERIAL PORT //
+	if (serial_is_open())
 	{
-		printf("\n");
+		serial_purge();
+		serial_close();
 	}
 
-	serial_purge();
-	serial_close();
+	// GESTURES //
+	gesture_destroy(GESTURES, NUM_GESTURES);
+	GESTURES = NULL;
+	NUM_GESTURES = 0;
+
 	log(LOG_SUCCESS, "Terminated Dexterity\n");
-	exit(code);
+	exit(code);   // end program
 }

@@ -18,6 +18,9 @@
 #define MODE_COMMAND_RAW      "raw"
 #define MODE_COMMAND_SCALED   "scaled"
 
+extern struct Gesture * GESTURES;   // points to the list of gestures (freed on exit)
+extern int NUM_GESTURES;            // the number of gestures in the list
+
 static int command_run(char * calibration_file, char * gestures_file);
 static int command_sample(void);
 static int command_calibrate(char * calibration_file);
@@ -51,24 +54,24 @@ static int command_run(char * calibration_file, char * gestures_file)
 	}
 
 	int rc = ERROR;
-	struct Gesture * gestures = NULL;
-	int quantity = 0;
+	GESTURES = NULL;
+	NUM_GESTURES = 0;
 
-	if (gesture_import(gestures_file, &gestures, &quantity) == ERROR)
+	if (gesture_import(gestures_file, &GESTURES, &NUM_GESTURES) == ERROR)
 	{
 		log(LOG_ERROR, "Failed to import gestures from '%s'\n", gestures_file);
 		goto EXIT;
 	}
 
-	if (quantity != NUM_ACTIONS)
+	if (NUM_GESTURES != NUM_ACTIONS)
 	{
 		log(LOG_ERROR, "Incorrect number of gestures imported from '%s': Expected %d but imported %d\n",
-		                gestures_file, NUM_ACTIONS, quantity);
+		                gestures_file, NUM_ACTIONS, NUM_GESTURES);
 	}
 
 	for (enum Action expected = 0; expected < NUM_ACTIONS; expected++)
 	{
-		enum Action actual = gestures[expected].action;
+		enum Action actual = GESTURES[expected].action;
 
 		if (actual != expected)
 		{
@@ -78,11 +81,11 @@ static int command_run(char * calibration_file, char * gestures_file)
 		}
 	}
 
-	log(LOG_SUCCESS, "Imported %d gestures from '%s'\n", quantity, gestures_file);
+	log(LOG_SUCCESS, "Imported %d gestures from '%s'\n", NUM_GESTURES, gestures_file);
 
-	for (int i = 0; i < quantity; i++)
+	for (int i = 0; i < NUM_GESTURES; i++)
 	{
-		gesture_print(&gestures[i]);
+		gesture_print(&GESTURES[i]);
 	}
 
 	if (command_upload(calibration_file) == ERROR)
@@ -144,32 +147,25 @@ static int command_run(char * calibration_file, char * gestures_file)
 
 		if (disabled)
 		{
-			continue;   // don't ru if disabled
+			continue;   // don't proceed with gesture recognition if disabled
 		}
 
 		// We also need to deal with the freeing of the gestures when control C happens
 
-		// you should apply any deadzone before doing any inference
-		// apply the deadzones to the entire hand here before doing anything else
-
-		// start with mouse mode.  Run the current mode.  If while in the mode you detetch a switch, exit the function
-		// and cycle, then run the new gesture.  gesture execute should return cycle when ?
-
 		// TODO: please replaaace all string arrays with a function module_to_string(enum) to avoid segfaults
 		// make assertion macros
-		// print line numbers in error messages as well as file name.  make these optional
 
-		// fix makefile header list.  the headers should have their own list
-		// not all headers have a corresponding c file.  try colour.h for example.
-		// wait nvm this might actually have already been taken care of by the dependecy generation.
+		// there are also some comments in main that should be addressed.  you can compare structs using memcmp() instead of doing it manually.
 
-		if (gesture_matches(ACTION_CYCLE, gestures, quantity, &hand))
+		// finally we need to make print usage functions because you are gonna forget how to use this thing
+
+		if (gesture_matches(ACTION_CYCLE, GESTURES, NUM_GESTURES, &hand))
 		{
 			control = (control + 1) % NUM_CONTROLS;   // cycle to next control
 			continue;
 		}
 
-		if (control_execute(control, gestures, quantity, &hand) == ERROR)
+		if (control_execute(control, GESTURES, NUM_GESTURES, &hand) == ERROR)
 		{
 			log(LOG_ERROR, "\nFailed to control %s\n", CONTROLS[control]);
 			goto EXIT;
@@ -179,8 +175,8 @@ static int command_run(char * calibration_file, char * gestures_file)
 	rc = SUCCESS;
 
 EXIT:
-	gesture_destroy(gestures, quantity);
-	gestures = NULL;
+	gesture_destroy(GESTURES, NUM_GESTURES);
+	GESTURES = NULL;
 	return rc;
 }
 

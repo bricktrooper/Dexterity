@@ -16,7 +16,7 @@ enum Control
 	NUM_CONTROLS
 };
 
-extern char * CONTROLS [NUM_CONTROLS];
+char * control_string(enum Control control);
 
 int control_execute(enum Control control, struct Gesture * gestures, int quantity, struct Hand * hand);
 

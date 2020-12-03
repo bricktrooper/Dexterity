@@ -29,15 +29,21 @@ static int command_download(char * calibration_file);
 static int command_mode(char * mode);
 static int command_record(char * gesture_file);
 
-char * COMMANDS [NUM_COMMANDS] = {
-	"run",
-	"sample",
-	"calibrate",
-	"upload",
-	"download",
-	"mode",
-	"record",
-};
+char * command_string(enum Command command)
+{
+	switch (command)
+	{
+		case COMMAND_RUN:         return "run";
+		case COMMAND_SAMPLE:      return "sample";
+		case COMMAND_CALIBRATE:   return "calibrate";
+		case COMMAND_UPLOAD:      return "upload";
+		case COMMAND_DOWNLOAD:    return "download";
+		case COMMAND_MODE:        return "mode";
+		case COMMAND_RECORD:      return "record";
+		case COMMAND_UNKNOWN:     return "UNKNOWN";
+		default:                  return "INVALID";
+	}
+}
 
 static int command_run(char * calibration_file, char * gestures_file)
 {
@@ -76,7 +82,7 @@ static int command_run(char * calibration_file, char * gestures_file)
 		if (actual != expected)
 		{
 			log(LOG_ERROR, "Incorrect action for gesture #%d: Expected '%s' but parsed '%s'\n",
-			                expected, ACTIONS[expected], ACTIONS[actual]);
+			                expected, action_string(expected), action_string(actual));
 			goto EXIT;
 		}
 	}
@@ -150,11 +156,6 @@ static int command_run(char * calibration_file, char * gestures_file)
 			continue;   // don't proceed with gesture recognition if disabled
 		}
 
-		// We also need to deal with the freeing of the gestures when control C happens
-
-		// TODO: please replaaace all string arrays with a function module_to_string(enum) to avoid segfaults
-		// make assertion macros
-
 		// there are also some comments in main that should be addressed.  you can compare structs using memcmp() instead of doing it manually.
 
 		// finally we need to make print usage functions because you are gonna forget how to use this thing
@@ -167,7 +168,7 @@ static int command_run(char * calibration_file, char * gestures_file)
 
 		if (control_execute(control, GESTURES, NUM_GESTURES, &hand) == ERROR)
 		{
-			log(LOG_ERROR, "\nFailed to control %s\n", CONTROLS[control]);
+			log(LOG_ERROR, "\nFailed to control %s\n", control_string(control));
 			goto EXIT;
 		}
 	}
@@ -205,14 +206,14 @@ static int command_sample(void)
 		printf("\r");
 
 		printf("[" BLUE "%0.3f ms" WHITE "] |", latency);
-		printf(RED    " %s" WHITE " : % 5hd |", DIRECTIONS[X],   hand.accel[X]);
-		printf(RED    " %s" WHITE " : % 5hd |", DIRECTIONS[Y],   hand.accel[Y]);
-		printf(RED    " %s" WHITE " : % 5hd |", DIRECTIONS[Z],   hand.accel[Z]);
-		printf(YELLOW " %s" WHITE " : % 5hd |", FINGERS[THUMB],  hand.flex[THUMB]);
-		printf(YELLOW " %s" WHITE " : % 5hd |", FINGERS[INDEX],  hand.flex[INDEX]);
-		printf(YELLOW " %s" WHITE " : % 5hd |", FINGERS[MIDDLE], hand.flex[MIDDLE]);
-		printf(YELLOW " %s" WHITE " : % 5hd |", FINGERS[RING],   hand.flex[RING]);
-		printf(YELLOW " %s" WHITE " : % 5hd |", FINGERS[PINKY],  hand.flex[PINKY]);
+		printf(RED    " %s" WHITE " : % 5hd |", direction_string(X),   hand.accel[X]);
+		printf(RED    " %s" WHITE " : % 5hd |", direction_string(Y),   hand.accel[Y]);
+		printf(RED    " %s" WHITE " : % 5hd |", direction_string(Z),   hand.accel[Z]);
+		printf(YELLOW " %s" WHITE " : % 5hd |", finger_string(THUMB),  hand.flex[THUMB]);
+		printf(YELLOW " %s" WHITE " : % 5hd |", finger_string(INDEX),  hand.flex[INDEX]);
+		printf(YELLOW " %s" WHITE " : % 5hd |", finger_string(MIDDLE), hand.flex[MIDDLE]);
+		printf(YELLOW " %s" WHITE " : % 5hd |", finger_string(RING),   hand.flex[RING]);
+		printf(YELLOW " %s" WHITE " : % 5hd |", finger_string(PINKY),  hand.flex[PINKY]);
 		printf(GREEN  " %s" WHITE " : % hhd |", "BUTTON",        hand.button);
 		printf(GREEN  " %s" WHITE " : % hhd |", "LED",           hand.led);
 
@@ -310,7 +311,7 @@ static int command_mode(char * mode)
 		return ERROR;
 	}
 
-	if (strncasecmp(mode, MODES[RAW], strlen(MODES[RAW])) == 0)
+	if (strncasecmp(mode, mode_string(RAW), strlen(mode_string(RAW))) == 0)
 	{
 		if (raw() == ERROR)
 		{
@@ -318,7 +319,7 @@ static int command_mode(char * mode)
 			return ERROR;
 		}
 	}
-	else if (strncasecmp(mode, MODES[SCALED], strlen(MODES[SCALED])) == 0)
+	else if (strncasecmp(mode, mode_string(SCALED), strlen(mode_string(SCALED))) == 0)
 	{
 		if (scaled() == ERROR)
 		{
@@ -371,7 +372,7 @@ enum Command command_identify(char * subcommand)
 
 	for (enum Command command = 0; command < NUM_COMMANDS; command++)
 	{
-		if (strncmp(subcommand, COMMANDS[command], MAX_COMMAND_SIZE) == 0)
+		if (strncmp(subcommand, command_string(command), MAX_COMMAND_SIZE) == 0)
 		{
 			return command;
 		}

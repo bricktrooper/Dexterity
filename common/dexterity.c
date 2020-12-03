@@ -1,40 +1,65 @@
 #include "dexterity.h"
 
-char * DIRECTIONS [NUM_DIRECTIONS] = {
-	"X",
-	"Y",
-	"Z"
-};
+char * direction_string(enum Direction direction)
+{
+	switch (direction)
+	{
+		case X:    return "X";
+		case Y:    return "Y";
+		case Z:    return "Z";
+		default:   return "INVALID";
+	}
+}
 
-char * FINGERS [NUM_FINGERS] = {
-	"THUMB",
-	"INDEX",
-	"MIDDLE",
-	"RING",
-	"PINKY"
-};
+char * finger_string(enum Finger finger)
+{
+	switch (finger)
+	{
+		case THUMB:    return "THUMB";
+		case INDEX:    return "INDEX";
+		case MIDDLE:   return "MIDDLE";
+		case RING:     return "RING";
+		case PINKY:    return "PINKY";
+		default:       return "INVALID";
+	}
+}
 
-char * MESSAGES [NUM_MESSAGES] = {
-	"SAMPLE",
-	"UPLOAD",
-	"DOWNLOAD",
-	"RAW",
-	"SCALED",
-	"ERROR",
-	"SUCCESS",
-	"UNKNOWN"
-};
+char * message_string(enum Message message)
+{
+	switch (message)
+	{
+		case MESSAGE_SAMPLE:     return "SAMPLE";
+		case MESSAGE_UPLOAD:     return "UPLOAD";
+		case MESSAGE_DOWNLOAD:   return "DOWNLOAD";
+		case MESSAGE_RAW:        return "RAW";
+		case MESSAGE_SCALED:     return "SCALED";
+		case MESSAGE_ERROR:      return "ERROR";
+		case MESSAGE_SUCCESS:    return "SUCCESS";
+		case MESSAGE_UNKNOWN:    return "UNKNOWN";
+		default:                 return "INVALID";
+	}
+}
 
-char * PARAMETERS [NUM_PARAMETERS] = {
-	"MIN",
-	"MAX",
-	"CENTRE"
-};
+char * parameter_string(enum Parameter parameter)
+{
+	switch (parameter)
+	{
+		case MIN:      return "MIN";
+		case MAX:      return "MAX";
+		case CENTRE:   return "CENTRE";
+		default:       return "INVALID";
+	}
+}
 
-char * MODES [NUM_MODES] = {
-	"RAW",
-	"SCALED",
-};
+char * mode_string(enum Mode mode)
+{
+	switch (mode)
+	{
+		case RAW:      return "RAW";
+		case SCALED:   return "SCALED";
+		default:       return "INVALID";
+	}
+}
 
 S16 scale(S16 reading, S16 range, S16 min, S16 max, S16 centre)
 {

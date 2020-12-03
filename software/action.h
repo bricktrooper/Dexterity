@@ -33,6 +33,8 @@ enum Action
 
 extern char * ACTIONS [NUM_ACTIONS];
 
+char * action_string(enum Action action);
+
 int action_move(struct Hand * hand);
 int action_drag(struct Hand * hand);
 int action_left_click(void);

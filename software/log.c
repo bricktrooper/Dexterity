@@ -35,7 +35,7 @@ void log_trace(bool enabled)
 	trace = enabled;
 }
 
-int log_print(const char * file, int line, const char * function, enum LogType type, const char * format, ...)
+int log_print(char const * file, int line, char const * function, enum LogType type, char const * format, ...)
 {
 	if (suppressed[type])
 	{

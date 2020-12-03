@@ -85,12 +85,12 @@ int dexterity(char * subcommand, char ** arguments, int count)
 int init(void)
 {
 	// SIGNAL HANDLERS //
-	signal(SIGINT, end);   // Ctrl + C
-    signal(SIGHUP, end);   // hangup Hang up detected on controlling terminal or death of controlling process
-    signal(SIGQUIT, end);  // Ctrl + D
-    signal(SIGFPE, end);   // arithmetic error
-    signal(SIGKILL, end);  // kill
-    signal(SIGTERM, end);  // terminate
+	signal(SIGINT, end);    // Ctrl + C
+    signal(SIGHUP, end);    // hangup Hang up detected on controlling terminal or death of controlling process
+    signal(SIGQUIT, end);   // Ctrl + D
+    signal(SIGFPE, end);    // arithmetic error
+    signal(SIGKILL, end);   // kill
+    signal(SIGTERM, end);   // terminate
 
 	// LOGGING SETTINGS //
 	log_suppress(LOG_ERROR, false);
@@ -128,6 +128,6 @@ void end(int code)
 	GESTURES = NULL;
 	NUM_GESTURES = 0;
 
-	log(LOG_SUCCESS, "Terminated Dexterity\n");
+	log(LOG_SUCCESS, "Terminated Dexterity (%d)\n", code);
 	exit(code);   // end program
 }

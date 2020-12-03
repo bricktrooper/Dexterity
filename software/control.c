@@ -11,14 +11,19 @@
 
 #include "control.h"
 
-char * CONTROLS [NUM_CONTROLS] = {
-	"MOUSE",
-	"ZOOM",
-	"SCROLL",
-	"VOLUME",
-	"MUSIC",
-	"SWIPE"
-};
+char * control_string(enum Control control)
+{
+	switch (control)
+	{
+		case CONTROL_MOUSE:    return "MOUSE";
+		case CONTROL_ZOOM:     return "ZOOM";
+		case CONTROL_SCROLL:   return "SCROLL";
+		case CONTROL_VOLUME:   return "VOLUME";
+		case CONTROL_MUSIC:    return "MUSIC";
+		case CONTROL_SWIPE:    return "SWIPE";
+		default:               return "INVALID";
+	}
+}
 
 static int control_mouse(struct Gesture * gestures, int quantity, struct Hand * hand)
 {
@@ -202,7 +207,7 @@ int control_execute(enum Control control, struct Gesture * gestures, int quantit
 
 	int result = ERROR;
 
-	printf("%s ", CONTROLS[control]);
+	printf("%s ", control_string(control));
 
 	switch (control)
 	{

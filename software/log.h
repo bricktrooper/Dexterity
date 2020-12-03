@@ -18,6 +18,6 @@ enum LogType
 
 void log_suppress(enum LogType type, bool suppress);
 void log_trace(bool enabled);
-int log_print(const char * file, int line, const char * function, enum LogType type, const char * format, ...) __attribute__ ((format (printf, 5, 6)));
+int log_print(char const * file, int line, char const * function, enum LogType type, char const * format, ...) __attribute__ ((format (printf, 5, 6)));
 
 #endif /* LOG_H */

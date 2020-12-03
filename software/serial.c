@@ -301,7 +301,7 @@ enum Message serial_read_message(void)
 
 	for (enum Message message = 0; message < NUM_MESSAGES; message++)
 	{
-		if (strncmp(data, MESSAGES[message], MAX_MESSAGE_SIZE) == 0)
+		if (strncmp(data, message_string(message), MAX_MESSAGE_SIZE) == 0)
 		{
 			return message;
 		}
@@ -312,12 +312,12 @@ enum Message serial_read_message(void)
 
 int serial_write_message(enum Message message)
 {
-	int length = strlen(MESSAGES[message]);
+	int length = strlen(message_string(message));
 	char buffer [MAX_MESSAGE_SIZE] = {0};
 
-	memcpy(buffer, MESSAGES[message], length);   // get message string
-	memcpy(buffer + length, "\r", 1);            // carriage return [Enter] indicates end of transmission
-	length += 1;                                 // length of message including the terminator
+	memcpy(buffer, message_string(message), length);   // get message string
+	memcpy(buffer + length, "\r", 1);                  // carriage return [Enter] indicates end of transmission
+	length += 1;                                       // length of message including the terminator
 
 	if (serial_write(buffer, length) != length)
 	{

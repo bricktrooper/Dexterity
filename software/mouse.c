@@ -6,6 +6,7 @@
 
 #include "mouse.h"
 
+// Screen limits for a 1080p monitor
 #define X_MIN   0
 #define Y_MIN   0
 #define X_MAX   1920

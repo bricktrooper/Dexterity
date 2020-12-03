@@ -126,7 +126,7 @@ int gesture_import(char * file_name, struct Gesture ** gestures, int * quantity)
 
 		for (enum Action action = 0; action < NUM_ACTIONS; action++)
 		{
-			if (strncmp(name, ACTIONS[action], MAX_ACTION_NAME_LENGTH) == 0)
+			if (strncmp(name, action_string(action), MAX_ACTION_NAME_LENGTH) == 0)
 			{
 				gesture->action = action;
 				break;
@@ -265,7 +265,7 @@ int gesture_export(char * file_name, struct Gesture * gestures, int quantity)
 			return ERROR;
 		}
 
-		fprintf(file, "ACTION=%s\n", ACTIONS[gesture->action]);
+		fprintf(file, "ACTION=%s\n", action_string(gesture->action));
 		fprintf(file, "PHASES=%d\n", gesture->phases);
 		fprintf(file, "TOLERANCE=%f\n", gesture->tolerance);
 
@@ -273,12 +273,12 @@ int gesture_export(char * file_name, struct Gesture * gestures, int quantity)
 
 		for (enum Direction direction = 0; direction < NUM_DIRECTIONS; direction++)
 		{
-			fprintf(file, " %s=%hhd", DIRECTIONS[direction], (S8)gesture->ignores.accel[direction]);
+			fprintf(file, " %s=%hhd", direction_string(direction), (S8)gesture->ignores.accel[direction]);
 		}
 
 		for (enum Finger finger = 0; finger < NUM_FINGERS; finger++)
 		{
-			fprintf(file, " %s=%hhd", FINGERS[finger], (S8)gesture->ignores.flex[finger]);
+			fprintf(file, " %s=%hhd", finger_string(finger), (S8)gesture->ignores.flex[finger]);
 		}
 
 		fprintf(file, "\n");
@@ -289,12 +289,12 @@ int gesture_export(char * file_name, struct Gesture * gestures, int quantity)
 
 			for (enum Direction direction = 0; direction < NUM_DIRECTIONS; direction++)
 			{
-				fprintf(file, " %s=%hd", DIRECTIONS[direction], gesture->criteria[phase].accel[direction]);
+				fprintf(file, " %s=%hd", direction_string(direction), gesture->criteria[phase].accel[direction]);
 			}
 
 			for (enum Finger finger = 0; finger < NUM_FINGERS; finger++)
 			{
-				fprintf(file, " %s=%hd", FINGERS[finger], gesture->criteria[phase].flex[finger]);
+				fprintf(file, " %s=%hd", finger_string(finger), gesture->criteria[phase].flex[finger]);
 			}
 
 			fprintf(file, "\n");
@@ -370,14 +370,14 @@ int gesture_record(struct Gesture * gesture)
 
 			printf("\r");
 			printf("[" BLUE "Phase %d" WHITE "] |", phase);
-			printf(RED    " %s" WHITE " : % 5hd |", DIRECTIONS[X],   hand.accel[X]);
-			printf(RED    " %s" WHITE " : % 5hd |", DIRECTIONS[Y],   hand.accel[Y]);
-			printf(RED    " %s" WHITE " : % 5hd |", DIRECTIONS[Z],   hand.accel[Z]);
-			printf(YELLOW " %s" WHITE " : % 5hd |", FINGERS[THUMB],  hand.flex[THUMB]);
-			printf(YELLOW " %s" WHITE " : % 5hd |", FINGERS[INDEX],  hand.flex[INDEX]);
-			printf(YELLOW " %s" WHITE " : % 5hd |", FINGERS[MIDDLE], hand.flex[MIDDLE]);
-			printf(YELLOW " %s" WHITE " : % 5hd |", FINGERS[RING],   hand.flex[RING]);
-			printf(YELLOW " %s" WHITE " : % 5hd |", FINGERS[PINKY],  hand.flex[PINKY]);
+			printf(RED    " %s" WHITE " : % 5hd |", direction_string(X),   hand.accel[X]);
+			printf(RED    " %s" WHITE " : % 5hd |", direction_string(Y),   hand.accel[Y]);
+			printf(RED    " %s" WHITE " : % 5hd |", direction_string(Z),   hand.accel[Z]);
+			printf(YELLOW " %s" WHITE " : % 5hd |", finger_string(THUMB),  hand.flex[THUMB]);
+			printf(YELLOW " %s" WHITE " : % 5hd |", finger_string(INDEX),  hand.flex[INDEX]);
+			printf(YELLOW " %s" WHITE " : % 5hd |", finger_string(MIDDLE), hand.flex[MIDDLE]);
+			printf(YELLOW " %s" WHITE " : % 5hd |", finger_string(RING),   hand.flex[RING]);
+			printf(YELLOW " %s" WHITE " : % 5hd |", finger_string(PINKY),  hand.flex[PINKY]);
 			fflush(stdout);
 		}
 		while (hand.button == BUTTON_RELEASED);
@@ -505,19 +505,19 @@ int gesture_print(struct Gesture * gesture)
 	}
 
 	printf("=============================================================================\n");
-	printf("ACTION: %s\n", ACTIONS[gesture->action]);
+	printf("ACTION: %s\n", action_string(gesture->action));
 	printf("PHASES: %d\n", gesture->phases);
 	printf("TOLERANCE: %f\n", gesture->tolerance);
 	printf("IGNORE:");
 
 	for (enum Direction direction = 0; direction < NUM_DIRECTIONS; direction++)
 	{
-		printf(" %s=%hhd", DIRECTIONS[direction], (S8)gesture->ignores.accel[direction]);
+		printf(" %s=%hhd", direction_string(direction), (S8)gesture->ignores.accel[direction]);
 	}
 
 	for (enum Finger finger = 0; finger < NUM_FINGERS; finger++)
 	{
-		printf(" %s=%hhd", FINGERS[finger], (S8)gesture->ignores.flex[finger]);
+		printf(" %s=%hhd", finger_string(finger), (S8)gesture->ignores.flex[finger]);
 	}
 
 	printf("\n");
@@ -529,12 +529,12 @@ int gesture_print(struct Gesture * gesture)
 
 		for (enum Direction direction = 0; direction < NUM_DIRECTIONS; direction++)
 		{
-			printf(" %s=%hd", DIRECTIONS[direction], gesture->criteria[phase].accel[direction]);
+			printf(" %s=%hd", direction_string(direction), gesture->criteria[phase].accel[direction]);
 		}
 
 		for (enum Finger finger = 0; finger < NUM_FINGERS; finger++)
 		{
-			printf(" %s=%hd", FINGERS[finger], gesture->criteria[phase].flex[finger]);
+			printf(" %s=%hd", finger_string(finger), gesture->criteria[phase].flex[finger]);
 		}
 
 		printf("\n");

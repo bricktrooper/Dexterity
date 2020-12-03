@@ -16,6 +16,8 @@ enum Command
 	COMMAND_UNKNOWN      // the command entered was unknown
 };
 
+char * command_string(enum Command command);
+
 enum Command command_identify(char * subcommand);
 int command_execute(enum Command command, char ** arguments, int count);
 

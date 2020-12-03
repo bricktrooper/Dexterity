@@ -8,26 +8,32 @@
 
 #include "action.h"
 
-char * ACTIONS [NUM_ACTIONS] = {
-	"CYCLE",
-	"PRESS",
-	"RELEASE",
-	"LEFT_CLICK",
-	"RIGHT_CLICK",
-	"OVERVIEW",
-	"ZOOM_IN",
-	"ZOOM_OUT",
-	"SCROLL_UP",
-	"SCROLL_DOWN",
-	"VOLUME_CHANGE",
-	"VOLUME_MUTE",
-	"SWIPE_LEFT",
-	"SWIPE_RIGHT",
-	"FAST_FORWARD",
-	"REWIND",
-	"PAUSE_PLAY",
-	"IDLE"
-};
+char * action_string(enum Action action)
+{
+	switch (action)
+	{
+		case ACTION_CYCLE:           return "CYCLE";
+		case ACTION_PRESS:           return "PRESS";
+		case ACTION_RELEASE:         return "RELEASE";
+		case ACTION_LEFT_CLICK:      return "LEFT_CLICK";
+		case ACTION_RIGHT_CLICK:     return "RIGHT_CLICK";
+		case ACTION_OVERVIEW:        return "OVERVIEW";
+		case ACTION_ZOOM_IN:         return "ZOOM_IN";
+		case ACTION_ZOOM_OUT:        return "ZOOM_OUT";
+		case ACTION_SCROLL_UP:       return "SCROLL_UP";
+		case ACTION_SCROLL_DOWN:     return "SCROLL_DOWN";
+		case ACTION_VOLUME_CHANGE:   return "VOLUME_CHANGE";
+		case ACTION_VOLUME_MUTE:     return "VOLUME_MUTE";
+		case ACTION_SWIPE_LEFT:      return "SWIPE_LEFT";
+		case ACTION_SWIPE_RIGHT:     return "SWIPE_RIGHT";
+		case ACTION_FAST_FORWARD:    return "FAST_FORWARD";
+		case ACTION_REWIND:          return "REWIND";
+		case ACTION_PAUSE_PLAY:      return "PAUSE_PLAY";
+		case ACTION_IDLE:            return "IDLE";
+		case ACTION_UNKNOWN:         return "UNKNOWN";
+		default:                     return "INVALID";
+	}
+}
 
 int action_move(struct Hand * hand)
 {

@@ -99,7 +99,7 @@ int uart_receive(void * buffer, int size)
 
 int uart_transmit_message(enum Message message)
 {
-	char * data = MESSAGES[message];
+	char * data = message_string(message);
 	int length = strlen(data);
 
 	uart_transmit(data, length);
@@ -135,7 +135,7 @@ enum Message uart_receive_message(void)
 
 	for (enum Message message = 0; message < NUM_MESSAGES; message++)
 	{
-		if (strncmp(data, MESSAGES[message], MAX_MESSAGE_SIZE) == 0)
+		if (strncmp(data, message_string(message), MAX_MESSAGE_SIZE) == 0)
 		{
 			return message;
 		}

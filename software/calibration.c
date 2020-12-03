@@ -189,7 +189,25 @@ int calibration_upload(struct Calibration * calibration)
 		return ERROR;
 	}
 
-	log(LOG_SUCCESS, "Calibration uploaded to device\n");
+	// re-download the newly updated calibration settings from the device verification
+	struct Calibration settings;
+
+	if (download(&settings) == ERROR)
+	{
+		log(LOG_ERROR, "Failed to download calibration settings from device for verification\n");
+		return ERROR;
+	}
+
+	// compare the expected and actual settings
+	if (memcmp(calibration, &settings, sizeof(struct Calibration)) != 0)
+	{
+		// NOTE: This could occur due to noise in the UART.
+		// We should inform the user so that they can try uploading the calibration again.
+		log(LOG_ERROR, "The device's new calibration settings do not match what was uploaded\n");
+		return ERROR;
+	}
+
+	log(LOG_SUCCESS, "Calibration uploaded to device and verified\n");
 	return SUCCESS;
 }
 

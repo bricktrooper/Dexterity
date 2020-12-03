@@ -59,7 +59,7 @@ void main(void)
 
 			case MESSAGE_UPLOAD:   // receive the calibration settings and apply them
 
-				uart_transmit_message(MESSAGE_SUCCESS);   // handshake with PC
+				uart_transmit_message(MESSAGE_SUCCESS);   // handshake with the host
 
 				if (uart_receive(&calibration, sizeof(struct Calibration)) != sizeof(struct Calibration))
 				{
@@ -67,15 +67,14 @@ void main(void)
 					break;
 				}
 
-				// apply the calibration and send an ACK when finished
-				calibrate(&calibration);
-				uart_transmit_message(MESSAGE_SUCCESS);
+				calibrate(&calibration);                  // apply the calibration
+				uart_transmit_message(MESSAGE_SUCCESS);   // send an ACK when finished
 				break;
 
 			case MESSAGE_DOWNLOAD:   // transmit the current calibration settings
 
-				settings(&calibration);
-				uart_transmit(&calibration, sizeof(struct Calibration));
+				settings(&calibration);                                    // copy the current calibration settings
+				uart_transmit(&calibration, sizeof(struct Calibration));   // send the calibration back to the host
 				break;
 
 			case MESSAGE_UNKNOWN:   // respond with error if an unexpected or unknown message is received

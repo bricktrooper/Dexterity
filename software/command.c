@@ -156,10 +156,6 @@ static int command_run(char * calibration_file, char * gestures_file)
 			continue;   // don't proceed with gesture recognition if disabled
 		}
 
-		// there are also some comments in main that should be addressed.  you can compare structs using memcmp() instead of doing it manually.
-
-		// finally we need to make print usage functions because you are gonna forget how to use this thing
-
 		if (gesture_matches(ACTION_CYCLE, GESTURES, NUM_GESTURES, &hand))
 		{
 			control = (control + 1) % NUM_CONTROLS;   // cycle to next control

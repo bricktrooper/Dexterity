@@ -21,9 +21,12 @@ int dexterity(char * subcommand, char ** arguments, int count);
 int init(void);
 void end(int code);
 
-// when we calibrate we should 1. have the devie send an ack to affim that it is ready,
-// and 2. check the data we just updloaded by requesting a download and comparing it immediately after
-// 3. send an ack after the device applies the data
+////////////////////////////////////////////////
+////////////////////////////////////////////////
+////////////////////////////////////////////////
+////////////////////////////////////////////////
+////////////////////////////////////////////////
+// finally we need to make print usage functions because you are gonna forget how to use this thing
 
 int main(int argc, char ** argv)
 {
@@ -114,7 +117,14 @@ int init(void)
 
 void end(int code)
 {
-	printf("\n");
+	if (code != ERROR &&
+	    code != SUCCESS &&
+		code != WARNING)
+	{
+		/* Print on a new line if end() was triggered by a signal interrupt.
+		 * (all signals are > 0 while return codes are <= 0) */
+		printf("\n");
+	}
 
 	// SERIAL PORT //
 	if (serial_is_open())

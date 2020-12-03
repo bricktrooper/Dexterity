@@ -4,7 +4,7 @@
 #include <stdint.h>
 
 #define ERROR     -1
-#define WARNING    1
+#define WARNING   -2
 #define SUCCESS    0
 
 #define BUTTON_PRESSED    1

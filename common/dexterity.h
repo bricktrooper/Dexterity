@@ -10,7 +10,7 @@
 #define BUTTON_PRESSED    1
 #define BUTTON_RELEASED   0
 
-#define MAX_MESSAGE_SIZE         15
+#define MAX_MESSAGE_SIZE         10
 #define MAX_SENSOR_NAME_LENGTH   6
 
 #define ACCEL_DEFAULT_ZERO    100

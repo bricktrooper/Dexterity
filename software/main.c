@@ -99,8 +99,8 @@ int init(void)
 	log_suppress(LOG_ERROR, false);
 	log_suppress(LOG_WARNING, false);
 	log_suppress(LOG_SUCCESS, false);
-	log_suppress(LOG_DEBUG, false);
 	log_suppress(LOG_INFO, true);
+	log_suppress(LOG_DEBUG, true);
 
 	log_trace(true);
 
@@ -111,7 +111,7 @@ int init(void)
 		end(ERROR);
 	}
 
-	log(LOG_SUCCESS, "Initialized Dexterity\n");
+	log(LOG_INFO, "Initialized Dexterity\n");
 	return SUCCESS;
 }
 
@@ -138,6 +138,6 @@ void end(int code)
 	GESTURES = NULL;
 	NUM_GESTURES = 0;
 
-	log(LOG_SUCCESS, "Terminated Dexterity (%d)\n", code);
+	log(LOG_INFO, "Terminated Dexterity (%d)\n", code);
 	exit(code);   // end program
 }

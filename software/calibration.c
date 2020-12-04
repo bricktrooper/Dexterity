@@ -57,7 +57,7 @@ int calibration_import(char * file_name, struct Calibration * calibration)
 	{
 		if (fscanf(file, "%s", sensor_label) != 1)
 		{
-			log(LOG_ERROR, "sensor label was incorrectly parsed\n");
+			log(LOG_ERROR, "Sensor label was incorrectly parsed\n");
 			goto EXIT;
 		}
 
@@ -84,7 +84,7 @@ int calibration_import(char * file_name, struct Calibration * calibration)
 	{
 		if (fscanf(file, "%s", sensor_label) != 1)
 		{
-			log(LOG_ERROR, "sensor label was incorrectly parsed\n");
+			log(LOG_ERROR, "Sensor label was incorrectly parsed\n");
 			goto EXIT;
 		}
 
@@ -152,7 +152,7 @@ int calibration_export(char * file_name, struct Calibration * calibration)
 		        calibration->flex.params[finger][CENTRE]);
 	}
 
-	log(LOG_SUCCESS, "Export calibration to file '%s'\n", file_name);
+	log(LOG_SUCCESS, "Exported calibration to file '%s'\n", file_name);
 	fclose(file);
 	return SUCCESS;
 }
@@ -203,7 +203,7 @@ int calibration_upload(struct Calibration * calibration)
 	{
 		// NOTE: This could occur due to noise in the UART.
 		// We should inform the user so that they can try uploading the calibration again.
-		log(LOG_ERROR, "The device's new calibration settings do not match what was uploaded\n");
+		log(LOG_ERROR, "The device settings do not match what was uploaded\n");
 		return ERROR;
 	}
 

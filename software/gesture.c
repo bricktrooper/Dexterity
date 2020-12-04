@@ -455,7 +455,9 @@ float gesture_compare(struct Gesture * gesture, struct Hand * hand)
 		return 0.0;   // "exact" match
 	}
 
-	return (float)sum / total;
+	float deviation = (float)sum / total;
+	log(LOG_DEBUG, "Average gesture deviation: %f\n", deviation);
+	return deviation;
 }
 
 bool gesture_matches(enum Action action, struct Gesture * gestures, int quantity, struct Hand * hand)
@@ -473,6 +475,7 @@ bool gesture_matches(enum Action action, struct Gesture * gestures, int quantity
 		if (gestures[action].state == gestures[action].phases)   // check if the last phase has been reached
 		{
 			gesture_reset(gestures, quantity);   // reset all gestures states once a gesture is recongized
+			log(LOG_INFO, "Gesture matches '%s'\n", action_string(action));
 			return true;
 		}
 	}
@@ -493,6 +496,7 @@ int gesture_reset(struct Gesture * gestures, int quantity)
 		gestures[i].state = 0;   // reset phase state for all gestures
 	}
 
+	log(LOG_INFO, "Reset all gesture states to phase 0\n");
 	return SUCCESS;
 }
 

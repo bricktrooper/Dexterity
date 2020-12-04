@@ -42,7 +42,7 @@ int serial_open(void)
 		return ERROR;
 	}
 
-	log(LOG_SUCCESS, "Opened serial port '%s'\n", SERIAL_PORT);
+	log(LOG_INFO, "Opened serial port '%s'\n", SERIAL_PORT);
 
 	// GET SERIAL PORT ATTRIBUTES //
 
@@ -113,6 +113,8 @@ int serial_open(void)
 		goto EXIT;
 	}
 
+	log(LOG_INFO, "Set baud rate to %u\n", BAUD_RATE);
+
 	// SAVE ATTRIBUTES //
 
 	if (tcsetattr(serial_port, TCSANOW, &settings) != 0)
@@ -120,6 +122,7 @@ int serial_open(void)
 		log(LOG_ERROR, "Failed to set serial port attributes: %s (%d)\n", strerror(errno), errno);
 	}
 
+	log(LOG_INFO, "Configured serial port attributes\n");
 	rc = SUCCESS;
 
 EXIT:
@@ -141,7 +144,7 @@ int serial_close(void)
 
 	close(serial_port);
 	serial_port = -1;
-	log(LOG_SUCCESS, "Closed serial port '%s'\n", SERIAL_PORT);
+	log(LOG_INFO, "Closed serial port '%s'\n", SERIAL_PORT);
 
 	return SUCCESS;
 }
@@ -165,7 +168,6 @@ int serial_purge(void)
 		return ERROR;
 	}
 
-	log(LOG_INFO, "Purged serial port RX buffer\n");
 	return SUCCESS;
 }
 
@@ -208,7 +210,8 @@ int serial_read(void * buffer, int size)
 	{
 		if (errno == ETIMEDOUT)
 		{
-			log(LOG_WARNING, "%s (%d)\n", strerror(errno), errno);
+			// A timeout is not a fatal error (the user may want to try reading again)
+			log(LOG_WARNING, "Failed to read from serial port: %s (%d)\n", strerror(errno), errno);
 		}
 		else
 		{
@@ -217,7 +220,7 @@ int serial_read(void * buffer, int size)
 		}
 	}
 
-	log(LOG_INFO, "Read %dB from the serial port\n", received);
+	log(LOG_DEBUG, "Read %dB from the serial port\n", received);
 	return received;
 }
 
@@ -271,14 +274,14 @@ int serial_write(void * buffer, int size)
 		return ERROR;
 	}
 
-	log(LOG_INFO, "Wrote %dB to the serial port\n", transmitted);
+	log(LOG_DEBUG, "Wrote %dB to the serial port\n", transmitted);
 	return transmitted;
 }
 
 enum Message serial_read_message(void)
 {
 	char next = 0;
-	char data [MAX_MESSAGE_SIZE];
+	char data [MAX_MESSAGE_SIZE + 1];
 	int length = sizeof(data);
 
 	memset(data, 0, length);
@@ -301,29 +304,35 @@ enum Message serial_read_message(void)
 
 	for (enum Message message = 0; message < NUM_MESSAGES; message++)
 	{
-		if (strncmp(data, message_string(message), MAX_MESSAGE_SIZE) == 0)
+		char * string = message_string(message);
+
+		if (strncmp(data, string, MAX_MESSAGE_SIZE) == 0)
 		{
+			log(LOG_DEBUG, "Received message from device: '%s'\n", string);
 			return message;
 		}
 	}
 
+	log(LOG_WARNING, "Received unknown message from device: '%s'\n", data);
 	return MESSAGE_UNKNOWN;
 }
 
 int serial_write_message(enum Message message)
 {
-	int length = strlen(message_string(message));
-	char buffer [MAX_MESSAGE_SIZE] = {0};
+	char * string = message_string(message);
+	int length = strlen(string);
+	char data [MAX_MESSAGE_SIZE];
 
-	memcpy(buffer, message_string(message), length);   // get message string
-	memcpy(buffer + length, "\r", 1);                  // carriage return [Enter] indicates end of transmission
-	length += 1;                                       // length of message including the terminator
+	memcpy(data, string, length);   // get message string
+	memcpy(data + length, "\r", 1); // carriage return [Enter] indicates end of transmission
+	length += 1;                    // length of message including the terminator
 
-	if (serial_write(buffer, length) != length)
+	if (serial_write(data, length) != length)
 	{
-		log(LOG_ERROR, "Failed to write message to serial port\n");
+		log(LOG_ERROR, "Failed to write message to serial port: '%s'\n", string);
 		return ERROR;
 	}
 
+	log(LOG_DEBUG, "Sent message to device: '%s'\n", string);
 	return SUCCESS;
 }

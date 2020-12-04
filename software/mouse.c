@@ -58,7 +58,7 @@ int mouse_correct(struct Mouse * mouse)
 {
 	if (mouse == NULL)
 	{
-		log(LOG_ERROR, "Mouse is NULL\n");
+		log(LOG_ERROR, "Invalid arguments\n");
 		return ERROR;
 	}
 

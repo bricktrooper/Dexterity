@@ -164,7 +164,7 @@ static int command_run(char * calibration_file, char * gestures_file)
 
 		if (control_execute(control, GESTURES, NUM_GESTURES, &hand) == ERROR)
 		{
-			log(LOG_ERROR, "\nFailed to control %s\n", control_string(control));
+			log(LOG_ERROR, "Failed to control %s\n", control_string(control));
 			goto EXIT;
 		}
 	}
@@ -311,7 +311,7 @@ static int command_mode(char * mode)
 	{
 		if (raw() == ERROR)
 		{
-			log(LOG_SUCCESS, "Failed to set device to %s mode\n", mode);
+			log(LOG_ERROR, "Failed to set device to %s mode\n", mode);
 			return ERROR;
 		}
 	}
@@ -319,7 +319,7 @@ static int command_mode(char * mode)
 	{
 		if (scaled() == ERROR)
 		{
-			log(LOG_SUCCESS, "Failed to set device to %s mode\n", mode);
+			log(LOG_ERROR, "Failed to set device to %s mode\n", mode);
 			return ERROR;
 		}
 	}
@@ -339,7 +339,7 @@ static int command_record(char * gesture_file)
 
 	if (gesture_record(&gesture) == ERROR)
 	{
-		log(LOG_SUCCESS, "Failed to record gesture\n");
+		log(LOG_ERROR, "Failed to record gesture\n");
 		return ERROR;
 	}
 

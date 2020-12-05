@@ -137,7 +137,6 @@ enum Key
 };
 
 char * key_string(enum Key key);
-
 int keyboard_press(enum Key key);
 int keyboard_release(enum Key key);
 int keyboard_tap(enum Key key);

@@ -21,24 +21,29 @@ int dexterity(char * subcommand, char ** arguments, int count);
 int init(void);
 void end(int code);
 
-////////////////////////////////////////////////
-////////////////////////////////////////////////
-////////////////////////////////////////////////
-////////////////////////////////////////////////
-////////////////////////////////////////////////
-// finally we need to make print usage functions because you are gonna forget how to use this thing
-
 int main(int argc, char ** argv)
 {
+	// LOGGING SETTINGS //
+
+	log_suppress(LOG_ERROR, false);
+	log_suppress(LOG_WARNING, false);
+	log_suppress(LOG_SUCCESS, false);
+	log_suppress(LOG_INFO, false);
+	log_suppress(LOG_DEBUG, true);
+
+	log_trace(false);   // don't print the source of log messages
+
 	if (argc < ARGV_MIN)
 	{
 		log(LOG_ERROR, "Insufficient arguments\n");
+		print_usage(COMMAND_DEXTERITY, false);
 		return ERROR;
 	}
 
 	if (argc > ARGV_MAX)
 	{
 		log(LOG_ERROR, "Too many arguments\n");
+		print_usage(COMMAND_DEXTERITY, false);
 		return ERROR;
 	}
 
@@ -88,6 +93,7 @@ int dexterity(char * subcommand, char ** arguments, int count)
 int init(void)
 {
 	// SIGNAL HANDLERS //
+
 	signal(SIGINT, end);    // Ctrl + C
     signal(SIGHUP, end);    // hangup Hang up detected on controlling terminal or death of controlling process
     signal(SIGQUIT, end);   // Ctrl + D
@@ -95,23 +101,15 @@ int init(void)
     signal(SIGKILL, end);   // kill
     signal(SIGTERM, end);   // terminate
 
-	// LOGGING SETTINGS //
-	log_suppress(LOG_ERROR, false);
-	log_suppress(LOG_WARNING, false);
-	log_suppress(LOG_SUCCESS, false);
-	log_suppress(LOG_INFO, true);
-	log_suppress(LOG_DEBUG, true);
-
-	log_trace(true);
-
 	// SERIAL PORT //
+
 	if (serial_open() == ERROR)
 	{
 		log(LOG_ERROR, "Initialization failed\n");
 		end(ERROR);
 	}
 
-	log(LOG_INFO, "Initialized Dexterity\n");
+	log(LOG_DEBUG, "Initialized Dexterity\n");
 	return SUCCESS;
 }
 
@@ -127,6 +125,7 @@ void end(int code)
 	}
 
 	// SERIAL PORT //
+
 	if (serial_is_open())
 	{
 		serial_purge();
@@ -134,10 +133,11 @@ void end(int code)
 	}
 
 	// GESTURES //
+
 	gesture_destroy(GESTURES, NUM_GESTURES);
 	GESTURES = NULL;
 	NUM_GESTURES = 0;
 
-	log(LOG_INFO, "Terminated Dexterity (%d)\n", code);
+	log(LOG_DEBUG, "Terminated Dexterity (%d)\n", code);
 	exit(code);   // end program
 }

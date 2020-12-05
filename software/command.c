@@ -15,21 +15,44 @@
 #include "command.h"
 
 #define MAX_COMMAND_SIZE      15
-#define MODE_COMMAND_RAW      "raw"
-#define MODE_COMMAND_SCALED   "scaled"
 
 extern struct Gesture * GESTURES;   // points to the list of gestures (freed on exit)
 extern int NUM_GESTURES;            // the number of gestures in the list
 
+static char * subcommand_string(enum Command command);
+static char * arguments_string(enum Command command);
+static char * description_string(enum Command command);
+static bool argument_is_help(char * argument);
+
+static int command_help(void);
 static int command_run(char * calibration_file, char * gestures_file);
 static int command_sample(void);
 static int command_calibrate(char * calibration_file);
 static int command_upload(char * calibration_file);
 static int command_download(char * calibration_file);
-static int command_mode(char * mode);
+static int command_raw(void);
+static int command_scaled(void);
 static int command_record(char * gesture_file);
 
 char * command_string(enum Command command)
+{
+	switch (command)
+	{
+		case COMMAND_RUN:         return "RUN";
+		case COMMAND_SAMPLE:      return "SAMPLE";
+		case COMMAND_CALIBRATE:   return "CALIBRATE";
+		case COMMAND_UPLOAD:      return "UPLOAD";
+		case COMMAND_DOWNLOAD:    return "DOWNLOAD";
+		case COMMAND_RAW:         return "RAW";
+		case COMMAND_SCALED:      return "SCALED";
+		case COMMAND_RECORD:      return "RECORD";
+		case COMMAND_HELP:        return "HELP";
+		case COMMAND_DEXTERITY:   return "dexterity";
+		default:                  return "INVALID";
+	}
+}
+
+static char * subcommand_string(enum Command command)
 {
 	switch (command)
 	{
@@ -38,11 +61,89 @@ char * command_string(enum Command command)
 		case COMMAND_CALIBRATE:   return "calibrate";
 		case COMMAND_UPLOAD:      return "upload";
 		case COMMAND_DOWNLOAD:    return "download";
-		case COMMAND_MODE:        return "mode";
+		case COMMAND_RAW:         return "raw";
+		case COMMAND_SCALED:      return "scaled";
 		case COMMAND_RECORD:      return "record";
-		case COMMAND_UNKNOWN:     return "UNKNOWN";
+		case COMMAND_HELP:        return "--help";
+		case COMMAND_DEXTERITY:   return "<subcommand>";
 		default:                  return "INVALID";
 	}
+}
+
+static char * arguments_string(enum Command command)
+{
+	switch (command)
+	{
+		case COMMAND_RUN:         return "<calibration_file> <gestures_file>";
+		case COMMAND_SAMPLE:      return "";
+		case COMMAND_CALIBRATE:   return "[output_file]";
+		case COMMAND_UPLOAD:      return "<input_file>";
+		case COMMAND_DOWNLOAD:    return "[output_file]";
+		case COMMAND_RAW:         return "";
+		case COMMAND_SCALED:      return "";
+		case COMMAND_RECORD:      return "[output_file]";
+		case COMMAND_HELP:        return "";
+		case COMMAND_DEXTERITY:   return "<arguments>";
+		default:                  return "INVALID";
+	}
+}
+
+static char * description_string(enum Command command)
+{
+	switch (command)
+	{
+		case COMMAND_RUN:         return "Use the device as a computer peripheral";
+		case COMMAND_SAMPLE:      return "Monitor the analogue sensor readings";
+		case COMMAND_CALIBRATE:   return "Record a calibration for the device";
+		case COMMAND_UPLOAD:      return "Upload a calibration to the device";
+		case COMMAND_DOWNLOAD:    return "Download the current device calibration ";
+		case COMMAND_RAW:         return "Disable scaling of analogue sensor readings";
+		case COMMAND_SCALED:      return "Enable scaling of analogue sensor readings";
+		case COMMAND_RECORD:      return "Record an N-phase gesture";
+		case COMMAND_HELP:        return "Print command usage information";
+		case COMMAND_DEXTERITY:   return "Dexterity is a wearable gesture recognition device";
+		default:                  return "INVALID";
+	}
+}
+
+void print_usage(enum Command command, bool align)
+{
+	char const * program = command_string(COMMAND_DEXTERITY);
+	char const * subcommand = subcommand_string(command);
+	char const * help = (command == COMMAND_HELP ? "" : "[--help]");
+	char const * arguments = arguments_string(command);
+
+	if (align)
+	{
+		log(LOG_INFO, "%-9s %-9s %-8s %-s\n", program, subcommand, help, arguments);
+	}
+	else
+	{
+		log(LOG_INFO, "%s %s %s %s\n", program, subcommand, help, arguments);
+	}
+
+}
+
+void print_description(enum Command command)
+{
+	log(LOG_INFO, "%s\n", description_string(command));
+}
+
+static bool argument_is_help(char * argument)
+{
+	if (argument == NULL)
+	{
+		return false;
+	}
+
+	char const * string = subcommand_string(COMMAND_HELP);
+
+	if (strncmp(argument, string, strlen(string)) == 0)
+	{
+		return true;
+	}
+
+	return false;
 }
 
 static int command_run(char * calibration_file, char * gestures_file)
@@ -202,16 +303,16 @@ static int command_sample(void)
 		printf("\r");
 
 		printf("[" BLUE "%0.3f ms" WHITE "] |", latency);
-		printf(RED    " %s" WHITE " : % 5hd |", direction_string(X),   hand.accel[X]);
-		printf(RED    " %s" WHITE " : % 5hd |", direction_string(Y),   hand.accel[Y]);
-		printf(RED    " %s" WHITE " : % 5hd |", direction_string(Z),   hand.accel[Z]);
-		printf(YELLOW " %s" WHITE " : % 5hd |", finger_string(THUMB),  hand.flex[THUMB]);
-		printf(YELLOW " %s" WHITE " : % 5hd |", finger_string(INDEX),  hand.flex[INDEX]);
-		printf(YELLOW " %s" WHITE " : % 5hd |", finger_string(MIDDLE), hand.flex[MIDDLE]);
-		printf(YELLOW " %s" WHITE " : % 5hd |", finger_string(RING),   hand.flex[RING]);
-		printf(YELLOW " %s" WHITE " : % 5hd |", finger_string(PINKY),  hand.flex[PINKY]);
-		printf(GREEN  " %s" WHITE " : % hhd |", "BUTTON",        hand.button);
-		printf(GREEN  " %s" WHITE " : % hhd |", "LED",           hand.led);
+		printf(RED    " %s" WHITE ": % 4hd |", direction_string(X),   hand.accel[X]);
+		printf(RED    " %s" WHITE ": % 4hd |", direction_string(Y),   hand.accel[Y]);
+		printf(RED    " %s" WHITE ": % 4hd |", direction_string(Z),   hand.accel[Z]);
+		printf(YELLOW " %s" WHITE ": % 4hd |", finger_string(THUMB),  hand.flex[THUMB]);
+		printf(YELLOW " %s" WHITE ": % 4hd |", finger_string(INDEX),  hand.flex[INDEX]);
+		printf(YELLOW " %s" WHITE ": % 4hd |", finger_string(MIDDLE), hand.flex[MIDDLE]);
+		printf(YELLOW " %s" WHITE ": % 4hd |", finger_string(RING),   hand.flex[RING]);
+		printf(YELLOW " %s" WHITE ": % 4hd |", finger_string(PINKY),  hand.flex[PINKY]);
+		printf(GREEN  " %s" WHITE ": % 1hhd |", "BUTTON",        hand.button);
+		printf(GREEN  " %s" WHITE ": % 1hhd |", "LED",           hand.led);
 
 		fflush(stdout);
 	}
@@ -221,12 +322,6 @@ static int command_sample(void)
 
 static int command_calibrate(char * calibration_file)
 {
-	if (calibration_file == NULL)
-	{
-		log(LOG_ERROR, "No output file provided for calibration data\n");
-		return ERROR;
-	}
-
 	struct Calibration calibration;
 
 	if (calibration_interactive(&calibration) == ERROR)
@@ -236,6 +331,11 @@ static int command_calibrate(char * calibration_file)
 	}
 
 	calibration_print(&calibration);
+
+	if (calibration_file == NULL)
+	{
+		return SUCCESS;
+	}
 
 	if (calibration_export(calibration_file, &calibration) == ERROR)
 	{
@@ -299,37 +399,27 @@ static int command_download(char * calibration_file)
 	return SUCCESS;
 }
 
-static int command_mode(char * mode)
+static int command_raw(void)
 {
-	if (mode == NULL)
+	if (raw() == ERROR)
 	{
-		log(LOG_ERROR, "No argument provided for scaling mode\n");
+		log(LOG_ERROR, "Failed to set device to raw mode\n");
 		return ERROR;
 	}
 
-	if (strncasecmp(mode, mode_string(RAW), strlen(mode_string(RAW))) == 0)
+	log(LOG_SUCCESS, "Set device to raw mode\n");
+	return SUCCESS;
+}
+
+static int command_scaled(void)
+{
+	if (scaled() == ERROR)
 	{
-		if (raw() == ERROR)
-		{
-			log(LOG_ERROR, "Failed to set device to %s mode\n", mode);
-			return ERROR;
-		}
-	}
-	else if (strncasecmp(mode, mode_string(SCALED), strlen(mode_string(SCALED))) == 0)
-	{
-		if (scaled() == ERROR)
-		{
-			log(LOG_ERROR, "Failed to set device to %s mode\n", mode);
-			return ERROR;
-		}
-	}
-	else
-	{
-		log(LOG_ERROR, "Unknown scaling mode '%s'\n", mode);
+		log(LOG_ERROR, "Failed to set device to scaled mode\n");
 		return ERROR;
 	}
 
-	log(LOG_SUCCESS, "Set device to %s mode\n", mode);
+	log(LOG_SUCCESS, "Set device to scaled mode\n");
 	return SUCCESS;
 }
 
@@ -359,16 +449,43 @@ static int command_record(char * gesture_file)
 	return SUCCESS;
 }
 
+static int command_help(void)
+{
+	printf("==================================================================\n");
+	log(LOG_INFO, "USAGE:\n");
+	print_usage(COMMAND_DEXTERITY, false);
+	printf("------------------------------------------------------------------\n");
+	log(LOG_INFO, "COMMANDS:\n");
+
+	for (enum Command command = 0; command < NUM_COMMANDS; command++)
+	{
+		print_usage(command, true);
+	}
+
+	printf("==================================================================\n");
+	return SUCCESS;
+}
+
+static int command_dexterity(void)
+{
+	print_description(COMMAND_DEXTERITY);
+	print_usage(COMMAND_DEXTERITY, false);
+	log(LOG_INFO, "Please try 'dexterity --help' for a list of commands\n");
+	return SUCCESS;
+}
+
 enum Command command_identify(char * subcommand)
 {
 	if (subcommand == NULL)
 	{
-		return COMMAND_RUN;   // default command
+		return COMMAND_DEXTERITY;   // default subcommand
 	}
 
 	for (enum Command command = 0; command < NUM_COMMANDS; command++)
 	{
-		if (strncmp(subcommand, command_string(command), MAX_COMMAND_SIZE) == 0)
+		char const * string = subcommand_string(command);
+
+		if (strncmp(subcommand, string, strlen(string)) == 0)
 		{
 			return command;
 		}
@@ -399,6 +516,13 @@ int command_execute(enum Command command, char ** arguments, int count)
 		arg1 = arguments[1];
 	}
 
+	if (argument_is_help(arg0))
+	{
+		print_description(command);
+		print_usage(command, false);
+		return SUCCESS;
+	}
+
 	usleep(1000);   // give the serial port some time to initialize
 
 	switch (command)
@@ -418,11 +542,20 @@ int command_execute(enum Command command, char ** arguments, int count)
 		case COMMAND_DOWNLOAD:
 			return command_download(arg0);
 
-		case COMMAND_MODE:
-			return command_mode(arg0);
+		case COMMAND_RAW:
+			return command_raw();
+
+		case COMMAND_SCALED:
+			return command_scaled();
 
 		case COMMAND_RECORD:
 			return command_record(arg0);
+
+		case COMMAND_HELP:
+			return command_help();
+
+		case COMMAND_DEXTERITY:
+			return command_dexterity();
 
 		default:
 			log(LOG_ERROR, "Invalid command\n");

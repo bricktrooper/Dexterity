@@ -42,7 +42,7 @@ int serial_open(void)
 		return ERROR;
 	}
 
-	log(LOG_INFO, "Opened serial port '%s'\n", SERIAL_PORT);
+	log(LOG_DEBUG, "Opened serial port '%s'\n", SERIAL_PORT);
 
 	// GET SERIAL PORT ATTRIBUTES //
 
@@ -113,7 +113,7 @@ int serial_open(void)
 		goto EXIT;
 	}
 
-	log(LOG_INFO, "Set baud rate to %u\n", BAUD_RATE);
+	log(LOG_DEBUG, "Set baud rate to %u\n", BAUD_RATE);
 
 	// SAVE ATTRIBUTES //
 
@@ -122,7 +122,7 @@ int serial_open(void)
 		log(LOG_ERROR, "Failed to set serial port attributes: %s (%d)\n", strerror(errno), errno);
 	}
 
-	log(LOG_INFO, "Configured serial port attributes\n");
+	log(LOG_DEBUG, "Configured serial port attributes\n");
 	rc = SUCCESS;
 
 EXIT:
@@ -144,7 +144,7 @@ int serial_close(void)
 
 	close(serial_port);
 	serial_port = -1;
-	log(LOG_INFO, "Closed serial port '%s'\n", SERIAL_PORT);
+	log(LOG_DEBUG, "Closed serial port '%s'\n", SERIAL_PORT);
 
 	return SUCCESS;
 }
@@ -306,7 +306,7 @@ enum Message serial_read_message(void)
 	{
 		char * string = message_string(message);
 
-		if (strncmp(data, string, MAX_MESSAGE_SIZE) == 0)
+		if (strncmp(data, string, strlen(string)) == 0)
 		{
 			log(LOG_DEBUG, "Received message from device: '%s'\n", string);
 			return message;
@@ -323,7 +323,7 @@ int serial_write_message(enum Message message)
 	int length = strlen(string);
 	char data [MAX_MESSAGE_SIZE];
 
-	memcpy(data, string, length);   // get message string
+	memcpy(data, string, length);   // load message string
 	memcpy(data + length, "\r", 1); // carriage return [Enter] indicates end of transmission
 	length += 1;                    // length of message including the terminator
 

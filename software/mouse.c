@@ -80,7 +80,7 @@ int mouse_correct(struct Mouse * mouse)
 		mouse->y = Y_MAX;
 	}
 
-	log(LOG_INFO, "Corrected cursor position to edge (%d,%d)\n", mouse->x, mouse->y);
+	log(LOG_DEBUG, "Corrected cursor position to edge (%d,%d)\n", mouse->x, mouse->y);
 	return SUCCESS;
 }
 

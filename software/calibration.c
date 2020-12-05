@@ -61,10 +61,12 @@ int calibration_import(char * file_name, struct Calibration * calibration)
 			goto EXIT;
 		}
 
-		if (strncmp(sensor_label, direction_string(direction), MAX_SENSOR_NAME_LENGTH) != 0)
+		char const * string = direction_string(direction);
+
+		if (strncmp(sensor_label, string, strlen(string)) != 0)
 		{
 			log(LOG_ERROR, "Incorrect sensor label: Expected '%s' but parsed '%s'\n",
-			                     direction_string(direction), sensor_label);
+			                     string, sensor_label);
 			goto EXIT;
 		}
 
@@ -88,10 +90,12 @@ int calibration_import(char * file_name, struct Calibration * calibration)
 			goto EXIT;
 		}
 
-		if (strncmp(sensor_label, finger_string(finger), MAX_SENSOR_NAME_LENGTH) != 0)
+		char const * string = finger_string(finger);
+
+		if (strncmp(sensor_label, string, strlen(string)) != 0)
 		{
 			log(LOG_ERROR, "Incorrect sensor label: Expected '%s' but parsed '%s'\n",
-			                     finger_string(finger), sensor_label);
+			                     string, sensor_label);
 			goto EXIT;
 		}
 

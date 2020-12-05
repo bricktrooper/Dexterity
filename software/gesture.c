@@ -126,7 +126,8 @@ int gesture_import(char * file_name, struct Gesture ** gestures, int * quantity)
 
 		for (enum Action action = 0; action < NUM_ACTIONS; action++)
 		{
-			if (strncmp(name, action_string(action), MAX_ACTION_NAME_LENGTH) == 0)
+			char const * string = action_string(action);
+			if (strncmp(name, string, strlen(string)) == 0)
 			{
 				gesture->action = action;
 				break;
@@ -475,7 +476,7 @@ bool gesture_matches(enum Action action, struct Gesture * gestures, int quantity
 		if (gestures[action].state == gestures[action].phases)   // check if the last phase has been reached
 		{
 			gesture_reset(gestures, quantity);   // reset all gestures states once a gesture is recongized
-			log(LOG_INFO, "Gesture matches '%s'\n", action_string(action));
+			log(LOG_DEBUG, "Gesture matches '%s'\n", action_string(action));
 			return true;
 		}
 	}
@@ -496,7 +497,7 @@ int gesture_reset(struct Gesture * gestures, int quantity)
 		gestures[i].state = 0;   // reset phase state for all gestures
 	}
 
-	log(LOG_INFO, "Reset all gesture states to phase 0\n");
+	log(LOG_DEBUG, "Reset all gesture states to phase 0\n");
 	return SUCCESS;
 }
 

@@ -369,8 +369,6 @@ int keyboard_tap(enum Key key)
 	}
 
 	usleep(50);
-
-	log(LOG_INFO, "Tapped '%s'\n", key_string(key));
 	return SUCCESS;
 }
 

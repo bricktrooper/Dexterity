@@ -1,8 +1,5 @@
 MAKE = /usr/bin/make
 
-FIRMWARE = firmware.hex
-SOFTWARE = software.bin
-
 ART = artifacts
 
 $(shell mkdir -p $(ART))
@@ -14,13 +11,13 @@ dexterity: firmware software
 firmware:
 	@echo Building firmware.......
 	@$(MAKE) -C firmware
-	@cp firmware/bin/dexterity.hex $(ART)/$(FIRMWARE)
+	@cp firmware/bin/dexterity.hex $(ART)/
 
 .PHONY: software
 software:
 	@echo Building software.......
 	@$(MAKE) -C software
-	@cp software/bin/dexterity $(ART)/$(SOFTWARE)
+	@cp software/bin/dexterity $(ART)/
 
 clean:
 	@$(MAKE) clean -C firmware

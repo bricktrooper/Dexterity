@@ -16,8 +16,8 @@
 
 #define MAX_COMMAND_SIZE      15
 
-extern struct Gesture * GESTURES;   // points to the list of gestures (freed on exit)
-extern int NUM_GESTURES;            // the number of gestures in the list
+static struct Gesture * GESTURES = NULL;   // points to the list of gestures (freed on exit)
+static int QUANTITY = 0;                   // the number of gestures in the list
 
 static char * subcommand_string(enum Command command);
 static char * arguments_string(enum Command command);
@@ -146,6 +146,13 @@ static bool argument_is_help(char * argument)
 	return false;
 }
 
+void command_free_gestures(void)
+{
+	gesture_destroy(GESTURES, QUANTITY);
+	GESTURES = NULL;
+	QUANTITY = 0;
+}
+
 static int command_run(char * calibration_file, char * gestures_file)
 {
 	if (calibration_file == NULL)
@@ -162,18 +169,18 @@ static int command_run(char * calibration_file, char * gestures_file)
 
 	int rc = ERROR;
 	GESTURES = NULL;
-	NUM_GESTURES = 0;
+	QUANTITY = 0;
 
-	if (gesture_import(gestures_file, &GESTURES, &NUM_GESTURES) == ERROR)
+	if (gesture_import(gestures_file, &GESTURES, &QUANTITY) == ERROR)
 	{
 		log(LOG_ERROR, "Failed to import gestures from '%s'\n", gestures_file);
 		goto EXIT;
 	}
 
-	if (NUM_GESTURES != NUM_ACTIONS)
+	if (QUANTITY != NUM_ACTIONS)
 	{
 		log(LOG_ERROR, "Incorrect number of gestures imported from '%s': Expected %d but imported %d\n",
-		                gestures_file, NUM_ACTIONS, NUM_GESTURES);
+		                gestures_file, NUM_ACTIONS, QUANTITY);
 	}
 
 	for (enum Action expected = 0; expected < NUM_ACTIONS; expected++)
@@ -188,9 +195,9 @@ static int command_run(char * calibration_file, char * gestures_file)
 		}
 	}
 
-	log(LOG_SUCCESS, "Imported %d gestures from '%s'\n", NUM_GESTURES, gestures_file);
+	log(LOG_SUCCESS, "Imported %d gestures from '%s'\n", QUANTITY, gestures_file);
 
-	for (int i = 0; i < NUM_GESTURES; i++)
+	for (int i = 0; i < QUANTITY; i++)
 	{
 		gesture_print(&GESTURES[i]);
 	}
@@ -257,13 +264,13 @@ static int command_run(char * calibration_file, char * gestures_file)
 			continue;   // don't proceed with gesture recognition if disabled
 		}
 
-		if (gesture_matches(ACTION_CYCLE, GESTURES, NUM_GESTURES, &hand))
+		if (gesture_matches(ACTION_CYCLE, GESTURES, QUANTITY, &hand))
 		{
 			control = (control + 1) % NUM_CONTROLS;   // cycle to next control
 			continue;
 		}
 
-		if (control_execute(control, GESTURES, NUM_GESTURES, &hand) == ERROR)
+		if (control_execute(control, GESTURES, QUANTITY, &hand) == ERROR)
 		{
 			log(LOG_ERROR, "Failed to control %s\n", control_string(control));
 			goto EXIT;
@@ -273,7 +280,7 @@ static int command_run(char * calibration_file, char * gestures_file)
 	rc = SUCCESS;
 
 EXIT:
-	gesture_destroy(GESTURES, NUM_GESTURES);
+	gesture_destroy(GESTURES, QUANTITY);
 	GESTURES = NULL;
 	return rc;
 }

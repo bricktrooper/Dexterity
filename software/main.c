@@ -14,9 +14,6 @@
 #define ARGV_SUBCOMMAND   1
 #define ARGV_ARGUMENTS    2
 
-struct Gesture * GESTURES = NULL;   // point to the list of gestures (freed on exit)
-int NUM_GESTURES = 0;               // the number of gestures in the list
-
 int dexterity(char * subcommand, char ** arguments, int count);
 int init(void);
 void end(int code);
@@ -122,6 +119,7 @@ void end(int code)
 		/* Print on a new line if end() was triggered by a signal interrupt.
 		 * (all signals are > 0 while return codes are <= 0) */
 		printf("\n");
+		code = SUCCESS;
 	}
 
 	// SERIAL PORT //
@@ -134,9 +132,7 @@ void end(int code)
 
 	// GESTURES //
 
-	gesture_destroy(GESTURES, NUM_GESTURES);
-	GESTURES = NULL;
-	NUM_GESTURES = 0;
+	command_free_gestures();
 
 	log(LOG_DEBUG, "Terminated Dexterity (%d)\n", code);
 	exit(code);   // end program

@@ -21,6 +21,7 @@ enum Command
 
 void print_usage(enum Command command, bool align);
 char * command_string(enum Command command);
+void command_free_gestures(void);
 enum Command command_identify(char * subcommand);
 int command_execute(enum Command command, char ** arguments, int count);
 

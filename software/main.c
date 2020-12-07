@@ -6,7 +6,6 @@
 #include "log.h"
 #include "serial.h"
 #include "command.h"
-#include "gesture.h"
 
 #define ARGV_MIN          1   // no subcommand
 #define ARGV_MAX          4   // subcommand + arguments

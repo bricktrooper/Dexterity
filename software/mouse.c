@@ -1,16 +1,11 @@
 #include <ApplicationServices/ApplicationServices.h>
+#include <CoreGraphics/CGDisplayConfiguration.h>
 
 #include "dexterity.h"
 #include "log.h"
 #include "utils.h"
 
 #include "mouse.h"
-
-// Screen limits for a 1080p monitor
-#define X_MIN   0
-#define Y_MIN   0
-#define X_MAX   1920
-#define Y_MAX   1080
 
 static CGEventRef mouse_create_event(CGEventType type)
 {
@@ -44,9 +39,21 @@ static void mouse_destroy_event(CGEventRef event)
 	CFRelease(event);   // destroy the event
 }
 
+struct Mouse get_display_dimensions(void)
+{
+	struct Mouse dimensions;
+	CGDirectDisplayID display = CGMainDisplayID();
+	dimensions.x = CGDisplayPixelsWide(display);
+	dimensions.y =  CGDisplayPixelsHigh(display);
+	return dimensions;
+}
+
 bool mouse_valid(struct Mouse mouse)
 {
-	if (mouse.x < X_MIN || mouse.x > X_MAX || mouse.y < Y_MIN || mouse.y > Y_MAX)
+	struct Mouse dimensions = get_display_dimensions();
+
+	if (mouse.x < 0 || mouse.x > dimensions.x ||
+	    mouse.y < 0 || mouse.y > dimensions.y)
 	{
 		return false;
 	}
@@ -62,22 +69,24 @@ int mouse_correct(struct Mouse * mouse)
 		return ERROR;
 	}
 
-	if (mouse->x < X_MIN)
+	struct Mouse dimensions = get_display_dimensions();
+
+	if (mouse->x < 0)
 	{
-		mouse->x = X_MIN;
+		mouse->x = 0;
 	}
-	else if (mouse->x > X_MAX)
+	else if (mouse->x > dimensions.x)
 	{
-		mouse->x = X_MAX;
+		mouse->x = dimensions.x;
 	}
 
-	if (mouse->y < Y_MIN)
+	if (mouse->y < 0)
 	{
-		mouse->y = Y_MIN;
+		mouse->y = 0;
 	}
-	else if (mouse->y > Y_MAX)
+	else if (mouse->y > dimensions.y)
 	{
-		mouse->y = Y_MAX;
+		mouse->y = dimensions.y;
 	}
 
 	log(LOG_DEBUG, "Corrected cursor position to edge (%d,%d)\n", mouse->x, mouse->y);

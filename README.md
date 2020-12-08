@@ -16,7 +16,7 @@ The device is powered by a custom circuit board with a Microchip PIC16F690 micro
 
 ![alt text](images/board.jpg)
 
-The board requires a wired serial connection, which doubles as the 5V power supply.  If a wireless serial transmitter is used in the future, then a separate battery will be needed to power the board.  The accelerometer is an ADXL335 3-axis sensor module, composed of analogue output pins for the X, Y, and Z spatial directions.  Resistors were added for the flex sensors to produce a voltage divider sampling node, and 0.1uF filtering capacitors were added for noise reduction.  The board also contains an enable/disable button and a status LED.
+The board requires a wired serial connection, which doubles as the 5V power supply.  If a wireless serial transmitter is used in the future, then a separate battery will be needed to power the board.  The accelerometer is an ADXL335 3-axis sensor module, composed of analogue output pins for the X, Y, and Z spatial directions.  Resistors were added for the flex sensors to produce a voltage divider sampling node, and 0.1uF filtering capacitors were added for noise reduction.  The board also contains an enable/disable button and a status LED.  Typical current draw ranges between 3.5mA and 4mA with a 5V supply.
 
 ![alt text](images/schematic.png)
 

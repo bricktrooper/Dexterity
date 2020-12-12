@@ -97,7 +97,7 @@ int uart_receive(void * buffer, int size)
 	return count;
 }
 
-int uart_transmit_message(enum Message message)
+int uart_transmit_message(Message message)
 {
 	char * data = message_string(message);
 	int length = strlen(data);
@@ -108,7 +108,7 @@ int uart_transmit_message(enum Message message)
 	return length + 1;
 }
 
-enum Message uart_receive_message(void)
+Message uart_receive_message(void)
 {
 	char next = 0;
 	char data [MAX_MESSAGE_SIZE];
@@ -133,7 +133,7 @@ enum Message uart_receive_message(void)
 		return MESSAGE_UNKNOWN;
 	}
 
-	for (enum Message message = 0; message < NUM_MESSAGES; message++)
+	for (Message message = 0; message < NUM_MESSAGES; message++)
 	{
 		if (strncmp(data, message_string(message), MAX_MESSAGE_SIZE) == 0)
 		{

@@ -70,7 +70,7 @@ int main(int argc, char ** argv)
 
 int dexterity(char * subcommand, char ** arguments, int count)
 {
-	enum Command command = command_identify(subcommand);
+	Command command = command_identify(subcommand);
 
 	if (command == COMMAND_UNKNOWN)
 	{

@@ -16,7 +16,9 @@ enum Control
 	NUM_CONTROLS
 };
 
-char * control_string(enum Control control);
-int control_execute(enum Control control, struct Gesture * gestures, int quantity, struct Hand * hand);
+typedef enum Control Control;
+
+char * control_string(Control control);
+int control_execute(Control control, Gesture * gestures, int quantity, Hand * hand);
 
 #endif /* CONTROL_H */

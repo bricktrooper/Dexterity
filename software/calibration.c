@@ -15,7 +15,7 @@
 
 extern int errno;
 
-int calibration_import(char * file_name, struct Calibration * calibration)
+int calibration_import(char * file_name, Calibration * calibration)
 {
 	if (file_name == NULL || calibration == NULL)
 	{
@@ -53,7 +53,7 @@ int calibration_import(char * file_name, struct Calibration * calibration)
 
 	char sensor_label [MAX_SENSOR_NAME_LENGTH + 1];
 
-	for (enum Direction direction = 0; direction < NUM_DIRECTIONS; direction++)
+	for (Direction direction = 0; direction < NUM_DIRECTIONS; direction++)
 	{
 		if (fscanf(file, "%s", sensor_label) != 1)
 		{
@@ -82,7 +82,7 @@ int calibration_import(char * file_name, struct Calibration * calibration)
 		}
 	}
 
-	for (enum Finger finger = 0; finger < NUM_FINGERS; finger++)
+	for (Finger finger = 0; finger < NUM_FINGERS; finger++)
 	{
 		if (fscanf(file, "%s", sensor_label) != 1)
 		{
@@ -119,7 +119,7 @@ EXIT:
 	return rc;
 }
 
-int calibration_export(char * file_name, struct Calibration * calibration)
+int calibration_export(char * file_name, Calibration * calibration)
 {
 	if (file_name == NULL || calibration == NULL)
 	{
@@ -138,7 +138,7 @@ int calibration_export(char * file_name, struct Calibration * calibration)
 	fprintf(file, "accel-range=%hd\n", calibration->accel.range);
 	fprintf(file, "flex-range=%hd\n", calibration->flex.range);
 
-	for (enum Direction direction = 0; direction < NUM_DIRECTIONS; direction++)
+	for (Direction direction = 0; direction < NUM_DIRECTIONS; direction++)
 	{
 		fprintf(file, "%-*s MIN=%hd MAX=%hd CENTRE=%hd\n",
 		        MAX_SENSOR_NAME_LENGTH, direction_string(direction),
@@ -147,7 +147,7 @@ int calibration_export(char * file_name, struct Calibration * calibration)
 		        calibration->accel.params[direction][CENTRE]);
 	}
 
-	for (enum Finger finger = 0; finger < NUM_FINGERS; finger++)
+	for (Finger finger = 0; finger < NUM_FINGERS; finger++)
 	{
 		fprintf(file, "%-*s MIN=%hd MAX=%hd CENTRE=%hd\n",
 		        MAX_SENSOR_NAME_LENGTH, finger_string(finger),
@@ -161,7 +161,7 @@ int calibration_export(char * file_name, struct Calibration * calibration)
 	return SUCCESS;
 }
 
-int calibration_download(struct Calibration * calibration)
+int calibration_download(Calibration * calibration)
 {
 	if (calibration == NULL)
 	{
@@ -179,7 +179,7 @@ int calibration_download(struct Calibration * calibration)
 	return SUCCESS;
 }
 
-int calibration_upload(struct Calibration * calibration)
+int calibration_upload(Calibration * calibration)
 {
 	if (calibration == NULL)
 	{
@@ -194,7 +194,7 @@ int calibration_upload(struct Calibration * calibration)
 	}
 
 	// re-download the newly updated calibration settings from the device verification
-	struct Calibration settings;
+	Calibration settings;
 
 	if (download(&settings) == ERROR)
 	{
@@ -203,7 +203,7 @@ int calibration_upload(struct Calibration * calibration)
 	}
 
 	// compare the expected and actual settings
-	if (memcmp(calibration, &settings, sizeof(struct Calibration)) != 0)
+	if (memcmp(calibration, &settings, sizeof(Calibration)) != 0)
 	{
 		// NOTE: This could occur due to noise in the UART.
 		// We should inform the user so that they can try uploading the calibration again.
@@ -215,7 +215,7 @@ int calibration_upload(struct Calibration * calibration)
 	return SUCCESS;
 }
 
-int calibration_interactive(struct Calibration * calibration)
+int calibration_interactive(Calibration * calibration)
 {
 	if (calibration == NULL)
 	{
@@ -236,15 +236,15 @@ int calibration_interactive(struct Calibration * calibration)
 
 	printf("Press the button to confirm a measurement\n\n");
 
-	struct Hand hand;
+	Hand hand;
 
-	for (enum Parameter parameter = 0; parameter < NUM_PARAMETERS; parameter++)
+	for (Parameter parameter = 0; parameter < NUM_PARAMETERS; parameter++)
 	{
 		printf("=======================\n");
 		printf("%s\n", parameter_string(parameter));
 		printf("-----------------------\n");
 
-		for (enum Direction direction = 0; direction < NUM_DIRECTIONS; direction++)
+		for (Direction direction = 0; direction < NUM_DIRECTIONS; direction++)
 		{
 			// press button to calibrate
 			do
@@ -287,7 +287,7 @@ int calibration_interactive(struct Calibration * calibration)
 			while (hand.button == BUTTON_PRESSED);
 		}
 
-		for (enum Finger finger = 0; finger < NUM_FINGERS; finger++)
+		for (Finger finger = 0; finger < NUM_FINGERS; finger++)
 		{
 			// press button to calibrate
 			do
@@ -342,7 +342,7 @@ int calibration_interactive(struct Calibration * calibration)
 	return SUCCESS;
 }
 
-int calibration_print(struct Calibration * calibration)
+int calibration_print(Calibration * calibration)
 {
 	if (calibration == NULL)
 	{
@@ -361,7 +361,7 @@ int calibration_print(struct Calibration * calibration)
 			MAX_SENSOR_NAME_LENGTH, parameter_string(CENTRE));
 	printf("-------------------------------------\n");
 
-	for (enum Direction direction = 0; direction < NUM_DIRECTIONS; direction++)
+	for (Direction direction = 0; direction < NUM_DIRECTIONS; direction++)
 	{
 		printf("| %-*s | %*hd | %*hd | %*hd |\n",
 		       MAX_SENSOR_NAME_LENGTH, direction_string(direction),
@@ -370,7 +370,7 @@ int calibration_print(struct Calibration * calibration)
 		       MAX_SENSOR_NAME_LENGTH, calibration->accel.params[direction][CENTRE]);
 	}
 
-	for (enum Finger finger = 0; finger < NUM_FINGERS; finger++)
+	for (Finger finger = 0; finger < NUM_FINGERS; finger++)
 	{
 		printf("| %-*s | %*hd | %*hd | %*hd |\n",
 		       MAX_SENSOR_NAME_LENGTH, finger_string(finger),

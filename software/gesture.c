@@ -13,9 +13,9 @@
 
 #define DEFAULT_TOLERANCE   0.1   // how much deviation is tolerated in the confidence (average of the individual deviations)
 
-struct Gesture * gesture_create(int quantity)
+Gesture * gesture_create(int quantity)
 {
-	struct Gesture * gestures = malloc(quantity * sizeof(struct Gesture));
+	Gesture * gestures = malloc(quantity * sizeof(Gesture));
 
 	if (gestures == NULL)
 	{
@@ -29,14 +29,14 @@ struct Gesture * gesture_create(int quantity)
 		gestures[i].phases = -1;
 		gestures[i].state = 0;
 		gestures[i].tolerance = DEFAULT_TOLERANCE;
-		memset(&gestures[i].ignores, 0, sizeof(struct Ignores));
+		memset(&gestures[i].ignores, 0, sizeof(Ignores));
 		gestures[i].criteria = NULL;
 	}
 
 	return gestures;
 }
 
-int gesture_destroy(struct Gesture * gestures, int quantity)
+int gesture_destroy(Gesture * gestures, int quantity)
 {
 	if (quantity < 0)
 	{
@@ -56,7 +56,7 @@ int gesture_destroy(struct Gesture * gestures, int quantity)
 	return SUCCESS;
 }
 
-bool gesture_valid(struct Gesture * gesture)
+bool gesture_valid(Gesture * gesture)
 {
 	if (gesture == NULL ||
 		gesture->action >= NUM_ACTIONS ||
@@ -71,7 +71,7 @@ bool gesture_valid(struct Gesture * gesture)
 	return true;
 }
 
-int gesture_import(char * file_name, struct Gesture ** gestures, int * quantity)
+int gesture_import(char * file_name, Gesture ** gestures, int * quantity)
 {
 	if (file_name == NULL || gestures == NULL || quantity == NULL)
 	{
@@ -88,7 +88,7 @@ int gesture_import(char * file_name, struct Gesture ** gestures, int * quantity)
 	}
 
 	int rc = ERROR;
-	struct Gesture * elements = NULL;
+	Gesture * elements = NULL;
 	int count = 0;
 
 	if (fscanf(file, "QUANTITY=%d\n\n", &count) != 1)
@@ -113,7 +113,7 @@ int gesture_import(char * file_name, struct Gesture ** gestures, int * quantity)
 
 	for (int i = 0; i < count; i++)
 	{
-		struct Gesture * gesture = (struct Gesture *)&elements[i];
+		Gesture * gesture = (Gesture *)&elements[i];
 		char name [MAX_ACTION_NAME_LENGTH + 1];
 
 		if (fscanf(file, "ACTION=%s\n", name) != 1)
@@ -124,7 +124,7 @@ int gesture_import(char * file_name, struct Gesture ** gestures, int * quantity)
 
 		gesture->action = ACTION_UNKNOWN;
 
-		for (enum Action action = 0; action < NUM_ACTIONS; action++)
+		for (Action action = 0; action < NUM_ACTIONS; action++)
 		{
 			char const * string = action_string(action);
 			if (strncmp(name, string, strlen(string)) == 0)
@@ -164,7 +164,7 @@ int gesture_import(char * file_name, struct Gesture ** gestures, int * quantity)
 			goto EXIT;
 		}
 
-		gesture->criteria = malloc(gesture->phases * sizeof(struct Sensors));
+		gesture->criteria = malloc(gesture->phases * sizeof(Sensors));
 
 		if (gesture->criteria == NULL)
 		{
@@ -237,7 +237,7 @@ EXIT:
 	return rc;
 }
 
-int gesture_export(char * file_name, struct Gesture * gestures, int quantity)
+int gesture_export(char * file_name, Gesture * gestures, int quantity)
 {
 	if (file_name == NULL || gestures == NULL || quantity < 1)
 	{
@@ -254,11 +254,11 @@ int gesture_export(char * file_name, struct Gesture * gestures, int quantity)
 	}
 
 	fprintf(file, "QUANTITY=%d\n\n", quantity);
-	struct Gesture * gesture = NULL;
+	Gesture * gesture = NULL;
 
 	for (int i = 0; i < quantity; i++)
 	{
-		gesture = (struct Gesture *)&gestures[i];
+		gesture = (Gesture *)&gestures[i];
 
 		if (!gesture_valid(gesture))
 		{
@@ -272,12 +272,12 @@ int gesture_export(char * file_name, struct Gesture * gestures, int quantity)
 
 		fprintf(file, "IGNORE");
 
-		for (enum Direction direction = 0; direction < NUM_DIRECTIONS; direction++)
+		for (Direction direction = 0; direction < NUM_DIRECTIONS; direction++)
 		{
 			fprintf(file, " %s=%hhd", direction_string(direction), (S8)gesture->ignores.accel[direction]);
 		}
 
-		for (enum Finger finger = 0; finger < NUM_FINGERS; finger++)
+		for (Finger finger = 0; finger < NUM_FINGERS; finger++)
 		{
 			fprintf(file, " %s=%hhd", finger_string(finger), (S8)gesture->ignores.flex[finger]);
 		}
@@ -288,12 +288,12 @@ int gesture_export(char * file_name, struct Gesture * gestures, int quantity)
 		{
 			fprintf(file, "%6d", phase);
 
-			for (enum Direction direction = 0; direction < NUM_DIRECTIONS; direction++)
+			for (Direction direction = 0; direction < NUM_DIRECTIONS; direction++)
 			{
 				fprintf(file, " %s=%hd", direction_string(direction), gesture->criteria[phase].accel[direction]);
 			}
 
-			for (enum Finger finger = 0; finger < NUM_FINGERS; finger++)
+			for (Finger finger = 0; finger < NUM_FINGERS; finger++)
 			{
 				fprintf(file, " %s=%hd", finger_string(finger), gesture->criteria[phase].flex[finger]);
 			}
@@ -309,7 +309,7 @@ int gesture_export(char * file_name, struct Gesture * gestures, int quantity)
 	return SUCCESS;
 }
 
-int gesture_record(struct Gesture * gesture)
+int gesture_record(Gesture * gesture)
 {
 	if (gesture == NULL)
 	{
@@ -328,7 +328,7 @@ int gesture_record(struct Gesture * gesture)
 
 	gesture->action = ACTION_IDLE;
 	gesture->tolerance = DEFAULT_TOLERANCE;
-	memset(&gesture->ignores, 0, sizeof(struct Ignores));
+	memset(&gesture->ignores, 0, sizeof(Ignores));
 
 	printf("Enter the number of phases: ");
 
@@ -346,7 +346,7 @@ int gesture_record(struct Gesture * gesture)
 		return ERROR;
 	}
 
-	gesture->criteria = malloc(gesture->phases * sizeof(struct Sensors));
+	gesture->criteria = malloc(gesture->phases * sizeof(Sensors));
 
 	if (gesture->criteria == NULL)
 	{
@@ -356,7 +356,7 @@ int gesture_record(struct Gesture * gesture)
 
 	printf("Press the button to confirm a measurement\n\n");
 
-	struct Hand hand;
+	Hand hand;
 
 	for (int phase = 0; phase < gesture->phases; phase++)
 	{
@@ -411,7 +411,7 @@ int gesture_record(struct Gesture * gesture)
 	return SUCCESS;
 }
 
-float gesture_compare(struct Gesture * gesture, struct Hand * hand)
+float gesture_compare(Gesture * gesture, Hand * hand)
 {
 	if (gesture == NULL || hand == NULL)
 	{
@@ -425,12 +425,12 @@ float gesture_compare(struct Gesture * gesture, struct Hand * hand)
 		return ERROR;
 	}
 
-	struct Ignores * ignores = (struct Ignores *)&gesture->ignores;
-	struct Sensors * criteria = (struct Sensors *)&gesture->criteria[gesture->state];
+	Ignores * ignores = (Ignores *)&gesture->ignores;
+	Sensors * criteria = (Sensors *)&gesture->criteria[gesture->state];
 	int total = 0;
 	int sum = 0;
 
-	for (enum Direction direction = 0; direction < NUM_DIRECTIONS; direction++)
+	for (Direction direction = 0; direction < NUM_DIRECTIONS; direction++)
 	{
 		if (!ignores->accel[direction])
 		{
@@ -440,7 +440,7 @@ float gesture_compare(struct Gesture * gesture, struct Hand * hand)
 		}
 	}
 
-	for (enum Finger finger = 0; finger < NUM_FINGERS; finger++)
+	for (Finger finger = 0; finger < NUM_FINGERS; finger++)
 	{
 		if (!ignores->flex[finger])
 		{
@@ -461,7 +461,7 @@ float gesture_compare(struct Gesture * gesture, struct Hand * hand)
 	return deviation;
 }
 
-bool gesture_matches(enum Action action, struct Gesture * gestures, int quantity, struct Hand * hand)
+bool gesture_matches(Action action, Gesture * gestures, int quantity, Hand * hand)
 {
 	if (action >= NUM_ACTIONS || gestures == NULL || quantity < 0 || hand == NULL)
 	{
@@ -484,7 +484,7 @@ bool gesture_matches(enum Action action, struct Gesture * gestures, int quantity
 	return false;
 }
 
-int gesture_reset(struct Gesture * gestures, int quantity)
+int gesture_reset(Gesture * gestures, int quantity)
 {
 	if (gestures == NULL || quantity < 0)
 	{
@@ -501,7 +501,7 @@ int gesture_reset(struct Gesture * gestures, int quantity)
 	return SUCCESS;
 }
 
-int gesture_print(struct Gesture * gesture)
+int gesture_print(Gesture * gesture)
 {
 	if (!gesture_valid(gesture))
 	{
@@ -515,12 +515,12 @@ int gesture_print(struct Gesture * gesture)
 	printf("TOLERANCE: %f\n", gesture->tolerance);
 	printf("IGNORE:");
 
-	for (enum Direction direction = 0; direction < NUM_DIRECTIONS; direction++)
+	for (Direction direction = 0; direction < NUM_DIRECTIONS; direction++)
 	{
 		printf(" %s=%hhd", direction_string(direction), (S8)gesture->ignores.accel[direction]);
 	}
 
-	for (enum Finger finger = 0; finger < NUM_FINGERS; finger++)
+	for (Finger finger = 0; finger < NUM_FINGERS; finger++)
 	{
 		printf(" %s=%hhd", finger_string(finger), (S8)gesture->ignores.flex[finger]);
 	}
@@ -532,12 +532,12 @@ int gesture_print(struct Gesture * gesture)
 	{
 		printf("%6d:", phase);
 
-		for (enum Direction direction = 0; direction < NUM_DIRECTIONS; direction++)
+		for (Direction direction = 0; direction < NUM_DIRECTIONS; direction++)
 		{
 			printf(" %s=%hd", direction_string(direction), gesture->criteria[phase].accel[direction]);
 		}
 
-		for (enum Finger finger = 0; finger < NUM_FINGERS; finger++)
+		for (Finger finger = 0; finger < NUM_FINGERS; finger++)
 		{
 			printf(" %s=%hd", finger_string(finger), gesture->criteria[phase].flex[finger]);
 		}

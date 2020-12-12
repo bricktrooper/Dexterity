@@ -6,6 +6,10 @@
 #include "dexterity.h"
 #include "action.h"
 
+typedef struct Ignores Ignores;
+typedef struct Sensors Sensors;
+typedef struct Gesture Gesture;
+
 struct Ignores
 {
 	bool accel [NUM_DIRECTIONS];
@@ -20,23 +24,23 @@ struct Sensors
 
 struct Gesture
 {
-	enum Action action;          // the gesture to execute when this binding is activated
-	int phases;                  // the number of phases in the gesture
-	int state;                   // tracks the current phase of the gesture (only used at runtime)
-	float tolerance;             // how much deviation is tolerated in the sensor readings
-	struct Ignores ignores;      // which sensors to ignore
-	struct Sensors * criteria;   // array of criteria for multiphase gestures
+	Action action;        // the gesture to execute when this binding is activated
+	int phases;           // the number of phases in the gesture
+	int state;            // tracks the current phase of the gesture (only used at runtime)
+	float tolerance;      // how much deviation is tolerated in the sensor readings
+	Ignores ignores;      // which sensors to ignore
+	Sensors * criteria;   // array of criteria for multiphase gestures
 };
 
-struct Gesture * gesture_create(int quantity);
-int gesture_destroy(struct Gesture * gestures, int quantity);
-bool gesture_valid(struct Gesture * gesture);
-int gesture_import(char * file_name, struct Gesture ** gestures, int * quantity);
-int gesture_export(char * file_name, struct Gesture * gestures, int quantity);
-int gesture_record(struct Gesture * gesture);
-float gesture_compare(struct Gesture * gesture, struct Hand * hand);
-bool gesture_matches(enum Action action, struct Gesture * gestures, int quantity, struct Hand * hand);
-int gesture_reset(struct Gesture * gestures, int quantity);
-int gesture_print(struct Gesture * gesture);
+Gesture * gesture_create(int quantity);
+int gesture_destroy(Gesture * gestures, int quantity);
+bool gesture_valid(Gesture * gesture);
+int gesture_import(char * file_name, Gesture ** gestures, int * quantity);
+int gesture_export(char * file_name, Gesture * gestures, int quantity);
+int gesture_record(Gesture * gesture);
+float gesture_compare(Gesture * gesture, Hand * hand);
+bool gesture_matches(Action action, Gesture * gestures, int quantity, Hand * hand);
+int gesture_reset(Gesture * gestures, int quantity);
+int gesture_print(Gesture * gesture);
 
 #endif /* GESTURE_H */

@@ -147,7 +147,7 @@ static CGKeyCode const KEYCODES [NUM_KEYS] = {
 	NX_KEYTYPE_ILLUMINATION_TOGGLE
 };
 
-char * key_string(enum Key key)
+char * key_string(Key key)
 {
 	switch (key)
 	{
@@ -282,7 +282,7 @@ char * key_string(enum Key key)
 	}
 }
 
-int keyboard_press(enum Key key)
+int keyboard_press(Key key)
 {
 	if (key < 0 || key >= NUM_KEYS)
 	{
@@ -314,7 +314,7 @@ int keyboard_press(enum Key key)
 	return SUCCESS;
 }
 
-int keyboard_release(enum Key key)
+int keyboard_release(Key key)
 {
 	if (key < 0 || key >= NUM_KEYS)
 	{
@@ -346,7 +346,7 @@ int keyboard_release(enum Key key)
 	return SUCCESS;
 }
 
-int keyboard_tap(enum Key key)
+int keyboard_tap(Key key)
 {
 	if (key < 0 || key >= NUM_KEYS)
 	{
@@ -372,7 +372,7 @@ int keyboard_tap(enum Key key)
 	return SUCCESS;
 }
 
-int keyboard_type(enum Key * keys, int length)
+int keyboard_type(Key * keys, int length)
 {
 	if (keys == NULL || length < 0)
 	{
@@ -382,7 +382,7 @@ int keyboard_type(enum Key * keys, int length)
 
 	for (int i = 0; i < length; i++)
 	{
-		enum Key key = keys[i];
+		Key key = keys[i];
 
 		if (key < 0 || key >= NUM_KEYS)
 		{
@@ -400,7 +400,7 @@ int keyboard_type(enum Key * keys, int length)
 	return SUCCESS;
 }
 
-int keyboard_combo(enum Key * keys, int length)
+int keyboard_combo(Key * keys, int length)
 {
 	if (keys == NULL || length < 0)
 	{
@@ -410,7 +410,7 @@ int keyboard_combo(enum Key * keys, int length)
 
 	for (int i = 0; i < length; i++)
 	{
-		enum Key key = keys[i];
+		Key key = keys[i];
 
 		if (key < 0 || key >= NUM_KEYS)
 		{

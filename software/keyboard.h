@@ -136,11 +136,13 @@ enum Key
 	NUM_KEYS
 };
 
-char * key_string(enum Key key);
-int keyboard_press(enum Key key);
-int keyboard_release(enum Key key);
-int keyboard_tap(enum Key key);
-int keyboard_type(enum Key * keys, int length);    // taps keys in succession
-int keyboard_combo(enum Key * keys, int length);   // holds down all keys and then releases them in the same order
+typedef enum Key Key;
+
+char * key_string(Key key);
+int keyboard_press(Key key);
+int keyboard_release(Key key);
+int keyboard_tap(Key key);
+int keyboard_type(Key * keys, int length);    // taps keys in succession
+int keyboard_combo(Key * keys, int length);   // holds down all keys and then releases them in the same order
 
 #endif /* KEYBOARD_H */

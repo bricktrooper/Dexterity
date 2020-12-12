@@ -25,7 +25,7 @@ static bool suppressed [] = {
 
 static bool trace = false;
 
-void log_suppress(enum LogType type, bool suppress)
+void log_suppress(LogType type, bool suppress)
 {
 	suppressed[type] = suppress;
 }
@@ -35,7 +35,7 @@ void log_trace(bool enabled)
 	trace = enabled;
 }
 
-int log_print(char const * file, int line, char const * function, enum LogType type, char const * format, ...)
+int log_print(char const * file, int line, char const * function, LogType type, char const * format, ...)
 {
 	if (suppressed[type])
 	{

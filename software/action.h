@@ -29,19 +29,21 @@ enum Action
 	ACTION_UNKNOWN          // the gesture could not be interpreted
 };
 
+typedef enum Action Action;
+
 extern char * ACTIONS [NUM_ACTIONS];
 
-char * action_string(enum Action action);
-int action_move(struct Hand * hand);
-int action_drag(struct Hand * hand);
+char * action_string(Action action);
+int action_move(Hand * hand);
+int action_drag(Hand * hand);
 int action_left_click(void);
 int action_right_click(void);
 int action_double_click(void);
 int action_overview(void);
 int action_zoom_in(void);
 int action_zoom_out(void);
-int action_scroll_up(struct Hand * hand);
-int action_scroll_down(struct Hand * hand);
+int action_scroll_up(Hand * hand);
+int action_scroll_down(Hand * hand);
 int action_volume_up(void);
 int action_volume_down(void);
 int action_volume_mute(void);

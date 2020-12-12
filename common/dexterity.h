@@ -33,11 +33,11 @@
 
 #define DOUBLE_CLICK_DELAY_US   15000
 
-typedef uint8_t  U8;
+typedef uint8_t U8;
 typedef uint16_t U16;
 typedef uint32_t U32;
 
-typedef int8_t  S8;
+typedef int8_t S8;
 typedef int16_t S16;
 typedef int32_t S32;
 
@@ -92,6 +92,17 @@ enum Mode
 	NUM_MODES
 };
 
+typedef enum Direction Direction;
+typedef enum Finger Finger;
+typedef enum Message Message;
+typedef enum Parameter Parameter;
+typedef enum Mode Mode;
+
+typedef struct Hand Hand;
+typedef struct AccelCalibration AccelCalibration;
+typedef struct FlexCalibration FlexCalibration;
+typedef struct Calibration Calibration;
+
 struct Hand
 {
 	S16 accel [NUM_DIRECTIONS];
@@ -114,15 +125,15 @@ struct FlexCalibration
 
 struct Calibration
 {
-	struct AccelCalibration accel;
-	struct FlexCalibration flex;
+	AccelCalibration accel;
+	FlexCalibration flex;
 };
 
-char * direction_string(enum Direction direction);
-char * finger_string(enum Finger finger);
-char * message_string(enum Message message);
-char * parameter_string(enum Parameter parameter);
-char * mode_string(enum Mode mode);
+char * direction_string(Direction direction);
+char * finger_string(Finger finger);
+char * message_string(Message message);
+char * parameter_string(Parameter parameter);
+char * mode_string(Mode mode);
 
 S16 scale(S16 reading, S16 range, S16 min, S16 max, S16 centre);
 

@@ -15,23 +15,28 @@ enum ScrollDirection
 	MOUSE_SCROLL_DOWN = -1  // (-) == DOWN
 };
 
+typedef enum MouseButton MouseButton;
+typedef enum ScrollDirection ScrollDirection;
+
+typedef struct Mouse Mouse;
+
 struct Mouse
 {
 	int x;
 	int y;
 };
 
-bool mouse_valid(struct Mouse mouse);
-int mouse_correct(struct Mouse * mouse);
-struct Mouse get_display_dimensions(void);
-struct Mouse mouse_get(void);
-int mouse_set(struct Mouse mouse);
+bool mouse_valid(Mouse mouse);
+int mouse_correct(Mouse * mouse);
+Mouse get_display_dimensions(void);
+Mouse mouse_get(void);
+int mouse_set(Mouse mouse);
 int mouse_move(int x_offset, int y_offset);
-int mouse_press(enum MouseButton button);
-int mouse_release(enum MouseButton button);
-int mouse_single_click(enum MouseButton button);
-int mouse_double_click(enum MouseButton button);
-int mouse_drag(enum MouseButton button, int x_offset, int y_offset);
-int mouse_scroll(enum ScrollDirection direction, S32 speed);
+int mouse_press(MouseButton button);
+int mouse_release(MouseButton button);
+int mouse_single_click(MouseButton button);
+int mouse_double_click(MouseButton button);
+int mouse_drag(MouseButton button, int x_offset, int y_offset);
+int mouse_scroll(ScrollDirection direction, S32 speed);
 
 #endif /* MOUSE_H */

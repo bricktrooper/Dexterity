@@ -16,20 +16,20 @@
 #include "flex.h"
 
 void init(void);
-int sample(struct Hand * hand);
+int sample(Hand * hand);
 void raw(void);
 void scaled(void);
-int calibrate(struct Calibration * calibration);
-int settings(struct Calibration * calibration);
+int calibrate(Calibration * calibration);
+int settings(Calibration * calibration);
 
 void main(void)
 {
 	init();
 	led_off();
 
-	struct Hand hand;
-	struct Calibration calibration;
-	enum Message message;
+	Hand hand;
+	Calibration calibration;
+	Message message;
 
 	while (1)
 	{
@@ -42,7 +42,7 @@ void main(void)
 			case MESSAGE_SAMPLE:   // read the analogue sensors and transmit the results
 
 				sample(&hand);
-				uart_transmit(&hand, sizeof(struct Hand));
+				uart_transmit(&hand, sizeof(Hand));
 				break;
 
 			case MESSAGE_RAW:   // use raw ADC readings
@@ -61,7 +61,7 @@ void main(void)
 
 				uart_transmit_message(MESSAGE_SUCCESS);   // handshake with the host
 
-				if (uart_receive(&calibration, sizeof(struct Calibration)) != sizeof(struct Calibration))
+				if (uart_receive(&calibration, sizeof(Calibration)) != sizeof(Calibration))
 				{
 					uart_transmit_message(MESSAGE_ERROR);
 					break;
@@ -73,8 +73,8 @@ void main(void)
 
 			case MESSAGE_DOWNLOAD:   // transmit the current calibration settings
 
-				settings(&calibration);                                    // copy the current calibration settings
-				uart_transmit(&calibration, sizeof(struct Calibration));   // send the calibration back to the host
+				settings(&calibration);                             // copy the current calibration settings
+				uart_transmit(&calibration, sizeof(Calibration));   // send the calibration back to the host
 				break;
 
 			case MESSAGE_UNKNOWN:   // respond with error if an unexpected or unknown message is received
@@ -97,7 +97,7 @@ void init(void)
 	flex_init();
 }
 
-int sample(struct Hand * hand)
+int sample(Hand * hand)
 {
 	if (hand == NULL)
 	{
@@ -146,7 +146,7 @@ void scaled(void)
 }
 
 
-int calibrate(struct Calibration * calibration)
+int calibrate(Calibration * calibration)
 {
 	if (calibration == NULL)
 	{
@@ -162,7 +162,7 @@ int calibrate(struct Calibration * calibration)
 	return SUCCESS;
 }
 
-int settings(struct Calibration * calibration)
+int settings(Calibration * calibration)
 {
 	if (calibration == NULL)
 	{

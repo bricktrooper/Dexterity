@@ -11,7 +11,7 @@
 
 #include "control.h"
 
-char * control_string(enum Control control)
+char * control_string(Control control)
 {
 	switch (control)
 	{
@@ -25,7 +25,7 @@ char * control_string(enum Control control)
 	}
 }
 
-static int control_mouse(struct Gesture * gestures, int quantity, struct Hand * hand)
+static int control_mouse(Gesture * gestures, int quantity, Hand * hand)
 {
 	static bool pressed = false;
 
@@ -82,7 +82,7 @@ static int control_mouse(struct Gesture * gestures, int quantity, struct Hand * 
 	}
 }
 
-static int control_zoom(struct Gesture * gestures, int quantity, struct Hand * hand)
+static int control_zoom(Gesture * gestures, int quantity, Hand * hand)
 {
 	if (hand->accel[Z] > 0 && gesture_matches(ACTION_ZOOM_IN, gestures, quantity, hand))
 	{
@@ -99,7 +99,7 @@ static int control_zoom(struct Gesture * gestures, int quantity, struct Hand * h
 	return SUCCESS;
 }
 
-static int control_swipe(struct Gesture * gestures, int quantity, struct Hand * hand)
+static int control_swipe(Gesture * gestures, int quantity, Hand * hand)
 {
 	if (hand->accel[Z] > SWIPE_ACTIVATION && gesture_matches(ACTION_SWIPE_LEFT, gestures, quantity, hand))
 	{
@@ -116,7 +116,7 @@ static int control_swipe(struct Gesture * gestures, int quantity, struct Hand * 
 	return SUCCESS;
 }
 
-static int control_scroll(struct Gesture * gestures, int quantity, struct Hand * hand)
+static int control_scroll(Gesture * gestures, int quantity, Hand * hand)
 {
 	if (hand->accel[Z] < -SCROLL_ACTIVATION && gesture_matches(ACTION_SCROLL_DOWN, gestures, quantity, hand))
 	{
@@ -133,7 +133,7 @@ static int control_scroll(struct Gesture * gestures, int quantity, struct Hand *
 	return SUCCESS;
 }
 
-static int control_volume(struct Gesture * gestures, int quantity, struct Hand * hand)
+static int control_volume(Gesture * gestures, int quantity, Hand * hand)
 {
 	static bool reset = false;
 
@@ -175,7 +175,7 @@ static int control_volume(struct Gesture * gestures, int quantity, struct Hand *
 	return SUCCESS;
 }
 
-static int control_music(struct Gesture * gestures, int quantity, struct Hand * hand)
+static int control_music(Gesture * gestures, int quantity, Hand * hand)
 {
 	if (gesture_matches(ACTION_PAUSE_PLAY, gestures, quantity, hand))
 	{
@@ -197,7 +197,7 @@ static int control_music(struct Gesture * gestures, int quantity, struct Hand * 
 	return SUCCESS;
 }
 
-int control_execute(enum Control control, struct Gesture * gestures, int quantity, struct Hand * hand)
+int control_execute(Control control, Gesture * gestures, int quantity, Hand * hand)
 {
 	if (control >= NUM_CONTROLS || gestures == NULL || quantity < 0 || hand == NULL)
 	{

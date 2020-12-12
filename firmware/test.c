@@ -75,7 +75,7 @@ void uart_test(void)
 	uart_print("number = %d" NEWLINE, 7);
 
 	uart_print("Please enter a message: ");
-	enum Message message = uart_receive_message();
+	Message message = uart_receive_message();
 	uart_print(NEWLINE);
 	uart_print("Your message was: ");
 	uart_transmit_message(message);

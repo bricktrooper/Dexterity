@@ -10,8 +10,8 @@
 
 #include "flex.h"
 
-static struct FlexCalibration scaling_calibration;
-static enum Mode scaling_mode = RAW;
+static FlexCalibration scaling_calibration;
+static Mode scaling_mode = RAW;
 static int channels [] = {F1_CHANNEL, F2_CHANNEL, F3_CHANNEL, F4_CHANNEL, F5_CHANNEL};
 
 void flex_init(void)
@@ -45,7 +45,7 @@ void flex_init(void)
 	F5_ANSEL = 1;       // set finger 5 pin as analogue
 }
 
-int flex_mode(enum Mode mode)
+int flex_mode(Mode mode)
 {
 	if (mode >= NUM_MODES)
 	{
@@ -56,7 +56,7 @@ int flex_mode(enum Mode mode)
 	return SUCCESS;
 }
 
-int flex_calibrate(struct FlexCalibration * calibration)
+int flex_calibrate(FlexCalibration * calibration)
 {
 	if (calibration == NULL)
 	{
@@ -65,7 +65,7 @@ int flex_calibrate(struct FlexCalibration * calibration)
 
 	scaling_calibration.range = calibration->range;
 
-	for (enum Finger finger = 0; finger < NUM_FINGERS; finger++)
+	for (Finger finger = 0; finger < NUM_FINGERS; finger++)
 	{
 		scaling_calibration.params[finger][MIN] = calibration->params[finger][MIN];
 		scaling_calibration.params[finger][MAX] = calibration->params[finger][MAX];
@@ -75,7 +75,7 @@ int flex_calibrate(struct FlexCalibration * calibration)
 	return SUCCESS;
 }
 
-int flex_settings(struct FlexCalibration * calibration)
+int flex_settings(FlexCalibration * calibration)
 {
 	if (calibration == NULL)
 	{
@@ -84,7 +84,7 @@ int flex_settings(struct FlexCalibration * calibration)
 
 	calibration->range = scaling_calibration.range;
 
-	for (enum Finger finger = 0; finger < NUM_FINGERS; finger++)
+	for (Finger finger = 0; finger < NUM_FINGERS; finger++)
 	{
 		calibration->params[finger][MIN] = scaling_calibration.params[finger][MIN];
 		calibration->params[finger][MAX] = scaling_calibration.params[finger][MAX];
@@ -98,7 +98,7 @@ void flex_reset(void)
 {
 	scaling_calibration.range = FLEX_DEFAULT_RANGE;
 
-	for (enum Finger finger = 0; finger < NUM_FINGERS; finger++)
+	for (Finger finger = 0; finger < NUM_FINGERS; finger++)
 	{
 		scaling_calibration.params[finger][MIN] = ADC_MIN;
 		scaling_calibration.params[finger][MAX] = ADC_MAX;
@@ -106,7 +106,7 @@ void flex_reset(void)
 	}
 }
 
-S16 flex_scaled(enum Finger finger)
+S16 flex_scaled(Finger finger)
 {
 	// scale flex reading from 'min' <-> 'max' to 0 <-> 100 centred at 'centre'
 	return scale(flex_raw(finger),
@@ -116,12 +116,12 @@ S16 flex_scaled(enum Finger finger)
 	             scaling_calibration.params[finger][CENTRE]);
 }
 
-S16 flex_raw(enum Finger finger)
+S16 flex_raw(Finger finger)
 {
 	return adc_read(channels[finger]);
 }
 
-S16 flex_read(enum Finger finger)
+S16 flex_read(Finger finger)
 {
 	if (scaling_mode == SCALED)
 	{

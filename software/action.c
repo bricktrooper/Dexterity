@@ -8,7 +8,7 @@
 
 #include "action.h"
 
-char * action_string(enum Action action)
+char * action_string(Action action)
 {
 	switch (action)
 	{
@@ -35,7 +35,7 @@ char * action_string(enum Action action)
 	}
 }
 
-int action_move(struct Hand * hand)
+int action_move(Hand * hand)
 {
 	deadzone(hand, CURSOR_DEADZONE);   // apply deadzone to accel values
 	int x = -hand->accel[Z];
@@ -43,7 +43,7 @@ int action_move(struct Hand * hand)
 	return mouse_move(x, y);
 }
 
-int action_drag(struct Hand * hand)
+int action_drag(Hand * hand)
 {
 	deadzone(hand, CURSOR_DEADZONE);   // apply deadzone to accel values
 	int x = -hand->accel[Z];
@@ -73,22 +73,22 @@ int action_overview(void)
 
 int action_zoom_in(void)
 {
-	enum Key stroke [] = {KEY_COMMAND, KEY_EQUAL};
-	return keyboard_combo(stroke, sizeof(stroke) / sizeof(enum Key));
+	Key stroke [] = {KEY_COMMAND, KEY_EQUAL};
+	return keyboard_combo(stroke, sizeof(stroke) / sizeof(Key));
 }
 
 int action_zoom_out(void)
 {
-	enum Key stroke [] = {KEY_COMMAND, KEY_MINUS};
-	return keyboard_combo(stroke, sizeof(stroke) / sizeof(enum Key));
+	Key stroke [] = {KEY_COMMAND, KEY_MINUS};
+	return keyboard_combo(stroke, sizeof(stroke) / sizeof(Key));
 }
 
-int action_scroll_up(struct Hand * hand)
+int action_scroll_up(Hand * hand)
 {
 	return mouse_scroll(MOUSE_SCROLL_UP, abs(hand->accel[Z]));
 }
 
-int action_scroll_down(struct Hand * hand)
+int action_scroll_down(Hand * hand)
 {
 	return mouse_scroll(MOUSE_SCROLL_DOWN, abs(hand->accel[Z]));
 }
@@ -124,12 +124,12 @@ int action_pause_play(void)
 
 int action_swipe_left(void)
 {
-	enum Key stroke [] = {KEY_COMMAND, KEY_LEFT_ARROW};
-	return keyboard_combo(stroke, sizeof(stroke) / sizeof(enum Key));
+	Key stroke [] = {KEY_COMMAND, KEY_LEFT_ARROW};
+	return keyboard_combo(stroke, sizeof(stroke) / sizeof(Key));
 }
 
 int action_swipe_right(void)
 {
-	enum Key stroke [] = {KEY_COMMAND, KEY_RIGHT_ARROW};
-	return keyboard_combo(stroke, sizeof(stroke) / sizeof(enum Key));
+	Key stroke [] = {KEY_COMMAND, KEY_RIGHT_ARROW};
+	return keyboard_combo(stroke, sizeof(stroke) / sizeof(Key));
 }

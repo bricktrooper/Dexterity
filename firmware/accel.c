@@ -10,8 +10,8 @@
 
 #include "accel.h"
 
-static struct AccelCalibration scaling_calibration;
-static enum Mode scaling_mode = RAW;
+static AccelCalibration scaling_calibration;
+static Mode scaling_mode = RAW;
 static int channels [] = {X_CHANNEL, Y_CHANNEL, Z_CHANNEL};
 
 void accel_init(void)
@@ -35,7 +35,7 @@ void accel_init(void)
 	Z_ANSEL = 1;        // set Z-axis pin as analogue
 }
 
-int accel_mode(enum Mode mode)
+int accel_mode(Mode mode)
 {
 	if (mode >= NUM_MODES)
 	{
@@ -46,7 +46,7 @@ int accel_mode(enum Mode mode)
 	return SUCCESS;
 }
 
-int accel_calibrate(struct AccelCalibration * calibration)
+int accel_calibrate(AccelCalibration * calibration)
 {
 	if (calibration == NULL)
 	{
@@ -55,7 +55,7 @@ int accel_calibrate(struct AccelCalibration * calibration)
 
 	scaling_calibration.range = calibration->range;
 
-	for (enum Direction direction = 0; direction < NUM_DIRECTIONS; direction++)
+	for (Direction direction = 0; direction < NUM_DIRECTIONS; direction++)
 	{
 		scaling_calibration.params[direction][MIN] = calibration->params[direction][MIN];
 		scaling_calibration.params[direction][MAX] = calibration->params[direction][MAX];
@@ -65,7 +65,7 @@ int accel_calibrate(struct AccelCalibration * calibration)
 	return SUCCESS;
 }
 
-int accel_settings(struct AccelCalibration * calibration)
+int accel_settings(AccelCalibration * calibration)
 {
 	if (calibration == NULL)
 	{
@@ -74,7 +74,7 @@ int accel_settings(struct AccelCalibration * calibration)
 
 	calibration->range = scaling_calibration.range;
 
-	for (enum Direction direction = 0; direction < NUM_DIRECTIONS; direction++)
+	for (Direction direction = 0; direction < NUM_DIRECTIONS; direction++)
 	{
 		calibration->params[direction][MIN] = scaling_calibration.params[direction][MIN];
 		calibration->params[direction][MAX] = scaling_calibration.params[direction][MAX];
@@ -88,7 +88,7 @@ void accel_reset(void)
 {
 	scaling_calibration.range = ACCEL_DEFAULT_RANGE;
 
-	for (enum Direction direction = 0; direction < NUM_DIRECTIONS; direction++)
+	for (Direction direction = 0; direction < NUM_DIRECTIONS; direction++)
 	{
 		scaling_calibration.params[direction][MIN] = ADC_MIN;
 		scaling_calibration.params[direction][MAX] = ADC_MAX;
@@ -96,7 +96,7 @@ void accel_reset(void)
 	}
 }
 
-S16 accel_scaled(enum Direction direction)
+S16 accel_scaled(Direction direction)
 {
 	// scale acceleration reading from 'min' <-> '1023' to -100 <-> +100 centered at 'centre'
 	return scale(accel_raw(direction),
@@ -106,12 +106,12 @@ S16 accel_scaled(enum Direction direction)
 	             scaling_calibration.params[direction][CENTRE]);
 }
 
-S16 accel_raw(enum Direction direction)
+S16 accel_raw(Direction direction)
 {
 	return adc_read(channels[direction]);
 }
 
-S16 accel_read(enum Direction direction)
+S16 accel_read(Direction direction)
 {
 	if (scaling_mode == SCALED)
 	{

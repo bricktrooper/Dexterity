@@ -11,7 +11,7 @@
 
 #include "utils.h"
 
-int sample(struct Hand * hand)
+int sample(Hand * hand)
 {
 	if (hand == NULL)
 	{
@@ -25,7 +25,7 @@ int sample(struct Hand * hand)
 		return ERROR;
 	}
 
-	if (serial_read(hand, sizeof(struct Hand)) != sizeof(struct Hand))
+	if (serial_read(hand, sizeof(Hand)) != sizeof(Hand))
 	{
 		log(LOG_ERROR, "Failed to receive sensor data\n");
 		return ERROR;
@@ -68,7 +68,7 @@ int scaled(void)
 	return SUCCESS;
 }
 
-int upload(struct Calibration * calibration)
+int upload(Calibration * calibration)
 {
 	if (calibration == NULL)
 	{
@@ -88,7 +88,7 @@ int upload(struct Calibration * calibration)
 		return ERROR;
 	}
 
-	if (serial_write(calibration, sizeof(struct Calibration)) != sizeof(struct Calibration))
+	if (serial_write(calibration, sizeof(Calibration)) != sizeof(Calibration))
 	{
 		log(LOG_ERROR, "Failed to send calibration data to device\n");
 		return ERROR;
@@ -103,7 +103,7 @@ int upload(struct Calibration * calibration)
 	return SUCCESS;
 }
 
-int download(struct Calibration * calibration)
+int download(Calibration * calibration)
 {
 	if (calibration == NULL)
 	{
@@ -117,7 +117,7 @@ int download(struct Calibration * calibration)
 		return ERROR;
 	}
 
-	if (serial_read(calibration, sizeof(struct Calibration)) != sizeof(struct Calibration))
+	if (serial_read(calibration, sizeof(Calibration)) != sizeof(Calibration))
 	{
 		log(LOG_ERROR, "Failed to receive calibration data from device\n");
 		return ERROR;
@@ -126,7 +126,7 @@ int download(struct Calibration * calibration)
 	return SUCCESS;
 }
 
-int deadzone(struct Hand * hand, int radius)
+int deadzone(Hand * hand, int radius)
 {
 	if (hand == NULL)
 	{
@@ -134,7 +134,7 @@ int deadzone(struct Hand * hand, int radius)
 		return ERROR;
 	}
 
-	for (enum Direction direction = 0; direction < NUM_DIRECTIONS; direction++)
+	for (Direction direction = 0; direction < NUM_DIRECTIONS; direction++)
 	{
 		if (abs(hand->accel[direction]) <= radius)
 		{

@@ -9,7 +9,7 @@
 
 static CGEventRef mouse_create_event(CGEventType type)
 {
-	struct Mouse mouse = mouse_get();   // get current cursor location
+	Mouse mouse = mouse_get();   // get current cursor location
 
 	if (!mouse_valid(mouse))
 	{
@@ -39,18 +39,18 @@ static void mouse_destroy_event(CGEventRef event)
 	CFRelease(event);   // destroy the event
 }
 
-struct Mouse get_display_dimensions(void)
+Mouse get_display_dimensions(void)
 {
-	struct Mouse dimensions;
+	Mouse dimensions;
 	CGDirectDisplayID display = CGMainDisplayID();
 	dimensions.x = CGDisplayPixelsWide(display);
 	dimensions.y =  CGDisplayPixelsHigh(display);
 	return dimensions;
 }
 
-bool mouse_valid(struct Mouse mouse)
+bool mouse_valid(Mouse mouse)
 {
-	struct Mouse dimensions = get_display_dimensions();
+	Mouse dimensions = get_display_dimensions();
 
 	if (mouse.x < 0 || mouse.x > dimensions.x ||
 	    mouse.y < 0 || mouse.y > dimensions.y)
@@ -61,7 +61,7 @@ bool mouse_valid(struct Mouse mouse)
 	return true;
 }
 
-int mouse_correct(struct Mouse * mouse)
+int mouse_correct(Mouse * mouse)
 {
 	if (mouse == NULL)
 	{
@@ -69,7 +69,7 @@ int mouse_correct(struct Mouse * mouse)
 		return ERROR;
 	}
 
-	struct Mouse dimensions = get_display_dimensions();
+	Mouse dimensions = get_display_dimensions();
 
 	if (mouse->x < 0)
 	{
@@ -93,9 +93,9 @@ int mouse_correct(struct Mouse * mouse)
 	return SUCCESS;
 }
 
-struct Mouse mouse_get(void)
+Mouse mouse_get(void)
 {
-	struct Mouse mouse = { .x = -1, .y = -1 };
+	Mouse mouse = { .x = -1, .y = -1 };
 
 	// Do not use mouse_create_event() here because
 	// it calls this function to get the cursor location.
@@ -118,7 +118,7 @@ struct Mouse mouse_get(void)
 	return mouse;
 }
 
-int mouse_set(struct Mouse mouse)
+int mouse_set(Mouse mouse)
 {
 	int rc = SUCCESS;
 
@@ -147,7 +147,7 @@ int mouse_set(struct Mouse mouse)
 int mouse_move(int x_offset, int y_offset)
 {
 	int rc = SUCCESS;
-	struct Mouse mouse = mouse_get();
+	Mouse mouse = mouse_get();
 
 	if (!mouse_valid(mouse))
 	{
@@ -168,7 +168,7 @@ int mouse_move(int x_offset, int y_offset)
 	return rc;
 }
 
-int mouse_press(enum MouseButton button)
+int mouse_press(MouseButton button)
 {
 	if (button != MOUSE_BUTTON_LEFT && button != MOUSE_BUTTON_RIGHT)
 	{
@@ -190,7 +190,7 @@ int mouse_press(enum MouseButton button)
 	return SUCCESS;
 }
 
-int mouse_release(enum MouseButton button)
+int mouse_release(MouseButton button)
 {
 	if (button != MOUSE_BUTTON_LEFT && button != MOUSE_BUTTON_RIGHT)
 	{
@@ -212,7 +212,7 @@ int mouse_release(enum MouseButton button)
 	return SUCCESS;
 }
 
-int mouse_single_click(enum MouseButton button)
+int mouse_single_click(MouseButton button)
 {
 	if (button != MOUSE_BUTTON_LEFT && button != MOUSE_BUTTON_RIGHT)
 	{
@@ -240,7 +240,7 @@ int mouse_single_click(enum MouseButton button)
 	return SUCCESS;
 }
 
-int mouse_double_click(enum MouseButton button)
+int mouse_double_click(MouseButton button)
 {
 	if (button != MOUSE_BUTTON_LEFT && button != MOUSE_BUTTON_RIGHT)
 	{
@@ -276,10 +276,10 @@ int mouse_double_click(enum MouseButton button)
 	return SUCCESS;
 }
 
-int mouse_drag(enum MouseButton button, int x_offset, int y_offset)
+int mouse_drag(MouseButton button, int x_offset, int y_offset)
 {
 	int rc = SUCCESS;
-	struct Mouse mouse = mouse_get();
+	Mouse mouse = mouse_get();
 
 	if (!mouse_valid(mouse))
 	{
@@ -313,7 +313,7 @@ int mouse_drag(enum MouseButton button, int x_offset, int y_offset)
 	return rc;
 }
 
-int mouse_scroll(enum ScrollDirection direction, S32 speed)
+int mouse_scroll(ScrollDirection direction, S32 speed)
 {
 	if (direction != MOUSE_SCROLL_UP && direction != MOUSE_SCROLL_DOWN)
 	{

@@ -278,7 +278,7 @@ int serial_write(void * buffer, int size)
 	return transmitted;
 }
 
-enum Message serial_read_message(void)
+Message serial_read_message(void)
 {
 	char next = 0;
 	char data [MAX_MESSAGE_SIZE + 1];
@@ -302,7 +302,7 @@ enum Message serial_read_message(void)
 		data[i] = next;
 	}
 
-	for (enum Message message = 0; message < NUM_MESSAGES; message++)
+	for (Message message = 0; message < NUM_MESSAGES; message++)
 	{
 		char * string = message_string(message);
 
@@ -317,7 +317,7 @@ enum Message serial_read_message(void)
 	return MESSAGE_UNKNOWN;
 }
 
-int serial_write_message(enum Message message)
+int serial_write_message(Message message)
 {
 	char * string = message_string(message);
 	int length = strlen(string);

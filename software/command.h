@@ -19,10 +19,12 @@ enum Command
 	COMMAND_DEXTERITY    // the main command
 };
 
-void print_usage(enum Command command, bool align);
-char * command_string(enum Command command);
+typedef enum Command Command;
+
+void print_usage(Command command, bool align);
+char * command_string(Command command);
 void command_free_gestures(void);
-enum Command command_identify(char * subcommand);
-int command_execute(enum Command command, char ** arguments, int count);
+Command command_identify(char * subcommand);
+int command_execute(Command command, char ** arguments, int count);
 
 #endif /* COMMAND_H */

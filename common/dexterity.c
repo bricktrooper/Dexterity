@@ -1,6 +1,6 @@
 #include "dexterity.h"
 
-char * direction_string(enum Direction direction)
+char * direction_string(Direction direction)
 {
 	switch (direction)
 	{
@@ -11,7 +11,7 @@ char * direction_string(enum Direction direction)
 	}
 }
 
-char * finger_string(enum Finger finger)
+char * finger_string(Finger finger)
 {
 	switch (finger)
 	{
@@ -24,7 +24,7 @@ char * finger_string(enum Finger finger)
 	}
 }
 
-char * message_string(enum Message message)
+char * message_string(Message message)
 {
 	switch (message)
 	{
@@ -40,7 +40,7 @@ char * message_string(enum Message message)
 	}
 }
 
-char * parameter_string(enum Parameter parameter)
+char * parameter_string(Parameter parameter)
 {
 	switch (parameter)
 	{
@@ -51,7 +51,7 @@ char * parameter_string(enum Parameter parameter)
 	}
 }
 
-char * mode_string(enum Mode mode)
+char * mode_string(Mode mode)
 {
 	switch (mode)
 	{

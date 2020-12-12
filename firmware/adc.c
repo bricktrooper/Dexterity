@@ -44,7 +44,7 @@ int adc_channel(int channel)
 	return SUCCESS;
 }
 
-void adc_vref(enum VREF vref)
+void adc_vref(VREF vref)
 {
 	ADCON0bits.VCFG = vref;
 }

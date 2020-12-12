@@ -16,12 +16,12 @@
 
 #define MAX_COMMAND_SIZE      15
 
-static struct Gesture * GESTURES = NULL;   // points to the list of gestures (freed on exit)
-static int QUANTITY = 0;                   // the number of gestures in the list
+static Gesture * GESTURES = NULL;   // points to the list of gestures (freed on exit)
+static int QUANTITY = 0;            // the number of gestures in the list
 
-static char * subcommand_string(enum Command command);
-static char * arguments_string(enum Command command);
-static char * description_string(enum Command command);
+static char * subcommand_string(Command command);
+static char * arguments_string(Command command);
+static char * description_string(Command command);
 static bool argument_is_help(char * argument);
 
 static int command_help(void);
@@ -34,7 +34,7 @@ static int command_raw(void);
 static int command_scaled(void);
 static int command_record(char * gesture_file);
 
-char * command_string(enum Command command)
+char * command_string(Command command)
 {
 	switch (command)
 	{
@@ -52,7 +52,7 @@ char * command_string(enum Command command)
 	}
 }
 
-static char * subcommand_string(enum Command command)
+static char * subcommand_string(Command command)
 {
 	switch (command)
 	{
@@ -70,7 +70,7 @@ static char * subcommand_string(enum Command command)
 	}
 }
 
-static char * arguments_string(enum Command command)
+static char * arguments_string(Command command)
 {
 	switch (command)
 	{
@@ -88,7 +88,7 @@ static char * arguments_string(enum Command command)
 	}
 }
 
-static char * description_string(enum Command command)
+static char * description_string(Command command)
 {
 	switch (command)
 	{
@@ -106,7 +106,7 @@ static char * description_string(enum Command command)
 	}
 }
 
-void print_usage(enum Command command, bool align)
+void print_usage(Command command, bool align)
 {
 	char const * program = command_string(COMMAND_DEXTERITY);
 	char const * subcommand = subcommand_string(command);
@@ -124,7 +124,7 @@ void print_usage(enum Command command, bool align)
 
 }
 
-void print_description(enum Command command)
+void print_description(Command command)
 {
 	log(LOG_INFO, "%s\n", description_string(command));
 }
@@ -183,9 +183,9 @@ static int command_run(char * calibration_file, char * gestures_file)
 		                gestures_file, NUM_ACTIONS, QUANTITY);
 	}
 
-	for (enum Action expected = 0; expected < NUM_ACTIONS; expected++)
+	for (Action expected = 0; expected < NUM_ACTIONS; expected++)
 	{
-		enum Action actual = GESTURES[expected].action;
+		Action actual = GESTURES[expected].action;
 
 		if (actual != expected)
 		{
@@ -214,8 +214,8 @@ static int command_run(char * calibration_file, char * gestures_file)
 		goto EXIT;
 	}
 
-	struct Hand hand;
-	enum Control control = CONTROL_MOUSE;
+	Hand hand;
+	Control control = CONTROL_MOUSE;
 	bool disabled = true;
 
 	printf("\n-------- CONTROLS --------\n");
@@ -291,7 +291,7 @@ EXIT:
 
 static int command_sample(void)
 {
-	struct Hand hand;
+	Hand hand;
 	int result;
 	double latency;
 	clock_t begin;
@@ -333,7 +333,7 @@ static int command_sample(void)
 
 static int command_calibrate(char * calibration_file)
 {
-	struct Calibration calibration;
+	Calibration calibration;
 
 	if (calibration_interactive(&calibration) == ERROR)
 	{
@@ -365,7 +365,7 @@ static int command_upload(char * calibration_file)
 		return ERROR;
 	}
 
-	struct Calibration calibration;
+	Calibration calibration;
 
 	if (calibration_import(calibration_file, &calibration) == ERROR)
 	{
@@ -386,7 +386,7 @@ static int command_upload(char * calibration_file)
 
 static int command_download(char * calibration_file)
 {
-	struct Calibration calibration;
+	Calibration calibration;
 
 	if (calibration_download(&calibration) == ERROR)
 	{
@@ -436,7 +436,7 @@ static int command_scaled(void)
 
 static int command_record(char * gesture_file)
 {
-	struct Gesture gesture;
+	Gesture gesture;
 
 	if (gesture_record(&gesture) == ERROR)
 	{
@@ -468,7 +468,7 @@ static int command_help(void)
 	printf("------------------------------------------------------------------\n");
 	log(LOG_INFO, "COMMANDS:\n");
 
-	for (enum Command command = 0; command < NUM_COMMANDS; command++)
+	for (Command command = 0; command < NUM_COMMANDS; command++)
 	{
 		print_usage(command, true);
 	}
@@ -485,14 +485,14 @@ static int command_dexterity(void)
 	return SUCCESS;
 }
 
-enum Command command_identify(char * subcommand)
+Command command_identify(char * subcommand)
 {
 	if (subcommand == NULL)
 	{
 		return COMMAND_DEXTERITY;   // default subcommand
 	}
 
-	for (enum Command command = 0; command < NUM_COMMANDS; command++)
+	for (Command command = 0; command < NUM_COMMANDS; command++)
 	{
 		char const * string = subcommand_string(command);
 
@@ -505,7 +505,7 @@ enum Command command_identify(char * subcommand)
 	return COMMAND_UNKNOWN;
 }
 
-int command_execute(enum Command command, char ** arguments, int count)
+int command_execute(Command command, char ** arguments, int count)
 {
 	if (count < 0)
 	{

@@ -124,7 +124,7 @@ int mouse_set(struct Mouse mouse)
 
 	if (!mouse_valid(mouse))
 	{
-		log(LOG_WARNING, "Invalid mouse cursor location (%d,%d)\n", mouse.x, mouse.y);
+		log(LOG_DEBUG, "Invalid mouse cursor location (%d,%d)\n", mouse.x, mouse.y);
 		mouse_correct(&mouse);
 		rc = WARNING;
 	}

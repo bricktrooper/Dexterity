@@ -3,8 +3,6 @@
 
 #include "dexterity.h"
 
-#define MAX_ACTION_NAME_LENGTH   18
-
 enum Action
 {
 	ACTION_CYCLE,           // cycle between controls

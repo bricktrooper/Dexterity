@@ -218,7 +218,9 @@ static int command_run(char * calibration_file, char * gestures_file)
 	enum Control control = CONTROL_MOUSE;
 	bool disabled = true;
 
-	printf("DISABLED\n");
+	printf("\n-------- CONTROLS --------\n");
+	printf("\r%-*s", ENABLE_DISABLE_PADDING, "DISABLED");
+	fflush(stdout);
 
 	while (1)
 	{
@@ -247,12 +249,14 @@ static int command_run(char * calibration_file, char * gestures_file)
 
 			if (disabled)
 			{
-				printf("ENABLED\n");
+				printf("\r%-*s", ENABLE_DISABLE_PADDING, "ENABLED");
+				fflush(stdout);
 				disabled = false;   // bring the device back from a disabled state
 			}
 			else
 			{
-				printf("DISABLED\n");
+				printf("\r%-*s", ENABLE_DISABLE_PADDING, "DISABLED");
+				fflush(stdout);
 				disabled = true;   // ignore all input from device until re-enabled
 			}
 

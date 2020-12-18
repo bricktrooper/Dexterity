@@ -8,8 +8,71 @@
 #include "dexterity.h"
 #include "log.h"
 #include "serial.h"
+#include "command.h"
 
 #include "utils.h"
+
+int dexterity(char * subcommand, char ** arguments, int count)
+{
+	Command command = command_identify(subcommand);
+
+	if (command == COMMAND_UNKNOWN)
+	{
+		log(LOG_ERROR, "Unknown subcommand '%s'\n", subcommand);
+		return ERROR;
+	}
+
+	return command_execute(command, arguments, count);
+}
+
+int init(void)
+{
+	// SIGNAL HANDLERS //
+
+	signal(SIGINT, end);    // Ctrl + C
+	signal(SIGHUP, end);    // hangup Hang up detected on controlling terminal or death of controlling process
+	signal(SIGQUIT, end);   // Ctrl + D
+	signal(SIGFPE, end);    // arithmetic error
+	signal(SIGKILL, end);   // kill
+	signal(SIGTERM, end);   // terminate
+
+	// SERIAL PORT //
+
+	if (serial_open() == ERROR)
+	{
+		log(LOG_ERROR, "Initialization failed\n");
+		cleanup(ERROR);
+		return ERROR;
+	}
+
+	log(LOG_DEBUG, "Initialized Dexterity\n");
+	return SUCCESS;
+}
+
+void cleanup(int result)
+{
+	// SERIAL PORT //
+
+	if (serial_is_open())
+	{
+		serial_purge();
+		serial_close();
+	}
+
+	// GESTURES //
+
+	command_free_gestures();
+	log(LOG_DEBUG, "Terminated Dexterity (%d)\n", result);
+}
+
+void end(int code)
+{
+	// Print on a new line if since end() will be triggered by a signal interrupt
+	// All signals are > 0 while return codes are <= 0
+	printf("\n");
+	cleanup(code);
+	exit(code);      // end program
+}
 
 int sample(Hand * hand)
 {

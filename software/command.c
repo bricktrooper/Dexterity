@@ -167,7 +167,7 @@ static int command_run(char * calibration_file, char * gestures_file)
 		return ERROR;
 	}
 
-	int rc = ERROR;
+	int result = ERROR;
 	GESTURES = NULL;
 	QUANTITY = 0;
 
@@ -281,12 +281,12 @@ static int command_run(char * calibration_file, char * gestures_file)
 		}
 	}
 
-	rc = SUCCESS;
+	result = SUCCESS;
 
 EXIT:
 	gesture_destroy(GESTURES, QUANTITY);
 	GESTURES = NULL;
-	return rc;
+	return result;
 }
 
 static int command_sample(void)
@@ -534,42 +534,65 @@ int command_execute(Command command, char ** arguments, int count)
 		return SUCCESS;
 	}
 
+	if (command != COMMAND_DEXTERITY && command != COMMAND_HELP)
+	{
+		if (init() == ERROR)
+		{
+			return ERROR;
+		}
+	}
+
 	usleep(1000);   // give the serial port some time to initialize
+	int result;
 
 	switch (command)
 	{
 		case COMMAND_RUN:
-			return command_run(arg0, arg1);
+			result = command_run(arg0, arg1);
+			break;
 
 		case COMMAND_SAMPLE:
-			return command_sample();
+			result = command_sample();
+			break;
 
 		case COMMAND_CALIBRATE:
-			return command_calibrate(arg0);
+			result = command_calibrate(arg0);
+			break;
 
 		case COMMAND_UPLOAD:
-			return command_upload(arg0);
+			result = command_upload(arg0);
+			break;
 
 		case COMMAND_DOWNLOAD:
-			return command_download(arg0);
+			result = command_download(arg0);
+			break;
 
 		case COMMAND_RAW:
-			return command_raw();
+			result = command_raw();
+			break;
 
 		case COMMAND_SCALED:
-			return command_scaled();
+			result = command_scaled();
+			break;
 
 		case COMMAND_RECORD:
-			return command_record(arg0);
+			result = command_record(arg0);
+			break;
 
 		case COMMAND_HELP:
-			return command_help();
+			result = command_help();
+			break;
 
 		case COMMAND_DEXTERITY:
-			return command_dexterity();
+			result = command_dexterity();
+			break;
 
 		default:
 			log(LOG_ERROR, "Invalid command\n");
-			return ERROR;
+			result = ERROR;
+			break;
 	}
+
+	cleanup(result);
+	return result;
 }

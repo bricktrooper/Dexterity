@@ -23,7 +23,7 @@ static struct termios settings;
 
 int serial_open(void)
 {
-	int rc = ERROR;
+	int result = ERROR;
 
 	if (serial_is_open())
 	{
@@ -123,15 +123,15 @@ int serial_open(void)
 	}
 
 	log(LOG_DEBUG, "Configured serial port attributes\n");
-	rc = SUCCESS;
+	result = SUCCESS;
 
 EXIT:
-	if (rc == ERROR)
+	if (result == ERROR)
 	{
 		serial_close();
 	}
 
-	return rc;
+	return result;
 }
 
 int serial_close(void)

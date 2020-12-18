@@ -31,7 +31,7 @@ int calibration_import(char * file_name, Calibration * calibration)
 		return ERROR;
 	}
 
-	int rc = ERROR;
+	int result = ERROR;
 
 	if (fscanf(file, "accel-range=%hd\n", &calibration->accel.range) != 1)
 	{
@@ -112,11 +112,11 @@ int calibration_import(char * file_name, Calibration * calibration)
 	}
 
 	log(LOG_SUCCESS, "Imported calibration from file '%s'\n", file_name);
-	rc = SUCCESS;
+	result = SUCCESS;
 
 EXIT:
 	fclose(file);
-	return rc;
+	return result;
 }
 
 int calibration_export(char * file_name, Calibration * calibration)

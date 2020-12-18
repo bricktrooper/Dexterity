@@ -120,13 +120,13 @@ Mouse mouse_get(void)
 
 int mouse_set(Mouse mouse)
 {
-	int rc = SUCCESS;
+	int result = SUCCESS;
 
 	if (!mouse_valid(mouse))
 	{
 		log(LOG_DEBUG, "Invalid mouse cursor location (%d,%d)\n", mouse.x, mouse.y);
 		mouse_correct(&mouse);
-		rc = WARNING;
+		result = WARNING;
 	}
 
 	CGEventRef event = mouse_create_event(kCGEventMouseMoved);
@@ -141,19 +141,19 @@ int mouse_set(Mouse mouse)
 	CGEventPost(kCGHIDEventTap, event);                         // inject event into HID stream
 	mouse_destroy_event(event);
 
-	return rc;
+	return result;
 }
 
 int mouse_move(int x_offset, int y_offset)
 {
-	int rc = SUCCESS;
+	int result = SUCCESS;
 	Mouse mouse = mouse_get();
 
 	if (!mouse_valid(mouse))
 	{
 		log(LOG_WARNING, "Invalid mouse cursor location (%d,%d)\n", mouse.x, mouse.y);
 		mouse_correct(&mouse);
-		rc = WARNING;
+		result = WARNING;
 	}
 
 	mouse.x += x_offset;
@@ -165,7 +165,7 @@ int mouse_move(int x_offset, int y_offset)
 		return ERROR;
 	}
 
-	return rc;
+	return result;
 }
 
 int mouse_press(MouseButton button)
@@ -278,14 +278,14 @@ int mouse_double_click(MouseButton button)
 
 int mouse_drag(MouseButton button, int x_offset, int y_offset)
 {
-	int rc = SUCCESS;
+	int result = SUCCESS;
 	Mouse mouse = mouse_get();
 
 	if (!mouse_valid(mouse))
 	{
 		log(LOG_WARNING, "Invalid mouse cursor location (%d,%d)\n", mouse.x, mouse.y);
 		mouse_correct(&mouse);
-		rc = WARNING;
+		result = WARNING;
 	}
 
 	mouse.x += x_offset;
@@ -295,7 +295,7 @@ int mouse_drag(MouseButton button, int x_offset, int y_offset)
 	{
 		log(LOG_WARNING, "Invalid mouse cursor location (%d,%d)\n", mouse.x, mouse.y);
 		mouse_correct(&mouse);
-		rc = WARNING;
+		result = WARNING;
 	}
 
 	CGEventRef event = mouse_create_event((button == MOUSE_BUTTON_LEFT) ? kCGEventLeftMouseDragged : kCGEventRightMouseDragged);
@@ -310,7 +310,7 @@ int mouse_drag(MouseButton button, int x_offset, int y_offset)
 	CGEventPost(kCGHIDEventTap, event);                         // inject event into HID stream
 	mouse_destroy_event(event);
 
-	return rc;
+	return result;
 }
 
 int mouse_scroll(ScrollDirection direction, S32 speed)

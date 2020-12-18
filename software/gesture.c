@@ -87,7 +87,7 @@ int gesture_import(char * file_name, Gesture ** gestures, int * quantity)
 		return ERROR;
 	}
 
-	int rc = ERROR;
+	int result = ERROR;
 	Gesture * elements = NULL;
 	int count = 0;
 
@@ -225,16 +225,16 @@ int gesture_import(char * file_name, Gesture ** gestures, int * quantity)
 	log(LOG_SUCCESS, "Imported %d gestures from file '%s'\n", count, file_name);
 	*gestures = elements;
 	*quantity = count;
-	rc = SUCCESS;
+	result = SUCCESS;
 
 EXIT:
-	if (rc == ERROR)
+	if (result == ERROR)
 	{
 		gesture_destroy(elements, count);
 	}
 
 	fclose(file);
-	return rc;
+	return result;
 }
 
 int gesture_export(char * file_name, Gesture * gestures, int quantity)

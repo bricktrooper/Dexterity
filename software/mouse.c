@@ -144,7 +144,7 @@ int mouse_set(Mouse mouse)
 	return result;
 }
 
-int mouse_move(int x_offset, int y_offset)
+int mouse_move(int dx, int dy)
 {
 	int result = SUCCESS;
 	Mouse mouse = mouse_get();
@@ -156,14 +156,22 @@ int mouse_move(int x_offset, int y_offset)
 		result = WARNING;
 	}
 
-	mouse.x += x_offset;
-	mouse.y += y_offset;
+	mouse.x += dx;
+	mouse.y += dy;
 
-	if (mouse_set(mouse) == ERROR)
+	CGEventRef event = mouse_create_event(kCGEventMouseMoved);
+
+	if (event == NULL)
 	{
-		log(LOG_ERROR, "Failed to move mouse cursor to (%d,%d)\n", mouse.x, mouse.y);
+		log(LOG_ERROR, "Failed to create event to move cursor\n");
 		return ERROR;
 	}
+
+	CGEventSetLocation(event, CGPointMake(mouse.x, mouse.y));     // update the location of the cursor
+	CGEventSetDoubleValueField(event, kCGMouseEventDeltaX, dx);   // set delta X
+	CGEventSetDoubleValueField(event, kCGMouseEventDeltaY, dy);   // set delta Y
+	CGEventPost(kCGHIDEventTap, event);                           // inject event into HID stream
+	mouse_destroy_event(event);
 
 	return result;
 }
@@ -276,7 +284,7 @@ int mouse_double_click(MouseButton button)
 	return SUCCESS;
 }
 
-int mouse_drag(MouseButton button, int x_offset, int y_offset)
+int mouse_drag(MouseButton button, int dx, int dy)
 {
 	int result = SUCCESS;
 	Mouse mouse = mouse_get();
@@ -288,8 +296,8 @@ int mouse_drag(MouseButton button, int x_offset, int y_offset)
 		result = WARNING;
 	}
 
-	mouse.x += x_offset;
-	mouse.y += y_offset;
+	mouse.x += dx;
+	mouse.y += dy;
 
 	if (!mouse_valid(mouse))
 	{
@@ -306,8 +314,10 @@ int mouse_drag(MouseButton button, int x_offset, int y_offset)
 		return ERROR;
 	}
 
-	CGEventSetLocation(event, CGPointMake(mouse.x ,mouse.y));   // update the location of the cursor
-	CGEventPost(kCGHIDEventTap, event);                         // inject event into HID stream
+	CGEventSetLocation(event, CGPointMake(mouse.x, mouse.y));     // update the location of the cursor
+	CGEventSetDoubleValueField(event, kCGMouseEventDeltaX, dx);   // set delta X
+	CGEventSetDoubleValueField(event, kCGMouseEventDeltaY, dy);   // set delta Y
+	CGEventPost(kCGHIDEventTap, event);                           // inject event into HID stream
 	mouse_destroy_event(event);
 
 	return result;

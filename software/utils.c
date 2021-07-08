@@ -30,7 +30,7 @@ int init(void)
 	// SIGNAL HANDLERS //
 
 	signal(SIGINT, end);    // Ctrl + C
-	signal(SIGHUP, end);    // hangup Hang up detected on controlling terminal or death of controlling process
+	signal(SIGHUP, end);    // hangup
 	signal(SIGQUIT, end);   // Ctrl + D
 	signal(SIGFPE, end);    // arithmetic error
 	signal(SIGKILL, end);   // kill

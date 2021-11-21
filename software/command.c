@@ -138,7 +138,7 @@ static bool argument_is_help(char * argument)
 
 	char const * string = subcommand_string(COMMAND_HELP);
 
-	if (strncmp(argument, string, strlen(string)) == 0)
+	if (strcmp(argument, string) == 0)
 	{
 		return true;
 	}
@@ -496,7 +496,7 @@ Command command_identify(char * subcommand)
 	{
 		char const * string = subcommand_string(command);
 
-		if (strncmp(subcommand, string, strlen(string)) == 0)
+		if (strcmp(subcommand, string) == 0)
 		{
 			return command;
 		}

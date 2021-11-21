@@ -313,17 +313,17 @@ static int command_sample(void)
 
 		printf("\r");
 
-		printf("[" BLUE "%0.3f ms" WHITE "] |", latency);
-		printf(RED    " %s" WHITE ": % 4hd |", direction_string(X),   hand.accel[X]);
-		printf(RED    " %s" WHITE ": % 4hd |", direction_string(Y),   hand.accel[Y]);
-		printf(RED    " %s" WHITE ": % 4hd |", direction_string(Z),   hand.accel[Z]);
-		printf(YELLOW " %s" WHITE ": % 4hd |", finger_string(THUMB),  hand.flex[THUMB]);
-		printf(YELLOW " %s" WHITE ": % 4hd |", finger_string(INDEX),  hand.flex[INDEX]);
-		printf(YELLOW " %s" WHITE ": % 4hd |", finger_string(MIDDLE), hand.flex[MIDDLE]);
-		printf(YELLOW " %s" WHITE ": % 4hd |", finger_string(RING),   hand.flex[RING]);
-		printf(YELLOW " %s" WHITE ": % 4hd |", finger_string(PINKY),  hand.flex[PINKY]);
-		printf(GREEN  " %s" WHITE ": % 1hhd |", "BUTTON",        hand.button);
-		printf(GREEN  " %s" WHITE ": % 1hhd |", "LED",           hand.led);
+		printf("[" BLUE "%0.3f ms" RESET "] |", latency);
+		printf(RED    " %s" RESET ": % 4hd |", direction_string(X),   hand.accel[X]);
+		printf(RED    " %s" RESET ": % 4hd |", direction_string(Y),   hand.accel[Y]);
+		printf(RED    " %s" RESET ": % 4hd |", direction_string(Z),   hand.accel[Z]);
+		printf(YELLOW " %s" RESET ": % 4hd |", finger_string(THUMB),  hand.flex[THUMB]);
+		printf(YELLOW " %s" RESET ": % 4hd |", finger_string(INDEX),  hand.flex[INDEX]);
+		printf(YELLOW " %s" RESET ": % 4hd |", finger_string(MIDDLE), hand.flex[MIDDLE]);
+		printf(YELLOW " %s" RESET ": % 4hd |", finger_string(RING),   hand.flex[RING]);
+		printf(YELLOW " %s" RESET ": % 4hd |", finger_string(PINKY),  hand.flex[PINKY]);
+		printf(GREEN  " %s" RESET ": % 1hhd |", "BUTTON",        hand.button);
+		printf(GREEN  " %s" RESET ": % 1hhd |", "LED",           hand.led);
 
 		fflush(stdout);
 	}

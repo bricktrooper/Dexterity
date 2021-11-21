@@ -370,15 +370,15 @@ int gesture_record(Gesture * gesture)
 			}
 
 			printf("\r");
-			printf("[" BLUE "Phase %d" WHITE "] |", phase);
-			printf(RED    " %s" WHITE " : % 5hd |", direction_string(X),   hand.accel[X]);
-			printf(RED    " %s" WHITE " : % 5hd |", direction_string(Y),   hand.accel[Y]);
-			printf(RED    " %s" WHITE " : % 5hd |", direction_string(Z),   hand.accel[Z]);
-			printf(YELLOW " %s" WHITE " : % 5hd |", finger_string(THUMB),  hand.flex[THUMB]);
-			printf(YELLOW " %s" WHITE " : % 5hd |", finger_string(INDEX),  hand.flex[INDEX]);
-			printf(YELLOW " %s" WHITE " : % 5hd |", finger_string(MIDDLE), hand.flex[MIDDLE]);
-			printf(YELLOW " %s" WHITE " : % 5hd |", finger_string(RING),   hand.flex[RING]);
-			printf(YELLOW " %s" WHITE " : % 5hd |", finger_string(PINKY),  hand.flex[PINKY]);
+			printf("[" BLUE "Phase %d" RESET "] |", phase);
+			printf(RED    " %s" RESET " : % 5hd |", direction_string(X),   hand.accel[X]);
+			printf(RED    " %s" RESET " : % 5hd |", direction_string(Y),   hand.accel[Y]);
+			printf(RED    " %s" RESET " : % 5hd |", direction_string(Z),   hand.accel[Z]);
+			printf(YELLOW " %s" RESET " : % 5hd |", finger_string(THUMB),  hand.flex[THUMB]);
+			printf(YELLOW " %s" RESET " : % 5hd |", finger_string(INDEX),  hand.flex[INDEX]);
+			printf(YELLOW " %s" RESET " : % 5hd |", finger_string(MIDDLE), hand.flex[MIDDLE]);
+			printf(YELLOW " %s" RESET " : % 5hd |", finger_string(RING),   hand.flex[RING]);
+			printf(YELLOW " %s" RESET " : % 5hd |", finger_string(PINKY),  hand.flex[PINKY]);
 			fflush(stdout);
 		}
 		while (hand.button == BUTTON_RELEASED);
@@ -393,7 +393,7 @@ int gesture_record(Gesture * gesture)
 		gesture->criteria[phase].flex[RING] = hand.flex[RING];
 		gesture->criteria[phase].flex[PINKY] = hand.flex[PINKY];
 
-		printf(" " GREEN "~" WHITE "\n");
+		printf(" " GREEN "~" RESET "\n");
 
 		// wait for user to release button
 		do

@@ -8,11 +8,11 @@
 #include "log.h"
 
 static char * prefixes [] = {
-	RED     "X"  WHITE,
-	YELLOW  "!"  WHITE,
-	GREEN   "~"  WHITE,
-	BLUE    "#"  WHITE,
-	PURPLE  ">"  WHITE
+	RED     "X"  RESET,
+	YELLOW  "!"  RESET,
+	GREEN   "~"  RESET,
+	CYAN    "#"  RESET,
+	BLUE    ">"  RESET
 };
 
 static bool suppressed [] = {

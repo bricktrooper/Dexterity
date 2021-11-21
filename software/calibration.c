@@ -272,7 +272,7 @@ int calibration_interactive(Calibration * calibration)
 
 			// save parameter to Calibration struct
 			calibration->accel.params[direction][parameter] = hand.accel[direction];
-			printf("\r%-6s : %-12hd " GREEN "~" WHITE "\n", direction_string(direction), calibration->accel.params[direction][parameter]);
+			printf("\r%-6s : %-12hd " GREEN "~" RESET "\n", direction_string(direction), calibration->accel.params[direction][parameter]);
 
 			// wait for user to release button
 			do
@@ -315,7 +315,7 @@ int calibration_interactive(Calibration * calibration)
 
 			// save parameter to Calibration struct
 			calibration->flex.params[finger][parameter] = hand.flex[finger];
-			printf("\r%-6s : %-12hd " GREEN "~" WHITE "\n", finger_string(finger), calibration->flex.params[finger][parameter]);
+			printf("\r%-6s : %-12hd " GREEN "~" RESET "\n", finger_string(finger), calibration->flex.params[finger][parameter]);
 
 			if (calibration->flex.params[finger][MIN] == calibration->flex.params[finger][MAX])
 			{

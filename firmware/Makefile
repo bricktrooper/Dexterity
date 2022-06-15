@@ -1,16 +1,18 @@
 CC = xc8-cc
 LD = xc8-cc
-MM = gcc
+MM = xc8-cc
 
 INCLUDE += ../common
 
 VPATH += $(INCLUDE)
 
+MMFLAGS += -mcpu=16F690
+MMFLAGS += -mc90lib
 MMFLAGS += $(addprefix -I , $(INCLUDE))
 
-CFLAGS += -mcpu=16F690
-CFLAGS += -mc90lib
-CFLAGS += $(addprefix -I , $(INCLUDE))
+CCFLAGS += -mcpu=16F690
+CCFLAGS += -mc90lib
+CCFLAGS += $(addprefix -I , $(INCLUDE))
 
 LDFLAGS += -mcpu=16F690
 LDFLAGS += -mc90lib
@@ -72,10 +74,11 @@ $(ART)/$(BIN): $(addprefix $(ART)/, $(OBJ))
 
 $(ART)/%.p1: %.c
 	@echo "CC   $(notdir $<)"
-	@$(CC) $(CFLAGS) $(TEST_TYPE) -c $< -o $@
+	@$(CC) $(CCFLAGS) $(TEST_TYPE) -c $< -o $@
 
 $(ART)/%.d: %.c
-	@$(MM) $(MMFLAGS) -MM $< -MT $(subst .d,.p1,$@) -MF $@
+	@$(MM) $(MMFLAGS) -MM $< -MF $@
+	@mv $(subst .c,.i,$(notdir $<)) $(ART)
 
 ifneq ($(TARGET), clean)
 -include $(addprefix $(ART)/, $(DEP))
